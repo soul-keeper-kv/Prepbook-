@@ -1,0 +1,485 @@
+{
+  "id": "p0",
+  "name": { "vi": "Giai đoạn 0 · Nền tảng ngôn ngữ", "en": "Phase 0 · Language fundamentals" },
+  "time": { "vi": "2–3 tuần", "en": "2–3 weeks" },
+  "items": [
+    {
+      "id": "p0-lang",
+      "type": "theory",
+      "title": {
+        "vi": "Chọn 1 ngôn ngữ (C++ / Python / Java) và đi đến cùng",
+        "en": "Pick one language (C++ / Python / Java) and stick with it"
+      },
+      "description": {
+        "vi": "Phỏng vấn thuật toán hầu như luôn cho bạn tự chọn ngôn ngữ. Quan trọng là thuộc ngôn ngữ đó đến mức không phải nghĩ về cú pháp, để dồn sức cho thuật toán.\n\n**Python** ngắn gọn nhất, rất hợp phỏng vấn. **Java** hợp nếu bạn làm backend Java. **C++** mạnh khi thi contest vì chạy nhanh và có STL đầy đủ.",
+        "en": "Coding interviews almost always let you choose the language. What matters is knowing it well enough that you never think about syntax, so all your focus goes to the algorithm.\n\n**Python** is the most concise and a great fit for interviews. **Java** makes sense if you work on Java backends. **C++** shines in contests because it is fast and the STL is complete."
+      },
+      "keyPoints": {
+        "vi": [
+          "Chọn ngôn ngữ bạn dùng hằng ngày hoặc ngôn ngữ của vị trí ứng tuyển",
+          "Không đổi ngôn ngữ giữa chừng, vì sẽ mất thời gian học lại thư viện",
+          "Thuộc khung `class Solution` của LeetCode và cách tự viết hàm main để test",
+          "Biết giới hạn của ngôn ngữ: Python giới hạn đệ quy mặc định ~1000 tầng, Java/C++ dễ tràn `int`"
+        ],
+        "en": [
+          "Pick the language you use every day, or the one the role uses",
+          "Don't switch halfway: relearning the standard library costs time",
+          "Know LeetCode's `class Solution` skeleton and how to write your own main to test",
+          "Know your language's limits: Python's default recursion limit is ~1000 frames, Java/C++ `int` overflows easily"
+        ]
+      },
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "from typing import List",
+              "",
+              "class Solution:",
+              "    def solve(self, nums: List[int]) -> int:",
+              "        # viết lời giải ở đây",
+              "        return 0",
+              "",
+              "if __name__ == '__main__':",
+              "    print(Solution().solve([1, 2, 3]))  # tự test trước khi submit"
+            ],
+            "en": [
+              "from typing import List",
+              "",
+              "class Solution:",
+              "    def solve(self, nums: List[int]) -> int:",
+              "        # write your solution here",
+              "        return 0",
+              "",
+              "if __name__ == '__main__':",
+              "    print(Solution().solve([1, 2, 3]))  # test locally before submitting"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class Solution {",
+              "    public int solve(int[] nums) {",
+              "        // viết lời giải ở đây",
+              "        return 0;",
+              "    }",
+              "",
+              "    public static void main(String[] args) {",
+              "        System.out.println(new Solution().solve(new int[]{1, 2, 3}));  // tự test trước khi submit",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class Solution {",
+              "    public int solve(int[] nums) {",
+              "        // write your solution here",
+              "        return 0;",
+              "    }",
+              "",
+              "    public static void main(String[] args) {",
+              "        System.out.println(new Solution().solve(new int[]{1, 2, 3}));  // test locally before submitting",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "pitfalls": {
+        "vi": [
+          "Dành quá nhiều thời gian so sánh ngôn ngữ thay vì bắt đầu làm bài"
+        ],
+        "en": [
+          "Spending too long comparing languages instead of starting to solve problems"
+        ]
+      },
+      "resources": [
+        { "type": "course", "title": "CS50x (Harvard)", "url": "https://cs50.harvard.edu/x/" },
+        { "type": "docs", "title": "Python docs: The Python Tutorial", "url": "https://docs.python.org/3/tutorial/" },
+        { "type": "docs", "title": "dev.java: Learn Java", "url": "https://dev.java/learn/" }
+      ]
+    },
+    {
+      "id": "p0-basics",
+      "type": "theory",
+      "title": {
+        "vi": "Biến, vòng lặp, hàm, mảng, chuỗi, nhập xuất nhanh",
+        "en": "Variables, loops, functions, arrays, strings, fast I/O"
+      },
+      "description": {
+        "vi": "Nắm chắc cú pháp cơ bản để viết code không vấp: duyệt mảng, xử lý chuỗi, mảng 2 chiều và đọc input nhanh khi thi contest.",
+        "en": "Get the basic syntax solid so you can code without stumbling: iterating arrays, handling strings, 2D arrays and fast input reading for contests."
+      },
+      "keyPoints": {
+        "vi": [
+          "Duyệt mảng kèm chỉ số: `for i, x in enumerate(a)`",
+          "Chuỗi trong Python/Java là bất biến. Cần nối nhiều lần thì gom vào list rồi `''.join(...)`, hoặc dùng `StringBuilder`",
+          "Tạo mảng 2 chiều đúng cách: `[[0] * m for _ in range(n)]`",
+          "Contest: đọc input bằng `sys.stdin`, in kết quả 1 lần thay vì gọi `print` nhiều lần"
+        ],
+        "en": [
+          "Iterate with the index: `for i, x in enumerate(a)`",
+          "Strings in Python/Java are immutable. To concatenate many times, collect parts in a list and `''.join(...)` them, or use `StringBuilder`",
+          "Create a 2D array the right way: `[[0] * m for _ in range(n)]`",
+          "Contests: read input with `sys.stdin` and print the output once instead of calling `print` many times"
+        ]
+      },
+      "examples": [
+        {
+          "title": { "vi": "Đảo ngược chuỗi tại chỗ", "en": "Reverse a string in place" },
+          "input": "s = ['h', 'e', 'l', 'l', 'o']",
+          "output": "['o', 'l', 'l', 'e', 'h']",
+          "explain": {
+            "vi": "Dùng 2 chỉ số ở 2 đầu, đổi chỗ rồi tiến dần vào giữa. O(n) time, O(1) space.",
+            "en": "Use two indices at both ends, swap, then move toward the middle. O(n) time, O(1) space."
+          }
+        }
+      ],
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "import sys",
+              "input = sys.stdin.readline",
+              "",
+              "def main():",
+              "    n = int(input())",
+              "    a = list(map(int, input().split()))",
+              "    out = []",
+              "    for i, x in enumerate(a):",
+              "        out.append(str(x * 2))",
+              "    print(' '.join(out))   # in 1 lần, nhanh hơn nhiều so với print từng dòng",
+              "",
+              "main()"
+            ],
+            "en": [
+              "import sys",
+              "input = sys.stdin.readline",
+              "",
+              "def main():",
+              "    n = int(input())",
+              "    a = list(map(int, input().split()))",
+              "    out = []",
+              "    for i, x in enumerate(a):",
+              "        out.append(str(x * 2))",
+              "    print(' '.join(out))   # print once, much faster than printing line by line",
+              "",
+              "main()"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.io.*;",
+              "import java.util.*;",
+              "",
+              "class Main {",
+              "    public static void main(String[] args) throws IOException {",
+              "        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));   // đọc nhanh hơn Scanner nhiều",
+              "        int n = Integer.parseInt(br.readLine().trim());",
+              "        StringTokenizer st = new StringTokenizer(br.readLine());",
+              "        StringBuilder out = new StringBuilder();",
+              "        for (int i = 0; i < n; i++) {",
+              "            int x = Integer.parseInt(st.nextToken());",
+              "            out.append(x * 2).append(' ');",
+              "        }",
+              "        System.out.println(out.toString().trim());   // in 1 lần, nhanh hơn nhiều so với print từng dòng",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.io.*;",
+              "import java.util.*;",
+              "",
+              "class Main {",
+              "    public static void main(String[] args) throws IOException {",
+              "        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));   // much faster than Scanner",
+              "        int n = Integer.parseInt(br.readLine().trim());",
+              "        StringTokenizer st = new StringTokenizer(br.readLine());",
+              "        StringBuilder out = new StringBuilder();",
+              "        for (int i = 0; i < n; i++) {",
+              "            int x = Integer.parseInt(st.nextToken());",
+              "            out.append(x * 2).append(' ');",
+              "        }",
+              "        System.out.println(out.toString().trim());   // print once, much faster than printing line by line",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "pitfalls": {
+        "vi": [
+          "`[[0] * m] * n` tạo n tham chiếu tới cùng một hàng: sửa 1 ô là sửa cả cột",
+          "Nối chuỗi bằng `+=` trong vòng lặp có thể thành O(n²)"
+        ],
+        "en": [
+          "`[[0] * m] * n` creates n references to the same row: changing one cell changes the whole column",
+          "Concatenating strings with `+=` in a loop can become O(n²)"
+        ]
+      },
+      "problems": [
+        { "title": "Reverse String", "url": "https://leetcode.com/problems/reverse-string/", "level": "Easy" },
+        { "title": "Fizz Buzz", "url": "https://leetcode.com/problems/fizz-buzz/", "level": "Easy" },
+        { "title": "Running Sum of 1d Array", "url": "https://leetcode.com/problems/running-sum-of-1d-array/", "level": "Easy" },
+        { "title": "Richest Customer Wealth", "url": "https://leetcode.com/problems/richest-customer-wealth/", "level": "Easy" },
+        { "title": "Palindrome Number", "url": "https://leetcode.com/problems/palindrome-number/", "level": "Easy" },
+        { "title": "Solve Me First", "url": "https://www.hackerrank.com/challenges/solve-me-first/problem", "level": "Easy" },
+        { "title": "Simple Array Sum", "url": "https://www.hackerrank.com/challenges/simple-array-sum/problem", "level": "Easy" },
+        { "title": "A Very Big Sum", "url": "https://www.hackerrank.com/challenges/a-very-big-sum/problem", "level": "Easy" },
+        { "title": "Diagonal Difference", "url": "https://www.hackerrank.com/challenges/diagonal-difference/problem", "level": "Easy" },
+        { "title": "Staircase", "url": "https://www.hackerrank.com/challenges/staircase/problem", "level": "Easy" },
+        { "title": "Time Conversion", "url": "https://www.hackerrank.com/challenges/time-conversion/problem", "level": "Easy" },
+        { "title": "Alternating Characters", "url": "https://www.hackerrank.com/challenges/alternating-characters/problem", "level": "Easy" },
+        { "title": "Funny String", "url": "https://www.hackerrank.com/challenges/funny-string/problem", "level": "Easy" }
+      ],
+      "resources": [
+        { "type": "article", "title": "USACO Guide: Input & Output", "url": "https://usaco.guide/general/input-output" },
+        { "type": "article", "title": "USACO Guide: Fast Input & Output", "url": "https://usaco.guide/general/fast-io" }
+      ]
+    },
+    {
+      "id": "p0-stdlib",
+      "type": "theory",
+      "title": {
+        "vi": "Thư viện chuẩn: vector/map/set/sort hoặc list/dict/set",
+        "en": "Standard library: vector/map/set/sort or list/dict/set"
+      },
+      "description": {
+        "vi": "Phần lớn bài phỏng vấn giải nhanh hơn nhiều khi dùng đúng cấu trúc có sẵn. Cần biết mỗi cấu trúc dùng để làm gì và mỗi thao tác tốn bao nhiêu.",
+        "en": "Most interview problems get much easier with the right built-in structure. Know what each structure is for and what each operation costs."
+      },
+      "keyPoints": {
+        "vi": [
+          "`dict` / `set`: tra cứu, thêm, xoá trung bình O(1)",
+          "`list`: thêm/xoá ở cuối O(1), ở đầu O(n). Cần thao tác cả 2 đầu thì dùng `deque`",
+          "`heapq` là min-heap, push/pop O(log n). Muốn max-heap thì lưu số âm",
+          "`sorted(a, key=...)` chạy O(n log n) và giữ nguyên thứ tự các phần tử bằng nhau (stable)",
+          "`bisect_left` / `bisect_right` để tìm nhị phân trên mảng đã sắp xếp",
+          "C++: `vector`, `unordered_map`, `set`, `priority_queue`. Java: `ArrayList`, `HashMap`, `TreeMap`, `PriorityQueue`, `ArrayDeque`"
+        ],
+        "en": [
+          "`dict` / `set`: lookup, insert and delete are O(1) on average",
+          "`list`: append/pop at the end is O(1), at the front O(n). Need both ends? Use `deque`",
+          "`heapq` is a min-heap with O(log n) push/pop. For a max-heap, store negated values",
+          "`sorted(a, key=...)` runs in O(n log n) and keeps equal elements in their original order (stable)",
+          "`bisect_left` / `bisect_right` for binary search on a sorted list",
+          "C++: `vector`, `unordered_map`, `set`, `priority_queue`. Java: `ArrayList`, `HashMap`, `TreeMap`, `PriorityQueue`, `ArrayDeque`"
+        ]
+      },
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "from collections import Counter, defaultdict, deque",
+              "import heapq, bisect",
+              "",
+              "cnt = Counter('banana')          # {'a': 3, 'n': 2, 'b': 1}",
+              "cnt.most_common(1)               # [('a', 3)]",
+              "",
+              "graph = defaultdict(list)        # không cần kiểm tra key đã tồn tại",
+              "graph[1].append(2)",
+              "",
+              "q = deque([1, 2, 3])",
+              "q.appendleft(0); q.popleft()     # O(1) ở cả 2 đầu",
+              "",
+              "h = []",
+              "heapq.heappush(h, 5); heapq.heappush(h, 1)",
+              "heapq.heappop(h)                 # 1 (min-heap)",
+              "heapq.heappush(h, -10)           # max-heap: lưu số âm",
+              "",
+              "a = [1, 3, 3, 7]",
+              "bisect.bisect_left(a, 3)         # 1: vị trí đầu tiên >= 3",
+              "bisect.bisect_right(a, 3)        # 3: vị trí đầu tiên > 3",
+              "",
+              "people = [('An', 25), ('Binh', 20)]",
+              "people.sort(key=lambda p: (p[1], p[0]))   # theo tuổi, rồi theo tên"
+            ],
+            "en": [
+              "from collections import Counter, defaultdict, deque",
+              "import heapq, bisect",
+              "",
+              "cnt = Counter('banana')          # {'a': 3, 'n': 2, 'b': 1}",
+              "cnt.most_common(1)               # [('a', 3)]",
+              "",
+              "graph = defaultdict(list)        # no need to check whether the key exists",
+              "graph[1].append(2)",
+              "",
+              "q = deque([1, 2, 3])",
+              "q.appendleft(0); q.popleft()     # O(1) at both ends",
+              "",
+              "h = []",
+              "heapq.heappush(h, 5); heapq.heappush(h, 1)",
+              "heapq.heappop(h)                 # 1 (min-heap)",
+              "heapq.heappush(h, -10)           # max-heap: store negated values",
+              "",
+              "a = [1, 3, 3, 7]",
+              "bisect.bisect_left(a, 3)         # 1: first position >= 3",
+              "bisect.bisect_right(a, 3)        # 3: first position > 3",
+              "",
+              "people = [('An', 25), ('Binh', 20)]",
+              "people.sort(key=lambda p: (p[1], p[0]))   # by age, then by name"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class Cheatsheet {",
+              "    record Person(String name, int age) {}",
+              "",
+              "    public static void main(String[] args) {",
+              "        Map<Character, Integer> cnt = new HashMap<>();",
+              "        for (char c : \"banana\".toCharArray()) cnt.merge(c, 1, Integer::sum);   // {a=3, b=1, n=2}",
+              "",
+              "        Map<Integer, List<Integer>> graph = new HashMap<>();",
+              "        graph.computeIfAbsent(1, k -> new ArrayList<>()).add(2);   // không cần kiểm tra key đã tồn tại",
+              "",
+              "        Deque<Integer> q = new ArrayDeque<>(List.of(1, 2, 3));",
+              "        q.offerFirst(0); q.pollFirst();                             // O(1) ở cả 2 đầu",
+              "",
+              "        PriorityQueue<Integer> minHeap = new PriorityQueue<>();",
+              "        minHeap.add(5); minHeap.add(1);",
+              "        minHeap.poll();                                              // 1 (min-heap)",
+              "        PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Comparator.reverseOrder());   // max-heap",
+              "",
+              "        int[] a = {1, 3, 3, 7};",
+              "        Arrays.binarySearch(a, 7);                                   // 3; có phần tử trùng thì không chắc trả về vị trí nào",
+              "        TreeMap<Integer, String> tm = new TreeMap<>(Map.of(1, \"a\", 5, \"b\"));",
+              "        tm.ceilingKey(3);                                            // 5: key nhỏ nhất >= 3",
+              "",
+              "        List<Person> people = new ArrayList<>(List.of(new Person(\"An\", 25), new Person(\"Binh\", 20)));",
+              "        people.sort(Comparator.comparingInt(Person::age).thenComparing(Person::name));   // theo tuổi, rồi theo tên",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class Cheatsheet {",
+              "    record Person(String name, int age) {}",
+              "",
+              "    public static void main(String[] args) {",
+              "        Map<Character, Integer> cnt = new HashMap<>();",
+              "        for (char c : \"banana\".toCharArray()) cnt.merge(c, 1, Integer::sum);   // {a=3, b=1, n=2}",
+              "",
+              "        Map<Integer, List<Integer>> graph = new HashMap<>();",
+              "        graph.computeIfAbsent(1, k -> new ArrayList<>()).add(2);   // no need to check whether the key exists",
+              "",
+              "        Deque<Integer> q = new ArrayDeque<>(List.of(1, 2, 3));",
+              "        q.offerFirst(0); q.pollFirst();                             // O(1) at both ends",
+              "",
+              "        PriorityQueue<Integer> minHeap = new PriorityQueue<>();",
+              "        minHeap.add(5); minHeap.add(1);",
+              "        minHeap.poll();                                              // 1 (min-heap)",
+              "        PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Comparator.reverseOrder());   // max-heap",
+              "",
+              "        int[] a = {1, 3, 3, 7};",
+              "        Arrays.binarySearch(a, 7);                                   // 3; with duplicates, the returned index is unspecified",
+              "        TreeMap<Integer, String> tm = new TreeMap<>(Map.of(1, \"a\", 5, \"b\"));",
+              "        tm.ceilingKey(3);                                            // 5: smallest key >= 3",
+              "",
+              "        List<Person> people = new ArrayList<>(List.of(new Person(\"An\", 25), new Person(\"Binh\", 20)));",
+              "        people.sort(Comparator.comparingInt(Person::age).thenComparing(Person::name));   // by age, then by name",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "complexity": {
+        "vi": "Nhớ bảng chi phí thao tác của từng cấu trúc. Phỏng vấn viên rất hay hỏi.",
+        "en": "Memorize the cost of each operation for each structure. Interviewers ask about it a lot."
+      },
+      "problems": [
+        { "title": "Contains Duplicate", "url": "https://leetcode.com/problems/contains-duplicate/", "level": "Easy" },
+        { "title": "Valid Anagram", "url": "https://leetcode.com/problems/valid-anagram/", "level": "Easy" },
+        { "title": "Intersection of Two Arrays", "url": "https://leetcode.com/problems/intersection-of-two-arrays/", "level": "Easy" },
+        { "title": "First Unique Character in a String", "url": "https://leetcode.com/problems/first-unique-character-in-a-string/", "level": "Easy" },
+        { "title": "collections.Counter()", "url": "https://www.hackerrank.com/challenges/collections-counter/problem", "level": "Easy" },
+        { "title": "DefaultDict Tutorial", "url": "https://www.hackerrank.com/challenges/defaultdict-tutorial/problem", "level": "Easy" },
+        { "title": "Collections.deque()", "url": "https://www.hackerrank.com/challenges/py-collections-deque/problem", "level": "Easy" },
+        { "title": "Java Hashset", "url": "https://www.hackerrank.com/challenges/java-hashset/problem", "level": "Easy" },
+        { "title": "Java Stack", "url": "https://www.hackerrank.com/challenges/java-stack/problem", "level": "Medium" },
+        { "title": "Java Dequeue", "url": "https://www.hackerrank.com/challenges/java-dequeue/problem", "level": "Medium" },
+        { "title": "Java Priority Queue", "url": "https://www.hackerrank.com/challenges/java-priority-queue/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "docs", "title": "Python docs: collections", "url": "https://docs.python.org/3/library/collections.html" },
+        { "type": "docs", "title": "Oracle: Java Collections tutorial", "url": "https://docs.oracle.com/javase/tutorial/collections/" },
+        { "type": "article", "title": "Python Wiki: TimeComplexity", "url": "https://wiki.python.org/moin/TimeComplexity" }
+      ]
+    },
+    {
+      "id": "p0-easy",
+      "type": "practice",
+      "title": {
+        "vi": "30–50 bài nhập môn: Codeforces 800 hoặc LeetCode Easy",
+        "en": "30–50 warm-up problems: Codeforces 800 or LeetCode Easy"
+      },
+      "description": {
+        "vi": "Mục tiêu là làm quen quy trình giải 1 bài: đọc đề, nghĩ cách, code, test. Chưa cần thuật toán khó. Mỗi bài giới hạn 20–30 phút.",
+        "en": "The goal is to get used to the process of solving a problem: read, plan, code, test. No hard algorithms yet. Give each problem 20–30 minutes."
+      },
+      "keyPoints": {
+        "vi": [
+          "Bước 1: hỏi lại đề. Input lớn cỡ nào, có số âm không, có phần tử trùng không",
+          "Bước 2: nói cách brute force trước, kèm độ phức tạp",
+          "Bước 3: tối ưu, chốt cách làm rồi mới code",
+          "Bước 4: tự chạy tay 1 ví dụ và các edge case",
+          "Bước 5: nói độ phức tạp cuối cùng",
+          "Quá 30 phút chưa ra thì xem lời giải, hiểu xong thì hôm sau code lại từ đầu"
+        ],
+        "en": [
+          "Step 1: clarify the problem. How large is the input? Negative numbers? Duplicates?",
+          "Step 2: state the brute-force approach first, with its complexity",
+          "Step 3: optimize and settle on an approach before coding",
+          "Step 4: dry-run an example and the edge cases by hand",
+          "Step 5: state the final complexity",
+          "Stuck after 30 minutes? Read the solution, understand it, then rewrite it from scratch the next day"
+        ]
+      },
+      "problems": [
+        { "title": "Two Sum", "url": "https://leetcode.com/problems/two-sum/", "level": "Easy" },
+        { "title": "Best Time to Buy and Sell Stock", "url": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/", "level": "Easy" },
+        { "title": "Merge Sorted Array", "url": "https://leetcode.com/problems/merge-sorted-array/", "level": "Easy" },
+        { "title": "Remove Duplicates from Sorted Array", "url": "https://leetcode.com/problems/remove-duplicates-from-sorted-array/", "level": "Easy" },
+        { "title": "Majority Element", "url": "https://leetcode.com/problems/majority-element/", "level": "Easy" },
+        { "title": "Move Zeroes", "url": "https://leetcode.com/problems/move-zeroes/", "level": "Easy" },
+        { "title": "Compare the Triplets", "url": "https://www.hackerrank.com/challenges/compare-the-triplets/problem", "level": "Easy" },
+        { "title": "Plus Minus", "url": "https://www.hackerrank.com/challenges/plus-minus/problem", "level": "Easy" },
+        { "title": "Mini-Max Sum", "url": "https://www.hackerrank.com/challenges/mini-max-sum/problem", "level": "Easy" },
+        { "title": "Birthday Cake Candles", "url": "https://www.hackerrank.com/challenges/birthday-cake-candles/problem", "level": "Easy" },
+        { "title": "Arrays - DS", "url": "https://www.hackerrank.com/challenges/arrays-ds/problem", "level": "Easy" },
+        { "title": "Left Rotation", "url": "https://www.hackerrank.com/challenges/array-left-rotation/problem", "level": "Easy" },
+        { "title": "Missing Numbers", "url": "https://www.hackerrank.com/challenges/missing-numbers/problem", "level": "Easy" },
+        { "title": "Gemstones", "url": "https://www.hackerrank.com/challenges/gem-stones/problem", "level": "Easy" }
+      ],
+      "resources": [
+        { "type": "article", "title": "Tech Interview Handbook: Coding interview techniques", "url": "https://www.techinterviewhandbook.org/coding-interview-techniques/" },
+        { "type": "practice", "title": "LeetCode study plan: LeetCode 75", "url": "https://leetcode.com/studyplan/leetcode-75/" },
+        { "type": "practice", "title": "LeetCode study plan: Top Interview 150", "url": "https://leetcode.com/studyplan/top-interview-150/" },
+        { "type": "practice", "title": "Grind 75", "url": "https://www.techinterviewhandbook.org/grind75/" },
+        { "type": "practice", "title": "HackerRank Interview Preparation Kit", "url": "https://www.hackerrank.com/interview/interview-preparation-kit" },
+        {
+          "type": "practice",
+          "title": { "vi": "Danh sách LeetCode Easy", "en": "LeetCode Easy problem list" },
+          "url": "https://leetcode.com/problemset/?difficulty=EASY"
+        },
+        { "type": "practice", "title": "Codeforces rating 800", "url": "https://codeforces.com/problemset?order=BY_RATING_ASC&tags=800-800" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "title": { "vi": "Lộ trình luyện thuật toán và DSA", "en": "Algorithms & DSA Roadmap" },
+  "subtitle": {
+    "vi": "Khung học theo kiến thức, luyện bài theo dạng. Bấm vào từng mục để xem chi tiết, code mẫu và ghi chú.",
+    "en": "Learn by topic, practice by pattern. Click any item to see details, template code and your notes."
+  },
+  "phases": [
+    "phase-0-nen-tang.json",
+    "phase-1-co-ban.json",
+    "phase-2-cau-truc-du-lieu.json",
+    "phase-3-cay-do-thi.json",
+    "phase-4-quy-hoach-dong.json",
+    "phase-5-nang-cao.json"
+  ],
+  "codeReviewChecklist": [
+    {
+      "id": "examples",
+      "text": { "vi": "Chạy đúng mọi ví dụ trong đề", "en": "Passes every example in the problem statement" }
+    },
+    {
+      "id": "edge",
+      "text": {
+        "vi": "Đã xét edge case: rỗng, 1 phần tử, phần tử trùng, số âm, tràn số",
+        "en": "Edge cases covered: empty input, single element, duplicates, negatives, overflow"
+      }
+    },
+    {
+      "id": "complexity",
+      "text": {
+        "vi": "Nói được độ phức tạp time/space và giải thích vì sao",
+        "en": "Can state the time/space complexity and explain why"
+      }
+    },
+    {
+      "id": "optimal",
+      "text": {
+        "vi": "Biết còn cách tốt hơn không, hoặc vì sao cách này đã tối ưu",
+        "en": "Knows whether a better approach exists, or why this one is optimal"
+      }
+    },
+    {
+      "id": "clean",
+      "text": {
+        "vi": "Tên biến rõ ràng, không còn code thừa hay debug print",
+        "en": "Clear variable names, no dead code or debug prints"
+      }
+    },
+    {
+      "id": "explain",
+      "text": {
+        "vi": "Giải thích được lời giải trong 2 phút như đang phỏng vấn",
+        "en": "Can explain the solution in 2 minutes, as in a real interview"
+      }
+    },
+    {
+      "id": "redo",
+      "text": {
+        "vi": "Tự code lại từ đầu được mà không xem lời giải",
+        "en": "Can rewrite it from scratch without looking at the solution"
+      }
+    }
+  ]
+}

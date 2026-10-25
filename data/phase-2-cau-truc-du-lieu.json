@@ -1,0 +1,998 @@
+{
+  "id": "p2",
+  "name": { "vi": "Giai đoạn 2 · Cấu trúc dữ liệu cơ bản", "en": "Phase 2 · Basic data structures" },
+  "time": { "vi": "4–5 tuần", "en": "4–5 weeks" },
+  "items": [
+    {
+      "id": "p2-stackq",
+      "type": "theory",
+      "title": {
+        "vi": "Stack, Queue, Deque và monotonic stack/queue",
+        "en": "Stack, Queue, Deque and monotonic stack/queue"
+      },
+      "description": {
+        "vi": "Stack (vào sau ra trước) và Queue (vào trước ra trước) là nền của rất nhiều thuật toán: kiểm tra ngoặc, DFS/BFS, tính biểu thức.\n\nMonotonic stack/queue giữ các phần tử theo thứ tự tăng hoặc giảm, dùng để trả lời câu hỏi 'phần tử lớn hơn gần nhất' trong O(n).",
+        "en": "Stacks (last in, first out) and queues (first in, first out) underpin many algorithms: bracket matching, DFS/BFS, expression evaluation.\n\nA monotonic stack/queue keeps elements in increasing or decreasing order to answer 'nearest greater element' questions in O(n)."
+      },
+      "keyPoints": {
+        "vi": [
+          "Python: `list` làm stack (`append` / `pop`), `deque` làm queue (`append` / `popleft`)",
+          "Monotonic stack: trước khi đẩy x, pop mọi phần tử nhỏ hơn x. Phần tử bị pop vừa tìm được 'phần tử lớn hơn tiếp theo' của nó",
+          "Thường lưu chỉ số trong stack thay vì giá trị, để còn tính khoảng cách",
+          "Monotonic deque: lấy max/min của cửa sổ trượt trong O(1) mỗi bước"
+        ],
+        "en": [
+          "Python: `list` as a stack (`append` / `pop`), `deque` as a queue (`append` / `popleft`)",
+          "Monotonic stack: before pushing x, pop every element smaller than x. Each popped element has just found its 'next greater element'",
+          "Store indices instead of values so you can compute distances",
+          "Monotonic deque: sliding-window max/min in O(1) per step"
+        ]
+      },
+      "examples": [
+        {
+          "title": { "vi": "Phần tử lớn hơn tiếp theo", "en": "Next greater element" },
+          "input": "nums = [2, 1, 2, 4, 3]",
+          "output": "[4, 2, 4, -1, -1]",
+          "explain": {
+            "vi": "Gặp 4 thì pop cả hai số 2 đang chờ trong stack, vì 4 là số lớn hơn đầu tiên bên phải chúng.",
+            "en": "When 4 arrives it pops both 2s waiting on the stack, because 4 is the first greater number to their right."
+          }
+        }
+      ],
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "from collections import deque",
+              "",
+              "def next_greater(nums):",
+              "    res = [-1] * len(nums)",
+              "    stack = []                     # chỉ số; giá trị giảm dần từ đáy lên đỉnh",
+              "    for i, x in enumerate(nums):",
+              "        while stack and nums[stack[-1]] < x:",
+              "            res[stack.pop()] = x",
+              "        stack.append(i)",
+              "    return res",
+              "",
+              "def max_sliding_window(nums, k):",
+              "    q, res = deque(), []           # chỉ số; giá trị giảm dần",
+              "    for i, x in enumerate(nums):",
+              "        while q and nums[q[-1]] <= x:",
+              "            q.pop()",
+              "        q.append(i)",
+              "        if q[0] <= i - k:",
+              "            q.popleft()            # phần tử đã ra khỏi cửa sổ",
+              "        if i >= k - 1:",
+              "            res.append(nums[q[0]])",
+              "    return res"
+            ],
+            "en": [
+              "from collections import deque",
+              "",
+              "def next_greater(nums):",
+              "    res = [-1] * len(nums)",
+              "    stack = []                     # indices; values decrease from bottom to top",
+              "    for i, x in enumerate(nums):",
+              "        while stack and nums[stack[-1]] < x:",
+              "            res[stack.pop()] = x",
+              "        stack.append(i)",
+              "    return res",
+              "",
+              "def max_sliding_window(nums, k):",
+              "    q, res = deque(), []           # indices; values decreasing",
+              "    for i, x in enumerate(nums):",
+              "        while q and nums[q[-1]] <= x:",
+              "            q.pop()",
+              "        q.append(i)",
+              "        if q[0] <= i - k:",
+              "            q.popleft()            # front element left the window",
+              "        if i >= k - 1:",
+              "            res.append(nums[q[0]])",
+              "    return res"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class Monotonic {",
+              "    static int[] nextGreater(int[] nums) {",
+              "        int[] res = new int[nums.length];",
+              "        Arrays.fill(res, -1);",
+              "        Deque<Integer> stack = new ArrayDeque<>();   // chỉ số; giá trị giảm dần từ đáy lên đỉnh",
+              "        for (int i = 0; i < nums.length; i++) {",
+              "            while (!stack.isEmpty() && nums[stack.peek()] < nums[i])",
+              "                res[stack.pop()] = nums[i];",
+              "            stack.push(i);",
+              "        }",
+              "        return res;",
+              "    }",
+              "",
+              "    static int[] maxSlidingWindow(int[] nums, int k) {",
+              "        Deque<Integer> q = new ArrayDeque<>();       // chỉ số; giá trị giảm dần",
+              "        int[] res = new int[nums.length - k + 1];",
+              "        for (int i = 0; i < nums.length; i++) {",
+              "            while (!q.isEmpty() && nums[q.peekLast()] <= nums[i]) q.pollLast();",
+              "            q.offerLast(i);",
+              "            if (q.peekFirst() <= i - k) q.pollFirst();   // phần tử đã ra khỏi cửa sổ",
+              "            if (i >= k - 1) res[i - k + 1] = nums[q.peekFirst()];",
+              "        }",
+              "        return res;",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class Monotonic {",
+              "    static int[] nextGreater(int[] nums) {",
+              "        int[] res = new int[nums.length];",
+              "        Arrays.fill(res, -1);",
+              "        Deque<Integer> stack = new ArrayDeque<>();   // indices; values decrease from bottom to top",
+              "        for (int i = 0; i < nums.length; i++) {",
+              "            while (!stack.isEmpty() && nums[stack.peek()] < nums[i])",
+              "                res[stack.pop()] = nums[i];",
+              "            stack.push(i);",
+              "        }",
+              "        return res;",
+              "    }",
+              "",
+              "    static int[] maxSlidingWindow(int[] nums, int k) {",
+              "        Deque<Integer> q = new ArrayDeque<>();       // indices; values decreasing",
+              "        int[] res = new int[nums.length - k + 1];",
+              "        for (int i = 0; i < nums.length; i++) {",
+              "            while (!q.isEmpty() && nums[q.peekLast()] <= nums[i]) q.pollLast();",
+              "            q.offerLast(i);",
+              "            if (q.peekFirst() <= i - k) q.pollFirst();   // front element left the window",
+              "            if (i >= k - 1) res[i - k + 1] = nums[q.peekFirst()];",
+              "        }",
+              "        return res;",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "complexity": {
+        "vi": "O(n): mỗi phần tử được push và pop tối đa 1 lần.",
+        "en": "O(n): each element is pushed and popped at most once."
+      },
+      "problems": [
+        { "title": "Next Greater Element I", "url": "https://leetcode.com/problems/next-greater-element-i/", "level": "Easy" },
+        { "title": "Daily Temperatures", "url": "https://leetcode.com/problems/daily-temperatures/", "level": "Medium" },
+        { "title": "Online Stock Span", "url": "https://leetcode.com/problems/online-stock-span/", "level": "Medium" },
+        { "title": "Sliding Window Maximum", "url": "https://leetcode.com/problems/sliding-window-maximum/", "level": "Hard" },
+        { "title": "Maximum Element", "url": "https://www.hackerrank.com/challenges/maximum-element/problem", "level": "Easy" },
+        { "title": "Queues: A Tale of Two Stacks", "url": "https://www.hackerrank.com/challenges/ctci-queue-using-two-stacks/problem", "level": "Medium" },
+        { "title": "Min Max Riddle", "url": "https://www.hackerrank.com/challenges/min-max-riddle/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "visual", "title": "VisuAlgo: Linked List, Stack, Queue, Deque", "url": "https://visualgo.net/en/list" },
+        { "type": "article", "title": "cp-algorithms: Minimum stack / Minimum queue", "url": "https://cp-algorithms.com/data_structures/stack_queue_modification.html" },
+        { "type": "practice", "title": "LeetCode tag: Monotonic Stack", "url": "https://leetcode.com/problem-list/monotonic-stack/" },
+        { "type": "practice", "title": "LeetCode tag: Monotonic Queue", "url": "https://leetcode.com/problem-list/monotonic-queue/" }
+      ]
+    },
+    {
+      "id": "p2-ds",
+      "type": "theory",
+      "title": "Linked List, Hash Map, Heap",
+      "description": {
+        "vi": "Hiểu bên trong các cấu trúc này để biết khi nào nên dùng, và trả lời được khi bị yêu cầu 'tự cài đặt X'.",
+        "en": "Understand how these structures work inside so you know when to use them, and can answer when asked to 'implement X yourself'."
+      },
+      "keyPoints": {
+        "vi": [
+          "Linked List: chèn/xoá O(1) nếu đã có node, truy cập O(n). Dùng **dummy node** để khỏi xét riêng đầu danh sách",
+          "Hash Map: hash key ra bucket, xử lý va chạm bằng chaining hoặc open addressing. Trung bình O(1), tệ nhất O(n)",
+          "Heap: cây nhị phân đầy đủ lưu trong mảng, cha ở `i`, con ở `2i+1` và `2i+2`. Push/pop O(log n), xem đỉnh O(1), heapify O(n)",
+          "Bài thiết kế kinh điển: LRU Cache = hash map + danh sách liên kết đôi"
+        ],
+        "en": [
+          "Linked list: O(1) insert/delete when you hold the node, O(n) access. Use a **dummy node** to avoid special-casing the head",
+          "Hash map: hash the key to a bucket, resolve collisions by chaining or open addressing. O(1) on average, O(n) worst case",
+          "Heap: a complete binary tree stored in an array, parent at `i`, children at `2i+1` and `2i+2`. Push/pop O(log n), peek O(1), heapify O(n)",
+          "Classic design problem: LRU Cache = hash map + doubly linked list"
+        ]
+      },
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "from collections import OrderedDict",
+              "",
+              "class ListNode:",
+              "    def __init__(self, val=0, next=None):",
+              "        self.val = val",
+              "        self.next = next",
+              "",
+              "class LRUCache:",
+              "    def __init__(self, capacity):",
+              "        self.cap = capacity",
+              "        self.data = OrderedDict()",
+              "",
+              "    def get(self, key):",
+              "        if key not in self.data:",
+              "            return -1",
+              "        self.data.move_to_end(key)          # vừa dùng -> đưa về cuối",
+              "        return self.data[key]",
+              "",
+              "    def put(self, key, value):",
+              "        self.data[key] = value",
+              "        self.data.move_to_end(key)",
+              "        if len(self.data) > self.cap:",
+              "            self.data.popitem(last=False)   # bỏ phần tử lâu nhất chưa dùng"
+            ],
+            "en": [
+              "from collections import OrderedDict",
+              "",
+              "class ListNode:",
+              "    def __init__(self, val=0, next=None):",
+              "        self.val = val",
+              "        self.next = next",
+              "",
+              "class LRUCache:",
+              "    def __init__(self, capacity):",
+              "        self.cap = capacity",
+              "        self.data = OrderedDict()",
+              "",
+              "    def get(self, key):",
+              "        if key not in self.data:",
+              "            return -1",
+              "        self.data.move_to_end(key)          # just used -> move to the end",
+              "        return self.data[key]",
+              "",
+              "    def put(self, key, value):",
+              "        self.data[key] = value",
+              "        self.data.move_to_end(key)",
+              "        if len(self.data) > self.cap:",
+              "            self.data.popitem(last=False)   # evict the least recently used"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class ListNode {",
+              "    int val;",
+              "    ListNode next;",
+              "    ListNode() {}",
+              "    ListNode(int val) { this.val = val; }",
+              "}",
+              "",
+              "class LRUCache extends LinkedHashMap<Integer, Integer> {",
+              "    private final int capacity;",
+              "",
+              "    LRUCache(int capacity) {",
+              "        super(capacity, 0.75f, true);              // accessOrder = true: get() đưa key về cuối",
+              "        this.capacity = capacity;",
+              "    }",
+              "",
+              "    public int get(int key) {",
+              "        return super.getOrDefault(key, -1);",
+              "    }",
+              "",
+              "    public void put(int key, int value) {",
+              "        super.put(key, value);",
+              "    }",
+              "",
+              "    @Override",
+              "    protected boolean removeEldestEntry(Map.Entry<Integer, Integer> eldest) {",
+              "        return size() > capacity;                  // bỏ phần tử lâu nhất chưa dùng",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class ListNode {",
+              "    int val;",
+              "    ListNode next;",
+              "    ListNode() {}",
+              "    ListNode(int val) { this.val = val; }",
+              "}",
+              "",
+              "class LRUCache extends LinkedHashMap<Integer, Integer> {",
+              "    private final int capacity;",
+              "",
+              "    LRUCache(int capacity) {",
+              "        super(capacity, 0.75f, true);              // accessOrder = true: get() moves the key to the end",
+              "        this.capacity = capacity;",
+              "    }",
+              "",
+              "    public int get(int key) {",
+              "        return super.getOrDefault(key, -1);",
+              "    }",
+              "",
+              "    public void put(int key, int value) {",
+              "        super.put(key, value);",
+              "    }",
+              "",
+              "    @Override",
+              "    protected boolean removeEldestEntry(Map.Entry<Integer, Integer> eldest) {",
+              "        return size() > capacity;                  // evict the least recently used",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "pitfalls": {
+        "vi": [
+          "Phỏng vấn có thể không cho dùng `OrderedDict` mà bắt tự cài danh sách liên kết đôi cho LRU Cache"
+        ],
+        "en": [
+          "The interviewer may forbid `OrderedDict` and ask you to build the doubly linked list for LRU Cache yourself"
+        ]
+      },
+      "problems": [
+        { "title": "Design HashMap", "url": "https://leetcode.com/problems/design-hashmap/", "level": "Easy" },
+        { "title": "Kth Largest Element in a Stream", "url": "https://leetcode.com/problems/kth-largest-element-in-a-stream/", "level": "Easy" },
+        { "title": "Design Linked List", "url": "https://leetcode.com/problems/design-linked-list/", "level": "Medium" },
+        { "title": "LRU Cache", "url": "https://leetcode.com/problems/lru-cache/", "level": "Medium" },
+        { "title": "Insert a node at the head of a linked list", "url": "https://www.hackerrank.com/challenges/insert-a-node-at-the-head-of-a-linked-list/problem", "level": "Easy" },
+        { "title": "Dynamic Array", "url": "https://www.hackerrank.com/challenges/dynamic-array/problem", "level": "Easy" }
+      ],
+      "resources": [
+        { "type": "video", "title": "freeCodeCamp: Data Structures Easy to Advanced Course", "url": "https://www.youtube.com/watch?v=RBSGKlAvoiM" },
+        { "type": "visual", "title": "VisuAlgo: Hash Table", "url": "https://visualgo.net/en/hashtable" },
+        { "type": "visual", "title": "VisuAlgo: Binary Heap", "url": "https://visualgo.net/en/heap" },
+        { "type": "practice", "title": "LeetCode tag: Design", "url": "https://leetcode.com/problem-list/design/" }
+      ]
+    },
+    {
+      "id": "p2-stack",
+      "type": "practice",
+      "title": { "vi": "Dạng bài Stack", "en": "Stack problems" },
+      "description": {
+        "vi": "Dấu hiệu nên dùng stack: có cặp mở/đóng, cần 'phần tử gần nhất bên trái/phải', hoặc cần quay lại trạng thái gần nhất.",
+        "en": "Signs you need a stack: matching open/close pairs, 'nearest element to the left/right', or going back to the most recent state."
+      },
+      "keyPoints": {
+        "vi": [
+          "Ngoặc: gặp ngoặc mở thì push, gặp ngoặc đóng thì pop và so khớp",
+          "Min Stack: mỗi phần tử lưu kèm giá trị min tại thời điểm đó",
+          "Biểu thức hậu tố (RPN): gặp số thì push, gặp toán tử thì pop 2 số",
+          "Largest Rectangle: monotonic stack tăng dần, khi pop thì tính diện tích với chiều cao vừa pop"
+        ],
+        "en": [
+          "Brackets: push on an opening bracket, pop and match on a closing one",
+          "Min Stack: store each element together with the minimum at that moment",
+          "Postfix expressions (RPN): push numbers, pop two operands on an operator",
+          "Largest Rectangle: increasing monotonic stack, compute the area with the popped height when popping"
+        ]
+      },
+      "examples": [
+        {
+          "title": "Valid Parentheses",
+          "input": "s = '([)]'",
+          "output": "false",
+          "explain": {
+            "vi": "Gặp ')' nhưng đỉnh stack là '[' nên không khớp.",
+            "en": "We meet ')' but the top of the stack is '[', so they don't match."
+          }
+        }
+      ],
+      "template": [
+        {
+          "lang": "python",
+          "code": [
+            "def is_valid(s):",
+            "    pairs = {')': '(', ']': '[', '}': '{'}",
+            "    stack = []",
+            "    for ch in s:",
+            "        if ch in pairs:",
+            "            if not stack or stack.pop() != pairs[ch]:",
+            "                return False",
+            "        else:",
+            "            stack.append(ch)",
+            "    return not stack"
+          ]
+        },
+        {
+          "lang": "java",
+          "code": [
+            "import java.util.*;",
+            "",
+            "class Brackets {",
+            "    static boolean isValid(String s) {",
+            "        Map<Character, Character> pairs = Map.of(')', '(', ']', '[', '}', '{');",
+            "        Deque<Character> stack = new ArrayDeque<>();",
+            "        for (char ch : s.toCharArray()) {",
+            "            if (pairs.containsKey(ch)) {",
+            "                char open = pairs.get(ch);",
+            "                if (stack.isEmpty() || stack.pop() != open) return false;",
+            "            } else {",
+            "                stack.push(ch);",
+            "            }",
+            "        }",
+            "        return stack.isEmpty();",
+            "    }",
+            "}"
+          ]
+        }
+      ],
+      "problems": [
+        { "title": "Valid Parentheses", "url": "https://leetcode.com/problems/valid-parentheses/", "level": "Easy" },
+        { "title": "Min Stack", "url": "https://leetcode.com/problems/min-stack/", "level": "Medium" },
+        { "title": "Evaluate Reverse Polish Notation", "url": "https://leetcode.com/problems/evaluate-reverse-polish-notation/", "level": "Medium" },
+        { "title": "Generate Parentheses", "url": "https://leetcode.com/problems/generate-parentheses/", "level": "Medium" },
+        { "title": "Daily Temperatures", "url": "https://leetcode.com/problems/daily-temperatures/", "level": "Medium" },
+        { "title": "Car Fleet", "url": "https://leetcode.com/problems/car-fleet/", "level": "Medium" },
+        { "title": "Largest Rectangle in Histogram", "url": "https://leetcode.com/problems/largest-rectangle-in-histogram/", "level": "Hard" },
+        { "title": "Equal Stacks", "url": "https://www.hackerrank.com/challenges/equal-stacks/problem", "level": "Easy" },
+        { "title": "Balanced Brackets", "url": "https://www.hackerrank.com/challenges/balanced-brackets/problem", "level": "Medium" },
+        { "title": "Simple Text Editor", "url": "https://www.hackerrank.com/challenges/simple-text-editor/problem", "level": "Medium" },
+        { "title": "Waiter", "url": "https://www.hackerrank.com/challenges/waiter/problem", "level": "Medium" },
+        { "title": "Largest Rectangle", "url": "https://www.hackerrank.com/challenges/largest-rectangle/problem", "level": "Medium" },
+        { "title": "Poisonous Plants", "url": "https://www.hackerrank.com/challenges/poisonous-plants/problem", "level": "Hard" }
+      ],
+      "resources": [
+        { "type": "article", "title": "Tech Interview Handbook: Stack", "url": "https://www.techinterviewhandbook.org/algorithms/stack/" },
+        { "type": "practice", "title": "LeetCode tag: Stack", "url": "https://leetcode.com/problem-list/stack/" }
+      ]
+    },
+    {
+      "id": "p2-bsearch",
+      "type": "practice",
+      "title": {
+        "vi": "Dạng bài Binary Search (kèm chặt nhị phân kết quả)",
+        "en": "Binary Search problems (including binary search on the answer)"
+      },
+      "description": {
+        "vi": "Binary search không chỉ để tìm phần tử trong mảng đã sort. Dạng mạnh nhất là **chặt nhị phân kết quả**: nếu đáp án x thỏa thì mọi giá trị lớn hơn x cũng thỏa, nên ta tìm x nhỏ nhất thỏa.",
+        "en": "Binary search is not just for finding an element in a sorted array. Its most powerful form is **binary search on the answer**: if answer x works then every larger value also works, so we look for the smallest x that works."
+      },
+      "keyPoints": {
+        "vi": [
+          "Chỉ dùng 1 template và hiểu rõ nó: tìm vị trí đầu tiên mà `ok(mid)` đúng",
+          "`mid = (lo + hi) // 2`. Java/C++ viết `lo + (hi - lo) / 2` để tránh tràn số",
+          "Chặt nhị phân kết quả: xác định khoảng đáp án [lo, hi] và hàm `ok(x)` đơn điệu",
+          "Mảng bị xoay: so sánh `nums[mid]` với `nums[hi]` để biết nửa nào đang được sort"
+        ],
+        "en": [
+          "Use one template and understand it well: find the first position where `ok(mid)` is true",
+          "`mid = (lo + hi) // 2`. In Java/C++ write `lo + (hi - lo) / 2` to avoid overflow",
+          "Binary search on the answer: define the answer range [lo, hi] and a monotonic `ok(x)`",
+          "Rotated array: compare `nums[mid]` with `nums[hi]` to see which half is sorted"
+        ]
+      },
+      "examples": [
+        {
+          "title": "Koko Eating Bananas",
+          "input": "piles = [3, 6, 7, 11], h = 8",
+          "output": "4",
+          "explain": {
+            "vi": "Ăn tốc độ k thì mất sum(ceil(p / k)) giờ. Tốc độ càng lớn càng nhanh, nên chặt nhị phân k trong [1, max(piles)].",
+            "en": "At speed k it takes sum(ceil(p / k)) hours. Faster is never worse, so binary search k in [1, max(piles)]."
+          }
+        }
+      ],
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "def first_true(lo, hi, ok):",
+              "    # x nhỏ nhất trong [lo, hi] mà ok(x) đúng; không có thì trả về hi + 1.",
+              "    # Yêu cầu ok đơn điệu: False ... False True ... True",
+              "    hi += 1",
+              "    while lo < hi:",
+              "        mid = (lo + hi) // 2",
+              "        if ok(mid):",
+              "            hi = mid",
+              "        else:",
+              "            lo = mid + 1",
+              "    return lo",
+              "",
+              "# Vị trí đầu tiên có nums[i] >= target (giống bisect_left):",
+              "# first_true(0, len(nums) - 1, lambda i: nums[i] >= target)",
+              "",
+              "def min_eating_speed(piles, h):        # Koko Eating Bananas",
+              "    hours = lambda k: sum((p + k - 1) // k for p in piles)",
+              "    return first_true(1, max(piles), lambda k: hours(k) <= h)"
+            ],
+            "en": [
+              "def first_true(lo, hi, ok):",
+              "    # smallest x in [lo, hi] with ok(x) true; returns hi + 1 if none.",
+              "    # ok must be monotonic: False ... False True ... True",
+              "    hi += 1",
+              "    while lo < hi:",
+              "        mid = (lo + hi) // 2",
+              "        if ok(mid):",
+              "            hi = mid",
+              "        else:",
+              "            lo = mid + 1",
+              "    return lo",
+              "",
+              "# First index with nums[i] >= target (like bisect_left):",
+              "# first_true(0, len(nums) - 1, lambda i: nums[i] >= target)",
+              "",
+              "def min_eating_speed(piles, h):        # Koko Eating Bananas",
+              "    hours = lambda k: sum((p + k - 1) // k for p in piles)",
+              "    return first_true(1, max(piles), lambda k: hours(k) <= h)"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.function.LongPredicate;",
+              "",
+              "class BinarySearch {",
+              "    // x nhỏ nhất trong [lo, hi] mà ok(x) đúng; không có thì trả về hi + 1.",
+              "    // Yêu cầu ok đơn điệu: False ... False True ... True",
+              "    static long firstTrue(long lo, long hi, LongPredicate ok) {",
+              "        hi++;",
+              "        while (lo < hi) {",
+              "            long mid = lo + (hi - lo) / 2;",
+              "            if (ok.test(mid)) hi = mid;",
+              "            else lo = mid + 1;",
+              "        }",
+              "        return lo;",
+              "    }",
+              "",
+              "    static int minEatingSpeed(int[] piles, int h) {   // Koko Eating Bananas",
+              "        int max = 0;",
+              "        for (int p : piles) max = Math.max(max, p);",
+              "        return (int) firstTrue(1, max, k -> {",
+              "            long hours = 0;",
+              "            for (int p : piles) hours += (p + k - 1) / k;",
+              "            return hours <= h;",
+              "        });",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.function.LongPredicate;",
+              "",
+              "class BinarySearch {",
+              "    // smallest x in [lo, hi] with ok(x) true; returns hi + 1 if none.",
+              "    // ok must be monotonic: False ... False True ... True",
+              "    static long firstTrue(long lo, long hi, LongPredicate ok) {",
+              "        hi++;",
+              "        while (lo < hi) {",
+              "            long mid = lo + (hi - lo) / 2;",
+              "            if (ok.test(mid)) hi = mid;",
+              "            else lo = mid + 1;",
+              "        }",
+              "        return lo;",
+              "    }",
+              "",
+              "    static int minEatingSpeed(int[] piles, int h) {   // Koko Eating Bananas",
+              "        int max = 0;",
+              "        for (int p : piles) max = Math.max(max, p);",
+              "        return (int) firstTrue(1, max, k -> {",
+              "            long hours = 0;",
+              "            for (int p : piles) hours += (p + k - 1) / k;",
+              "            return hours <= h;",
+              "        });",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "complexity": {
+        "vi": "O(log n), hoặc O(log(khoảng đáp án) × chi phí của ok).",
+        "en": "O(log n), or O(log(answer range) × cost of ok)."
+      },
+      "pitfalls": {
+        "vi": [
+          "Lặp vô hạn vì gán `lo = mid` trong khi mid được làm tròn xuống",
+          "Đặt sai biên lo/hi của khoảng đáp án"
+        ],
+        "en": [
+          "Infinite loop from `lo = mid` while mid rounds down",
+          "Wrong lo/hi bounds for the answer range"
+        ]
+      },
+      "problems": [
+        { "title": "Binary Search", "url": "https://leetcode.com/problems/binary-search/", "level": "Easy" },
+        { "title": "Search a 2D Matrix", "url": "https://leetcode.com/problems/search-a-2d-matrix/", "level": "Medium" },
+        { "title": "Koko Eating Bananas", "url": "https://leetcode.com/problems/koko-eating-bananas/", "level": "Medium" },
+        { "title": "Find Minimum in Rotated Sorted Array", "url": "https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/", "level": "Medium" },
+        { "title": "Search in Rotated Sorted Array", "url": "https://leetcode.com/problems/search-in-rotated-sorted-array/", "level": "Medium" },
+        { "title": "Time Based Key-Value Store", "url": "https://leetcode.com/problems/time-based-key-value-store/", "level": "Medium" },
+        { "title": "Median of Two Sorted Arrays", "url": "https://leetcode.com/problems/median-of-two-sorted-arrays/", "level": "Hard" },
+        { "title": "Climbing the Leaderboard", "url": "https://www.hackerrank.com/challenges/climbing-the-leaderboard/problem", "level": "Medium" },
+        { "title": "Hash Tables: Ice Cream Parlor", "url": "https://www.hackerrank.com/challenges/ctci-ice-cream-parlor/problem", "level": "Medium" },
+        { "title": "Minimum Time Required", "url": "https://www.hackerrank.com/challenges/minimum-time-required/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "cp-algorithms: Binary search", "url": "https://cp-algorithms.com/num_methods/binary_search.html" },
+        { "type": "article", "title": "USACO Guide: Binary Search", "url": "https://usaco.guide/silver/binary-search" },
+        { "type": "practice", "title": "LeetCode study plan: Binary Search", "url": "https://leetcode.com/studyplan/binary-search/" },
+        { "type": "practice", "title": "LeetCode tag: Binary Search", "url": "https://leetcode.com/problem-list/binary-search/" }
+      ]
+    },
+    {
+      "id": "p2-list",
+      "type": "practice",
+      "title": {
+        "vi": "Dạng bài Linked List (đảo, phát hiện chu trình, trộn)",
+        "en": "Linked List problems (reverse, cycle detection, merge)"
+      },
+      "description": {
+        "vi": "Bài linked list ít về thuật toán, chủ yếu kiểm tra bạn thao tác con trỏ có cẩn thận không. Vẽ ra giấy trước khi code.",
+        "en": "Linked list problems are less about algorithms and more about careful pointer handling. Draw it on paper before you code."
+      },
+      "keyPoints": {
+        "vi": [
+          "Dummy node đứng trước đầu danh sách giúp code gọn khi phải xoá/chèn ở đầu",
+          "Đảo danh sách: 3 biến `prev`, `cur`, `nxt`",
+          "Fast/slow pointer: tìm điểm giữa, phát hiện chu trình (Floyd)",
+          "Xoá node thứ n tính từ cuối: cho con trỏ fast đi trước n bước"
+        ],
+        "en": [
+          "A dummy node before the head keeps the code clean when inserting/deleting at the front",
+          "Reversing: three variables `prev`, `cur`, `nxt`",
+          "Fast/slow pointers: find the middle, detect cycles (Floyd)",
+          "Remove the n-th node from the end: let the fast pointer go n steps ahead"
+        ]
+      },
+      "template": [
+        {
+          "lang": "python",
+          "code": [
+            "def reverse_list(head):",
+            "    prev, cur = None, head",
+            "    while cur:",
+            "        nxt = cur.next",
+            "        cur.next = prev",
+            "        prev, cur = cur, nxt",
+            "    return prev",
+            "",
+            "def has_cycle(head):",
+            "    slow = fast = head",
+            "    while fast and fast.next:",
+            "        slow, fast = slow.next, fast.next.next",
+            "        if slow is fast:",
+            "            return True",
+            "    return False",
+            "",
+            "def merge_two_lists(a, b):",
+            "    dummy = tail = ListNode()",
+            "    while a and b:",
+            "        if a.val <= b.val:",
+            "            tail.next, a = a, a.next",
+            "        else:",
+            "            tail.next, b = b, b.next",
+            "        tail = tail.next",
+            "    tail.next = a or b",
+            "    return dummy.next"
+          ]
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "class ListNode {",
+              "    int val;",
+              "    ListNode next;",
+              "    ListNode() {}",
+              "    ListNode(int val) { this.val = val; }",
+              "}",
+              "",
+              "class LinkedListOps {",
+              "    static ListNode reverseList(ListNode head) {",
+              "        ListNode prev = null, cur = head;",
+              "        while (cur != null) {",
+              "            ListNode nxt = cur.next;",
+              "            cur.next = prev;",
+              "            prev = cur;",
+              "            cur = nxt;",
+              "        }",
+              "        return prev;",
+              "    }",
+              "",
+              "    static boolean hasCycle(ListNode head) {",
+              "        ListNode slow = head, fast = head;",
+              "        while (fast != null && fast.next != null) {",
+              "            slow = slow.next;",
+              "            fast = fast.next.next;",
+              "            if (slow == fast) return true;",
+              "        }",
+              "        return false;",
+              "    }",
+              "",
+              "    static ListNode mergeTwoLists(ListNode a, ListNode b) {",
+              "        ListNode dummy = new ListNode(), tail = dummy;   // dummy node: khỏi xét riêng đầu danh sách",
+              "        while (a != null && b != null) {",
+              "            if (a.val <= b.val) { tail.next = a; a = a.next; }",
+              "            else { tail.next = b; b = b.next; }",
+              "            tail = tail.next;",
+              "        }",
+              "        tail.next = (a != null) ? a : b;",
+              "        return dummy.next;",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "class ListNode {",
+              "    int val;",
+              "    ListNode next;",
+              "    ListNode() {}",
+              "    ListNode(int val) { this.val = val; }",
+              "}",
+              "",
+              "class LinkedListOps {",
+              "    static ListNode reverseList(ListNode head) {",
+              "        ListNode prev = null, cur = head;",
+              "        while (cur != null) {",
+              "            ListNode nxt = cur.next;",
+              "            cur.next = prev;",
+              "            prev = cur;",
+              "            cur = nxt;",
+              "        }",
+              "        return prev;",
+              "    }",
+              "",
+              "    static boolean hasCycle(ListNode head) {",
+              "        ListNode slow = head, fast = head;",
+              "        while (fast != null && fast.next != null) {",
+              "            slow = slow.next;",
+              "            fast = fast.next.next;",
+              "            if (slow == fast) return true;",
+              "        }",
+              "        return false;",
+              "    }",
+              "",
+              "    static ListNode mergeTwoLists(ListNode a, ListNode b) {",
+              "        ListNode dummy = new ListNode(), tail = dummy;   // dummy node: no special case for the head",
+              "        while (a != null && b != null) {",
+              "            if (a.val <= b.val) { tail.next = a; a = a.next; }",
+              "            else { tail.next = b; b = b.next; }",
+              "            tail = tail.next;",
+              "        }",
+              "        tail.next = (a != null) ? a : b;",
+              "        return dummy.next;",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "complexity": { "vi": "Thường O(n) time, O(1) space.", "en": "Usually O(n) time, O(1) space." },
+      "pitfalls": {
+        "vi": [
+          "Mất phần còn lại của danh sách vì đổi `cur.next` trước khi lưu lại `nxt`",
+          "Quên xét danh sách rỗng hoặc chỉ có 1 node"
+        ],
+        "en": [
+          "Losing the rest of the list by changing `cur.next` before saving `nxt`",
+          "Forgetting the empty list or the single-node list"
+        ]
+      },
+      "problems": [
+        { "title": "Reverse Linked List", "url": "https://leetcode.com/problems/reverse-linked-list/", "level": "Easy" },
+        { "title": "Merge Two Sorted Lists", "url": "https://leetcode.com/problems/merge-two-sorted-lists/", "level": "Easy" },
+        { "title": "Linked List Cycle", "url": "https://leetcode.com/problems/linked-list-cycle/", "level": "Easy" },
+        { "title": "Reorder List", "url": "https://leetcode.com/problems/reorder-list/", "level": "Medium" },
+        { "title": "Remove Nth Node From End of List", "url": "https://leetcode.com/problems/remove-nth-node-from-end-of-list/", "level": "Medium" },
+        { "title": "Copy List with Random Pointer", "url": "https://leetcode.com/problems/copy-list-with-random-pointer/", "level": "Medium" },
+        { "title": "Add Two Numbers", "url": "https://leetcode.com/problems/add-two-numbers/", "level": "Medium" },
+        { "title": "Find the Duplicate Number", "url": "https://leetcode.com/problems/find-the-duplicate-number/", "level": "Medium" },
+        { "title": "Merge k Sorted Lists", "url": "https://leetcode.com/problems/merge-k-sorted-lists/", "level": "Hard" },
+        { "title": "Reverse Nodes in k-Group", "url": "https://leetcode.com/problems/reverse-nodes-in-k-group/", "level": "Hard" },
+        { "title": "Reverse a linked list", "url": "https://www.hackerrank.com/challenges/reverse-a-linked-list/problem", "level": "Easy" },
+        { "title": "Linked Lists: Detect a Cycle", "url": "https://www.hackerrank.com/challenges/ctci-linked-list-cycle/problem", "level": "Easy" },
+        { "title": "Merge two sorted linked lists", "url": "https://www.hackerrank.com/challenges/merge-two-sorted-linked-lists/problem", "level": "Easy" },
+        { "title": "Delete duplicate-value nodes from a sorted linked list", "url": "https://www.hackerrank.com/challenges/delete-duplicate-value-nodes-from-a-sorted-linked-list/problem", "level": "Easy" },
+        { "title": "Get Node Value", "url": "https://www.hackerrank.com/challenges/get-the-value-of-the-node-at-a-specific-position-from-the-tail/problem", "level": "Easy" },
+        { "title": "Find Merge Point of Two Lists", "url": "https://www.hackerrank.com/challenges/find-the-merge-point-of-two-joined-linked-lists/problem", "level": "Easy" },
+        { "title": "Reverse a doubly linked list", "url": "https://www.hackerrank.com/challenges/reverse-a-doubly-linked-list/problem", "level": "Easy" },
+        { "title": "Inserting a Node Into a Sorted Doubly Linked List", "url": "https://www.hackerrank.com/challenges/insert-a-node-into-a-sorted-doubly-linked-list/problem", "level": "Easy" }
+      ],
+      "resources": [
+        { "type": "article", "title": "Tech Interview Handbook: Linked list", "url": "https://www.techinterviewhandbook.org/algorithms/linked-list/" },
+        { "type": "visual", "title": "VisuAlgo: Linked List, Stack, Queue, Deque", "url": "https://visualgo.net/en/list" },
+        { "type": "practice", "title": "LeetCode tag: Linked List", "url": "https://leetcode.com/problem-list/linked-list/" }
+      ]
+    },
+    {
+      "id": "p2-heap",
+      "type": "practice",
+      "title": {
+        "vi": "Dạng bài Heap / Priority Queue (top-K, trộn K list)",
+        "en": "Heap / Priority Queue problems (top-K, merge K lists)"
+      },
+      "description": {
+        "vi": "Dùng heap khi cần lấy liên tục phần tử lớn nhất/nhỏ nhất trong một tập đang thay đổi.",
+        "en": "Use a heap when you repeatedly need the largest/smallest element of a changing collection."
+      },
+      "keyPoints": {
+        "vi": [
+          "Top-K lớn nhất: giữ min-heap kích thước k, O(n log k)",
+          "Trộn K danh sách: heap chứa phần tử đầu của mỗi danh sách",
+          "Median của luồng dữ liệu: 2 heap, max-heap cho nửa dưới và min-heap cho nửa trên",
+          "Python chỉ có min-heap: lưu `-x` để có max-heap; lưu tuple `(priority, i, item)` khi item không so sánh được"
+        ],
+        "en": [
+          "Top-K largest: keep a min-heap of size k, O(n log k)",
+          "Merge K lists: the heap holds the head of each list",
+          "Median of a data stream: two heaps, a max-heap for the lower half and a min-heap for the upper half",
+          "Python only has a min-heap: store `-x` for a max-heap; store `(priority, i, item)` tuples when items aren't comparable"
+        ]
+      },
+      "examples": [
+        {
+          "title": "Kth Largest Element in an Array",
+          "input": "nums = [3, 2, 1, 5, 6, 4], k = 2",
+          "output": "5",
+          "explain": {
+            "vi": "Giữ heap 2 số lớn nhất: cuối cùng heap là [5, 6], đỉnh là 5.",
+            "en": "Keep a heap of the 2 largest numbers: it ends as [5, 6], and the top is 5."
+          }
+        }
+      ],
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "import heapq",
+              "",
+              "def find_kth_largest(nums, k):",
+              "    h = []                         # min-heap giữ k số lớn nhất",
+              "    for x in nums:",
+              "        heapq.heappush(h, x)",
+              "        if len(h) > k:",
+              "            heapq.heappop(h)",
+              "    return h[0]",
+              "",
+              "def merge_k_lists(lists):",
+              "    h = [(node.val, i, node) for i, node in enumerate(lists) if node]",
+              "    heapq.heapify(h)",
+              "    dummy = tail = ListNode()",
+              "    while h:",
+              "        _, i, node = heapq.heappop(h)",
+              "        tail.next = node",
+              "        tail = node",
+              "        if node.next:",
+              "            heapq.heappush(h, (node.next.val, i, node.next))",
+              "    return dummy.next"
+            ],
+            "en": [
+              "import heapq",
+              "",
+              "def find_kth_largest(nums, k):",
+              "    h = []                         # min-heap holding the k largest",
+              "    for x in nums:",
+              "        heapq.heappush(h, x)",
+              "        if len(h) > k:",
+              "            heapq.heappop(h)",
+              "    return h[0]",
+              "",
+              "def merge_k_lists(lists):",
+              "    h = [(node.val, i, node) for i, node in enumerate(lists) if node]",
+              "    heapq.heapify(h)",
+              "    dummy = tail = ListNode()",
+              "    while h:",
+              "        _, i, node = heapq.heappop(h)",
+              "        tail.next = node",
+              "        tail = node",
+              "        if node.next:",
+              "            heapq.heappush(h, (node.next.val, i, node.next))",
+              "    return dummy.next"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class Heaps {",
+              "    static int findKthLargest(int[] nums, int k) {",
+              "        PriorityQueue<Integer> h = new PriorityQueue<>();   // min-heap giữ k số lớn nhất",
+              "        for (int x : nums) {",
+              "            h.offer(x);",
+              "            if (h.size() > k) h.poll();",
+              "        }",
+              "        return h.peek();",
+              "    }",
+              "",
+              "    static ListNode mergeKLists(ListNode[] lists) {",
+              "        PriorityQueue<ListNode> h = new PriorityQueue<>((a, b) -> Integer.compare(a.val, b.val));",
+              "        for (ListNode node : lists) if (node != null) h.offer(node);",
+              "        ListNode dummy = new ListNode(), tail = dummy;",
+              "        while (!h.isEmpty()) {",
+              "            ListNode node = h.poll();",
+              "            tail.next = node;",
+              "            tail = node;",
+              "            if (node.next != null) h.offer(node.next);",
+              "        }",
+              "        return dummy.next;",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class Heaps {",
+              "    static int findKthLargest(int[] nums, int k) {",
+              "        PriorityQueue<Integer> h = new PriorityQueue<>();   // min-heap holding the k largest",
+              "        for (int x : nums) {",
+              "            h.offer(x);",
+              "            if (h.size() > k) h.poll();",
+              "        }",
+              "        return h.peek();",
+              "    }",
+              "",
+              "    static ListNode mergeKLists(ListNode[] lists) {",
+              "        PriorityQueue<ListNode> h = new PriorityQueue<>((a, b) -> Integer.compare(a.val, b.val));",
+              "        for (ListNode node : lists) if (node != null) h.offer(node);",
+              "        ListNode dummy = new ListNode(), tail = dummy;",
+              "        while (!h.isEmpty()) {",
+              "            ListNode node = h.poll();",
+              "            tail.next = node;",
+              "            tail = node;",
+              "            if (node.next != null) h.offer(node.next);",
+              "        }",
+              "        return dummy.next;",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "complexity": "Top-K: O(n log k) time, O(k) space.",
+      "problems": [
+        { "title": "Kth Largest Element in a Stream", "url": "https://leetcode.com/problems/kth-largest-element-in-a-stream/", "level": "Easy" },
+        { "title": "Last Stone Weight", "url": "https://leetcode.com/problems/last-stone-weight/", "level": "Easy" },
+        { "title": "K Closest Points to Origin", "url": "https://leetcode.com/problems/k-closest-points-to-origin/", "level": "Medium" },
+        { "title": "Kth Largest Element in an Array", "url": "https://leetcode.com/problems/kth-largest-element-in-an-array/", "level": "Medium" },
+        { "title": "Task Scheduler", "url": "https://leetcode.com/problems/task-scheduler/", "level": "Medium" },
+        { "title": "Design Twitter", "url": "https://leetcode.com/problems/design-twitter/", "level": "Medium" },
+        { "title": "Find Median from Data Stream", "url": "https://leetcode.com/problems/find-median-from-data-stream/", "level": "Hard" },
+        { "title": "QHEAP1", "url": "https://www.hackerrank.com/challenges/qheap1/problem", "level": "Easy" },
+        { "title": "Jesse and Cookies", "url": "https://www.hackerrank.com/challenges/jesse-and-cookies/problem", "level": "Easy" },
+        { "title": "Find the Running Median", "url": "https://www.hackerrank.com/challenges/find-the-running-median/problem", "level": "Hard" }
+      ],
+      "resources": [
+        { "type": "article", "title": "Tech Interview Handbook: Heap", "url": "https://www.techinterviewhandbook.org/algorithms/heap/" },
+        { "type": "docs", "title": "Java docs: PriorityQueue", "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/PriorityQueue.html" },
+        { "type": "practice", "title": "LeetCode tag: Heap (Priority Queue)", "url": "https://leetcode.com/problem-list/heap-priority-queue/" }
+      ]
+    },
+    {
+      "id": "p2-contest",
+      "type": "practice",
+      "title": { "vi": "Bắt đầu thi contest hằng tuần", "en": "Start doing weekly contests" },
+      "description": {
+        "vi": "Contest tập cho bạn giải bài dưới áp lực thời gian, rất giống phỏng vấn. LeetCode Weekly (9h30 sáng Chủ nhật giờ Việt Nam) và Biweekly đều có 4 bài trong 90 phút.",
+        "en": "Contests train you to solve problems under time pressure, very much like an interview. LeetCode Weekly (Sunday 9:30 AM Vietnam time, 02:30 UTC) and Biweekly both have 4 problems in 90 minutes."
+      },
+      "keyPoints": {
+        "vi": [
+          "Mục tiêu ban đầu: chắc chắn giải được 2 bài đầu",
+          "Sau contest luôn upsolve: làm lại các bài chưa ra trong vòng 1–2 ngày",
+          "Ghi lại lý do bị sai (WA/TLE) vào phần ghi chú",
+          "Nếu luyện cả lập trình thi đấu, Codeforces Div. 3 / Div. 4 hợp để bắt đầu"
+        ],
+        "en": [
+          "Initial goal: reliably solve the first 2 problems",
+          "Always upsolve: redo the problems you missed within 1–2 days",
+          "Write down why you failed (WA/TLE) in your notes",
+          "If you also do competitive programming, Codeforces Div. 3 / Div. 4 are good starting points"
+        ]
+      },
+      "resources": [
+        { "type": "practice", "title": "LeetCode Contest", "url": "https://leetcode.com/contest/" },
+        { "type": "practice", "title": "Codeforces Contests", "url": "https://codeforces.com/contests" },
+        { "type": "practice", "title": "AtCoder Contests", "url": "https://atcoder.jp/contests/" }
+      ]
+    }
+  ]
+}

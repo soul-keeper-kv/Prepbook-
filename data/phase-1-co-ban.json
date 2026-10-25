@@ -1,0 +1,1337 @@
+{
+  "id": "p1",
+  "name": { "vi": "Giai đoạn 1 · Tư duy cơ bản và độ phức tạp", "en": "Phase 1 · Core thinking and complexity" },
+  "time": { "vi": "3–4 tuần", "en": "3–4 weeks" },
+  "items": [
+    {
+      "id": "p1-bigo",
+      "type": "theory",
+      "title": { "vi": "Big-O: ước lượng ~10⁸ phép tính/giây", "en": "Big-O: estimate ~10⁸ operations per second" },
+      "description": {
+        "vi": "Trước khi code, ước lượng xem thuật toán có chạy kịp không. Quy tắc nhanh: máy chấm chạy khoảng 10⁸ phép tính đơn giản mỗi giây. Python chậm hơn khoảng 10 lần.\n\nĐọc ràng buộc của đề là cách nhanh nhất để đoán hướng giải.",
+        "en": "Before coding, estimate whether your algorithm will run in time. Rule of thumb: a judge runs about 10⁸ simple operations per second. Python is roughly 10 times slower.\n\nReading the constraints is the fastest way to guess the intended approach."
+      },
+      "keyPoints": {
+        "vi": [
+          "n ≤ 10–12: O(n!) hoặc O(2ⁿ·n), thử hết hoán vị hoặc tập con",
+          "n ≤ 20–25: O(2ⁿ), backtracking hoặc bitmask",
+          "n ≤ 500: O(n³)",
+          "n ≤ 5000: O(n²)",
+          "n ≤ 10⁶: O(n log n) hoặc O(n): sort, heap, two pointers, hash",
+          "n ≥ 10⁹: O(log n) hoặc O(1): binary search, công thức toán",
+          "Bộ nhớ cũng tính: đệ quy sâu n tầng tốn O(n) stack"
+        ],
+        "en": [
+          "n ≤ 10–12: O(n!) or O(2ⁿ·n), try every permutation or subset",
+          "n ≤ 20–25: O(2ⁿ), backtracking or bitmask",
+          "n ≤ 500: O(n³)",
+          "n ≤ 5000: O(n²)",
+          "n ≤ 10⁶: O(n log n) or O(n): sort, heap, two pointers, hashing",
+          "n ≥ 10⁹: O(log n) or O(1): binary search, a math formula",
+          "Memory counts too: recursion n levels deep uses O(n) stack"
+        ]
+      },
+      "examples": [
+        {
+          "title": { "vi": "Đọc ràng buộc để đoán hướng giải", "en": "Read the constraints to guess the approach" },
+          "input": "1 ≤ nums.length ≤ 10⁵",
+          "output": { "vi": "Cần O(n log n) hoặc tốt hơn", "en": "Need O(n log n) or better" },
+          "explain": {
+            "vi": "O(n²) là 10¹⁰ phép tính, quá chậm. Nghĩ tới sort, hash map, two pointers hoặc sliding window.",
+            "en": "O(n²) is 10¹⁰ operations, far too slow. Think sorting, hash maps, two pointers or sliding window."
+          }
+        }
+      ],
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "# O(n): 1 vòng lặp",
+              "for x in a: ...",
+              "",
+              "# O(n²): 2 vòng lặp lồng nhau",
+              "for i in range(n):",
+              "    for j in range(i + 1, n): ...",
+              "",
+              "# O(log n): mỗi bước chia đôi",
+              "while n > 0:",
+              "    n //= 2",
+              "",
+              "# O(n log n): sort",
+              "a.sort()",
+              "",
+              "# Bẫy: trông như O(n) nhưng thật ra O(n²)",
+              "for x in a:",
+              "    if x in some_list: ...   # 'in' trên list là O(n), đổi sang set"
+            ],
+            "en": [
+              "# O(n): one loop",
+              "for x in a: ...",
+              "",
+              "# O(n²): two nested loops",
+              "for i in range(n):",
+              "    for j in range(i + 1, n): ...",
+              "",
+              "# O(log n): halve at each step",
+              "while n > 0:",
+              "    n //= 2",
+              "",
+              "# O(n log n): sort",
+              "a.sort()",
+              "",
+              "# Trap: looks like O(n) but is actually O(n²)",
+              "for x in a:",
+              "    if x in some_list: ...   # 'in' on a list is O(n), use a set"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class Complexity {",
+              "    static void examples(int[] a, List<Integer> someList) {",
+              "        int n = a.length;",
+              "",
+              "        // O(n): 1 vòng lặp",
+              "        for (int x : a) { }",
+              "",
+              "        // O(n²): 2 vòng lặp lồng nhau",
+              "        for (int i = 0; i < n; i++)",
+              "            for (int j = i + 1; j < n; j++) { }",
+              "",
+              "        // O(log n): mỗi bước chia đôi",
+              "        for (int m = n; m > 0; m /= 2) { }",
+              "",
+              "        // O(n log n): sort",
+              "        Arrays.sort(a);",
+              "",
+              "        // Bẫy: trông như O(n) nhưng thật ra O(n²)",
+              "        for (int x : a)",
+              "            if (someList.contains(x)) { }   // contains trên List là O(n), đổi sang HashSet",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class Complexity {",
+              "    static void examples(int[] a, List<Integer> someList) {",
+              "        int n = a.length;",
+              "",
+              "        // O(n): one loop",
+              "        for (int x : a) { }",
+              "",
+              "        // O(n²): two nested loops",
+              "        for (int i = 0; i < n; i++)",
+              "            for (int j = i + 1; j < n; j++) { }",
+              "",
+              "        // O(log n): halve at each step",
+              "        for (int m = n; m > 0; m /= 2) { }",
+              "",
+              "        // O(n log n): sort",
+              "        Arrays.sort(a);",
+              "",
+              "        // Trap: looks like O(n) but is actually O(n²)",
+              "        for (int x : a)",
+              "            if (someList.contains(x)) { }   // contains on a List is O(n), use a HashSet",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "pitfalls": {
+        "vi": [
+          "Quên chi phí ẩn: `x in list` là O(n), cắt chuỗi `s[i:j]` là O(j − i)",
+          "Nhầm O(n + m) (2 vòng lặp nối tiếp) với O(n·m) (2 vòng lặp lồng nhau)"
+        ],
+        "en": [
+          "Forgetting hidden costs: `x in list` is O(n), slicing `s[i:j]` is O(j − i)",
+          "Confusing O(n + m) (two loops one after another) with O(n·m) (nested loops)"
+        ]
+      },
+      "resources": [
+        { "type": "article", "title": "USACO Guide: Time Complexity", "url": "https://usaco.guide/bronze/time-comp" },
+        { "type": "article", "title": "Big-O Cheat Sheet", "url": "https://www.bigocheatsheet.com/" }
+      ]
+    },
+    {
+      "id": "p1-math",
+      "type": "theory",
+      "title": {
+        "vi": "Toán cơ bản: GCD/LCM, số nguyên tố, sàng Eratosthenes, đồng dư",
+        "en": "Basic math: GCD/LCM, primes, sieve of Eratosthenes, modular arithmetic"
+      },
+      "description": {
+        "vi": "Một số bài cần số học cơ bản. Phỏng vấn ít khi hỏi sâu, nhưng GCD, kiểm tra số nguyên tố, sàng và lũy thừa nhanh thì phải viết được ngay.",
+        "en": "Some problems need basic number theory. Interviews rarely go deep, but you should be able to write GCD, a primality check, a sieve and fast exponentiation on the spot."
+      },
+      "keyPoints": {
+        "vi": [
+          "GCD theo Euclid: `gcd(a, b) = gcd(b, a % b)`, O(log min(a, b)). `lcm = a // gcd(a, b) * b`",
+          "Kiểm tra số nguyên tố: thử chia đến √n",
+          "Sàng Eratosthenes: tìm mọi số nguyên tố ≤ n trong O(n log log n)",
+          "Đồng dư: lấy `% m` sau từng phép cộng/nhân để tránh tràn số",
+          "Lũy thừa nhanh O(log n) bằng cách bình phương liên tục"
+        ],
+        "en": [
+          "Euclid's GCD: `gcd(a, b) = gcd(b, a % b)`, O(log min(a, b)). `lcm = a // gcd(a, b) * b`",
+          "Primality check: try divisors up to √n",
+          "Sieve of Eratosthenes: every prime ≤ n in O(n log log n)",
+          "Modular arithmetic: apply `% m` after every addition/multiplication to avoid overflow",
+          "Fast exponentiation in O(log n) by repeated squaring"
+        ]
+      },
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "def gcd(a, b):",
+              "    while b:",
+              "        a, b = b, a % b",
+              "    return a",
+              "",
+              "def is_prime(n):",
+              "    if n < 2:",
+              "        return False",
+              "    i = 2",
+              "    while i * i <= n:",
+              "        if n % i == 0:",
+              "            return False",
+              "        i += 1",
+              "    return True",
+              "",
+              "def sieve(n):                  # mọi số nguyên tố <= n (n >= 1)",
+              "    is_p = [True] * (n + 1)",
+              "    is_p[0] = is_p[1] = False",
+              "    for i in range(2, int(n ** 0.5) + 1):",
+              "        if is_p[i]:",
+              "            for j in range(i * i, n + 1, i):",
+              "                is_p[j] = False",
+              "    return [i for i in range(n + 1) if is_p[i]]",
+              "",
+              "def power(a, n, mod):          # a^n % mod, Python có sẵn pow(a, n, mod)",
+              "    res = 1",
+              "    a %= mod",
+              "    while n:",
+              "        if n & 1:",
+              "            res = res * a % mod",
+              "        a = a * a % mod",
+              "        n >>= 1",
+              "    return res"
+            ],
+            "en": [
+              "def gcd(a, b):",
+              "    while b:",
+              "        a, b = b, a % b",
+              "    return a",
+              "",
+              "def is_prime(n):",
+              "    if n < 2:",
+              "        return False",
+              "    i = 2",
+              "    while i * i <= n:",
+              "        if n % i == 0:",
+              "            return False",
+              "        i += 1",
+              "    return True",
+              "",
+              "def sieve(n):                  # all primes <= n (n >= 1)",
+              "    is_p = [True] * (n + 1)",
+              "    is_p[0] = is_p[1] = False",
+              "    for i in range(2, int(n ** 0.5) + 1):",
+              "        if is_p[i]:",
+              "            for j in range(i * i, n + 1, i):",
+              "                is_p[j] = False",
+              "    return [i for i in range(n + 1) if is_p[i]]",
+              "",
+              "def power(a, n, mod):          # a^n % mod, Python has built-in pow(a, n, mod)",
+              "    res = 1",
+              "    a %= mod",
+              "    while n:",
+              "        if n & 1:",
+              "            res = res * a % mod",
+              "        a = a * a % mod",
+              "        n >>= 1",
+              "    return res"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class MathUtils {",
+              "    static long gcd(long a, long b) {",
+              "        while (b != 0) {",
+              "            long t = a % b;",
+              "            a = b;",
+              "            b = t;",
+              "        }",
+              "        return a;",
+              "    }",
+              "",
+              "    static boolean isPrime(long n) {",
+              "        if (n < 2) return false;",
+              "        for (long i = 2; i * i <= n; i++)",
+              "            if (n % i == 0) return false;",
+              "        return true;",
+              "    }",
+              "",
+              "    static boolean[] sieve(int n) {               // isPrime[i] cho mọi i <= n",
+              "        boolean[] isPrime = new boolean[n + 1];",
+              "        Arrays.fill(isPrime, true);",
+              "        isPrime[0] = false;",
+              "        if (n >= 1) isPrime[1] = false;",
+              "        for (int i = 2; (long) i * i <= n; i++)",
+              "            if (isPrime[i])",
+              "                for (int j = i * i; j <= n; j += i) isPrime[j] = false;",
+              "        return isPrime;",
+              "    }",
+              "",
+              "    static long power(long a, long n, long mod) {  // a^n % mod trong O(log n)",
+              "        long res = 1;",
+              "        a %= mod;",
+              "        while (n > 0) {",
+              "            if ((n & 1) == 1) res = res * a % mod;",
+              "            a = a * a % mod;",
+              "            n >>= 1;",
+              "        }",
+              "        return res;",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class MathUtils {",
+              "    static long gcd(long a, long b) {",
+              "        while (b != 0) {",
+              "            long t = a % b;",
+              "            a = b;",
+              "            b = t;",
+              "        }",
+              "        return a;",
+              "    }",
+              "",
+              "    static boolean isPrime(long n) {",
+              "        if (n < 2) return false;",
+              "        for (long i = 2; i * i <= n; i++)",
+              "            if (n % i == 0) return false;",
+              "        return true;",
+              "    }",
+              "",
+              "    static boolean[] sieve(int n) {               // isPrime[i] for every i <= n",
+              "        boolean[] isPrime = new boolean[n + 1];",
+              "        Arrays.fill(isPrime, true);",
+              "        isPrime[0] = false;",
+              "        if (n >= 1) isPrime[1] = false;",
+              "        for (int i = 2; (long) i * i <= n; i++)",
+              "            if (isPrime[i])",
+              "                for (int j = i * i; j <= n; j += i) isPrime[j] = false;",
+              "        return isPrime;",
+              "    }",
+              "",
+              "    static long power(long a, long n, long mod) {  // a^n % mod trong O(log n)",
+              "        long res = 1;",
+              "        a %= mod;",
+              "        while (n > 0) {",
+              "            if ((n & 1) == 1) res = res * a % mod;",
+              "            a = a * a % mod;",
+              "            n >>= 1;",
+              "        }",
+              "        return res;",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "problems": [
+        { "title": "Greatest Common Divisor of Strings", "url": "https://leetcode.com/problems/greatest-common-divisor-of-strings/", "level": "Easy" },
+        { "title": "Find Greatest Common Divisor of Array", "url": "https://leetcode.com/problems/find-greatest-common-divisor-of-array/", "level": "Easy" },
+        { "title": "Ugly Number", "url": "https://leetcode.com/problems/ugly-number/", "level": "Easy" },
+        { "title": "Count Primes", "url": "https://leetcode.com/problems/count-primes/", "level": "Medium" },
+        { "title": "Pow(x, n)", "url": "https://leetcode.com/problems/powx-n/", "level": "Medium" },
+        { "title": "Find the Point", "url": "https://www.hackerrank.com/challenges/find-point/problem", "level": "Easy" },
+        { "title": "Handshake", "url": "https://www.hackerrank.com/challenges/handshake/problem", "level": "Easy" },
+        { "title": "Restaurant", "url": "https://www.hackerrank.com/challenges/restaurant/problem", "level": "Easy" },
+        { "title": "Time Complexity: Primality", "url": "https://www.hackerrank.com/challenges/ctci-big-o/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "cp-algorithms: Euclidean algorithm (GCD)", "url": "https://cp-algorithms.com/algebra/euclid-algorithm.html" },
+        { "type": "article", "title": "cp-algorithms: Sieve of Eratosthenes", "url": "https://cp-algorithms.com/algebra/sieve-of-eratosthenes.html" },
+        { "type": "article", "title": "cp-algorithms: Binary exponentiation", "url": "https://cp-algorithms.com/algebra/binary-exp.html" },
+        { "type": "practice", "title": "LeetCode tag: Math", "url": "https://leetcode.com/problem-list/math/" },
+        { "type": "practice", "title": "LeetCode tag: Number Theory", "url": "https://leetcode.com/problem-list/number-theory/" }
+      ]
+    },
+    {
+      "id": "p1-sort",
+      "type": "theory",
+      "title": {
+        "vi": "Sắp xếp: tự cài merge sort, quick sort",
+        "en": "Sorting: implement merge sort and quick sort yourself"
+      },
+      "description": {
+        "vi": "Khi phỏng vấn hiếm khi phải tự viết sort, nhưng hiểu merge sort và quick sort giúp bạn làm được các bài chia để trị và quick select (tìm phần tử thứ k).",
+        "en": "You rarely have to write a sort in an interview, but understanding merge sort and quick sort unlocks divide-and-conquer problems and quick select (finding the k-th element)."
+      },
+      "keyPoints": {
+        "vi": [
+          "Merge sort: chia đôi, sort từng nửa, trộn lại. Luôn O(n log n), tốn O(n) bộ nhớ, stable",
+          "Quick sort: chọn pivot, chia thành phần < pivot và > pivot. Trung bình O(n log n), tệ nhất O(n²). Chọn pivot ngẫu nhiên để tránh trường hợp tệ",
+          "Quick select: chỉ đi tiếp vào phần chứa phần tử thứ k, trung bình O(n)",
+          "Counting sort khi khoảng giá trị nhỏ: O(n + k)"
+        ],
+        "en": [
+          "Merge sort: split in half, sort each half, merge. Always O(n log n), O(n) extra memory, stable",
+          "Quick sort: pick a pivot, partition into < pivot and > pivot. O(n log n) on average, O(n²) worst case. Use a random pivot to avoid the worst case",
+          "Quick select: only recurse into the part that contains the k-th element, O(n) on average",
+          "Counting sort when the value range is small: O(n + k)"
+        ]
+      },
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "import random",
+              "",
+              "def merge_sort(a):",
+              "    if len(a) <= 1:",
+              "        return a",
+              "    mid = len(a) // 2",
+              "    left, right = merge_sort(a[:mid]), merge_sort(a[mid:])",
+              "    res, i, j = [], 0, 0",
+              "    while i < len(left) and j < len(right):",
+              "        if left[i] <= right[j]:",
+              "            res.append(left[i]); i += 1",
+              "        else:",
+              "            res.append(right[j]); j += 1",
+              "    return res + left[i:] + right[j:]",
+              "",
+              "def quick_select(a, k):        # phần tử nhỏ thứ k (k tính từ 0)",
+              "    pivot = random.choice(a)",
+              "    less = [x for x in a if x < pivot]",
+              "    equal = [x for x in a if x == pivot]",
+              "    greater = [x for x in a if x > pivot]",
+              "    if k < len(less):",
+              "        return quick_select(less, k)",
+              "    if k < len(less) + len(equal):",
+              "        return pivot",
+              "    return quick_select(greater, k - len(less) - len(equal))"
+            ],
+            "en": [
+              "import random",
+              "",
+              "def merge_sort(a):",
+              "    if len(a) <= 1:",
+              "        return a",
+              "    mid = len(a) // 2",
+              "    left, right = merge_sort(a[:mid]), merge_sort(a[mid:])",
+              "    res, i, j = [], 0, 0",
+              "    while i < len(left) and j < len(right):",
+              "        if left[i] <= right[j]:",
+              "            res.append(left[i]); i += 1",
+              "        else:",
+              "            res.append(right[j]); j += 1",
+              "    return res + left[i:] + right[j:]",
+              "",
+              "def quick_select(a, k):        # k-th smallest element (k is 0-based)",
+              "    pivot = random.choice(a)",
+              "    less = [x for x in a if x < pivot]",
+              "    equal = [x for x in a if x == pivot]",
+              "    greater = [x for x in a if x > pivot]",
+              "    if k < len(less):",
+              "        return quick_select(less, k)",
+              "    if k < len(less) + len(equal):",
+              "        return pivot",
+              "    return quick_select(greater, k - len(less) - len(equal))"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class Sorting {",
+              "    static void mergeSort(int[] a, int lo, int hi, int[] tmp) {   // sort a[lo..hi)",
+              "        if (hi - lo <= 1) return;",
+              "        int mid = (lo + hi) >>> 1;",
+              "        mergeSort(a, lo, mid, tmp);",
+              "        mergeSort(a, mid, hi, tmp);",
+              "        int i = lo, j = mid, k = lo;",
+              "        while (i < mid && j < hi) tmp[k++] = a[i] <= a[j] ? a[i++] : a[j++];",
+              "        while (i < mid) tmp[k++] = a[i++];",
+              "        while (j < hi) tmp[k++] = a[j++];",
+              "        System.arraycopy(tmp, lo, a, lo, hi - lo);",
+              "    }",
+              "",
+              "    static final Random RNG = new Random();",
+              "",
+              "    static int quickSelect(int[] a, int k) {     // phần tử nhỏ thứ k (k tính từ 0)",
+              "        int lo = 0, hi = a.length - 1;",
+              "        while (true) {",
+              "            int pivot = a[lo + RNG.nextInt(hi - lo + 1)];",
+              "            int lt = lo, i = lo, gt = hi;          // chia 3 phần: < pivot, = pivot, > pivot",
+              "            while (i <= gt) {",
+              "                if (a[i] < pivot) swap(a, lt++, i++);",
+              "                else if (a[i] > pivot) swap(a, i, gt--);",
+              "                else i++;",
+              "            }",
+              "            if (k < lt) hi = lt - 1;",
+              "            else if (k > gt) lo = gt + 1;",
+              "            else return pivot;",
+              "        }",
+              "    }",
+              "",
+              "    static void swap(int[] a, int i, int j) {",
+              "        int t = a[i]; a[i] = a[j]; a[j] = t;",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class Sorting {",
+              "    static void mergeSort(int[] a, int lo, int hi, int[] tmp) {   // sort a[lo..hi)",
+              "        if (hi - lo <= 1) return;",
+              "        int mid = (lo + hi) >>> 1;",
+              "        mergeSort(a, lo, mid, tmp);",
+              "        mergeSort(a, mid, hi, tmp);",
+              "        int i = lo, j = mid, k = lo;",
+              "        while (i < mid && j < hi) tmp[k++] = a[i] <= a[j] ? a[i++] : a[j++];",
+              "        while (i < mid) tmp[k++] = a[i++];",
+              "        while (j < hi) tmp[k++] = a[j++];",
+              "        System.arraycopy(tmp, lo, a, lo, hi - lo);",
+              "    }",
+              "",
+              "    static final Random RNG = new Random();",
+              "",
+              "    static int quickSelect(int[] a, int k) {     // k-th smallest element (k is 0-based)",
+              "        int lo = 0, hi = a.length - 1;",
+              "        while (true) {",
+              "            int pivot = a[lo + RNG.nextInt(hi - lo + 1)];",
+              "            int lt = lo, i = lo, gt = hi;          // 3-way partition: < pivot, = pivot, > pivot",
+              "            while (i <= gt) {",
+              "                if (a[i] < pivot) swap(a, lt++, i++);",
+              "                else if (a[i] > pivot) swap(a, i, gt--);",
+              "                else i++;",
+              "            }",
+              "            if (k < lt) hi = lt - 1;",
+              "            else if (k > gt) lo = gt + 1;",
+              "            else return pivot;",
+              "        }",
+              "    }",
+              "",
+              "    static void swap(int[] a, int i, int j) {",
+              "        int t = a[i]; a[i] = a[j]; a[j] = t;",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "complexity": {
+        "vi": "Merge sort: O(n log n) time, O(n) space. Quick select: trung bình O(n).",
+        "en": "Merge sort: O(n log n) time, O(n) space. Quick select: O(n) on average."
+      },
+      "problems": [
+        { "title": "Merge Sorted Array", "url": "https://leetcode.com/problems/merge-sorted-array/", "level": "Easy" },
+        { "title": "Sort an Array", "url": "https://leetcode.com/problems/sort-an-array/", "level": "Medium" },
+        { "title": "Sort Colors", "url": "https://leetcode.com/problems/sort-colors/", "level": "Medium" },
+        { "title": "Kth Largest Element in an Array", "url": "https://leetcode.com/problems/kth-largest-element-in-an-array/", "level": "Medium" },
+        { "title": "Largest Number", "url": "https://leetcode.com/problems/largest-number/", "level": "Medium" },
+        { "title": "Sorting: Bubble Sort", "url": "https://www.hackerrank.com/challenges/ctci-bubble-sort/problem", "level": "Easy" },
+        { "title": "Insertion Sort - Part 1", "url": "https://www.hackerrank.com/challenges/insertionsort1/problem", "level": "Easy" },
+        { "title": "Quicksort 1 - Partition", "url": "https://www.hackerrank.com/challenges/quicksort1/problem", "level": "Easy" },
+        { "title": "Find the Median", "url": "https://www.hackerrank.com/challenges/find-the-median/problem", "level": "Easy" },
+        { "title": "Mark and Toys", "url": "https://www.hackerrank.com/challenges/mark-and-toys/problem", "level": "Easy" },
+        { "title": "Sorting: Comparator", "url": "https://www.hackerrank.com/challenges/ctci-comparator-sorting/problem", "level": "Medium" },
+        { "title": "Fraudulent Activity Notifications", "url": "https://www.hackerrank.com/challenges/fraudulent-activity-notifications/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "visual", "title": "VisuAlgo: Sorting", "url": "https://visualgo.net/en/sorting" },
+        { "type": "article", "title": "Tech Interview Handbook: Sorting and searching", "url": "https://www.techinterviewhandbook.org/algorithms/sorting-searching/" },
+        { "type": "course", "title": "Coursera: Algorithms, Part I (Princeton)", "url": "https://www.coursera.org/learn/algorithms-part1" },
+        { "type": "practice", "title": "LeetCode tag: Sorting", "url": "https://leetcode.com/problem-list/sorting/" }
+      ]
+    },
+    {
+      "id": "p1-hashing",
+      "type": "practice",
+      "title": { "vi": "Dạng bài Arrays and Hashing (NeetCode 150)", "en": "Arrays and Hashing problems (NeetCode 150)" },
+      "description": {
+        "vi": "Dạng bài nền tảng nhất. Ý tưởng chung: dùng hash map/set để nhớ những gì đã gặp, biến bài O(n²) thành O(n).",
+        "en": "The most fundamental pattern. Core idea: use a hash map/set to remember what you have seen, turning an O(n²) problem into O(n)."
+      },
+      "keyPoints": {
+        "vi": [
+          "Câu hỏi 'đã gặp x chưa?' → `set`",
+          "'x xuất hiện bao nhiêu lần?' → `Counter` hoặc `dict`",
+          "'phần bù của x nằm ở đâu?' (Two Sum) → `dict` lưu giá trị → chỉ số",
+          "Gom nhóm theo một khoá chung: Group Anagrams dùng chuỗi đã sort làm key",
+          "Bài top-K theo tần suất: bucket sort theo số lần xuất hiện cho O(n)"
+        ],
+        "en": [
+          "'Have I seen x before?' → `set`",
+          "'How many times does x appear?' → `Counter` or `dict`",
+          "'Where is x's complement?' (Two Sum) → `dict` mapping value → index",
+          "Group by a shared key: Group Anagrams uses the sorted string as the key",
+          "Top-K by frequency: bucket sort by count gives O(n)"
+        ]
+      },
+      "examples": [
+        {
+          "title": "Two Sum",
+          "input": "nums = [2, 7, 11, 15], target = 9",
+          "output": "[0, 1]",
+          "explain": {
+            "vi": "Duyệt từng số x, hỏi map xem `9 - x` đã gặp chưa. Gặp 7 thì thấy 2 đã có ở chỉ số 0.",
+            "en": "For each number x, ask the map whether `9 - x` was seen. At 7, we find 2 at index 0."
+          }
+        }
+      ],
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "from collections import defaultdict",
+              "",
+              "def two_sum(nums, target):",
+              "    seen = {}                      # giá trị -> chỉ số",
+              "    for i, x in enumerate(nums):",
+              "        if target - x in seen:",
+              "            return [seen[target - x], i]",
+              "        seen[x] = i",
+              "    return []",
+              "",
+              "def group_anagrams(strs):",
+              "    groups = defaultdict(list)",
+              "    for s in strs:",
+              "        groups[''.join(sorted(s))].append(s)",
+              "    return list(groups.values())"
+            ],
+            "en": [
+              "from collections import defaultdict",
+              "",
+              "def two_sum(nums, target):",
+              "    seen = {}                      # value -> index",
+              "    for i, x in enumerate(nums):",
+              "        if target - x in seen:",
+              "            return [seen[target - x], i]",
+              "        seen[x] = i",
+              "    return []",
+              "",
+              "def group_anagrams(strs):",
+              "    groups = defaultdict(list)",
+              "    for s in strs:",
+              "        groups[''.join(sorted(s))].append(s)",
+              "    return list(groups.values())"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class Hashing {",
+              "    static int[] twoSum(int[] nums, int target) {",
+              "        Map<Integer, Integer> seen = new HashMap<>();   // giá trị -> chỉ số",
+              "        for (int i = 0; i < nums.length; i++) {",
+              "            Integer j = seen.get(target - nums[i]);",
+              "            if (j != null) return new int[]{j, i};",
+              "            seen.put(nums[i], i);",
+              "        }",
+              "        return new int[0];",
+              "    }",
+              "",
+              "    static List<List<String>> groupAnagrams(String[] strs) {",
+              "        Map<String, List<String>> groups = new HashMap<>();",
+              "        for (String s : strs) {",
+              "            char[] key = s.toCharArray();",
+              "            Arrays.sort(key);",
+              "            groups.computeIfAbsent(new String(key), k -> new ArrayList<>()).add(s);",
+              "        }",
+              "        return new ArrayList<>(groups.values());",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class Hashing {",
+              "    static int[] twoSum(int[] nums, int target) {",
+              "        Map<Integer, Integer> seen = new HashMap<>();   // value -> index",
+              "        for (int i = 0; i < nums.length; i++) {",
+              "            Integer j = seen.get(target - nums[i]);",
+              "            if (j != null) return new int[]{j, i};",
+              "            seen.put(nums[i], i);",
+              "        }",
+              "        return new int[0];",
+              "    }",
+              "",
+              "    static List<List<String>> groupAnagrams(String[] strs) {",
+              "        Map<String, List<String>> groups = new HashMap<>();",
+              "        for (String s : strs) {",
+              "            char[] key = s.toCharArray();",
+              "            Arrays.sort(key);",
+              "            groups.computeIfAbsent(new String(key), k -> new ArrayList<>()).add(s);",
+              "        }",
+              "        return new ArrayList<>(groups.values());",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "complexity": { "vi": "Thường là O(n) time, O(n) space.", "en": "Usually O(n) time, O(n) space." },
+      "pitfalls": {
+        "vi": [
+          "Two Sum: kiểm tra phần bù trước rồi mới thêm x vào map, để không ghép x với chính nó",
+          "`list` không làm key được, phải đổi sang `tuple`"
+        ],
+        "en": [
+          "Two Sum: check for the complement before adding x to the map, so x is never paired with itself",
+          "A `list` can't be a dict key; convert it to a `tuple`"
+        ]
+      },
+      "problems": [
+        { "title": "Contains Duplicate", "url": "https://leetcode.com/problems/contains-duplicate/", "level": "Easy" },
+        { "title": "Valid Anagram", "url": "https://leetcode.com/problems/valid-anagram/", "level": "Easy" },
+        { "title": "Two Sum", "url": "https://leetcode.com/problems/two-sum/", "level": "Easy" },
+        { "title": "Group Anagrams", "url": "https://leetcode.com/problems/group-anagrams/", "level": "Medium" },
+        { "title": "Top K Frequent Elements", "url": "https://leetcode.com/problems/top-k-frequent-elements/", "level": "Medium" },
+        { "title": "Product of Array Except Self", "url": "https://leetcode.com/problems/product-of-array-except-self/", "level": "Medium" },
+        { "title": "Valid Sudoku", "url": "https://leetcode.com/problems/valid-sudoku/", "level": "Medium" },
+        { "title": "Longest Consecutive Sequence", "url": "https://leetcode.com/problems/longest-consecutive-sequence/", "level": "Medium" },
+        { "title": "Hash Tables: Ransom Note", "url": "https://www.hackerrank.com/challenges/ctci-ransom-note/problem", "level": "Easy" },
+        { "title": "Two Strings", "url": "https://www.hackerrank.com/challenges/two-strings/problem", "level": "Easy" },
+        { "title": "Strings: Making Anagrams", "url": "https://www.hackerrank.com/challenges/ctci-making-anagrams/problem", "level": "Easy" },
+        { "title": "2D Array - DS", "url": "https://www.hackerrank.com/challenges/2d-array/problem", "level": "Easy" },
+        { "title": "Sherlock and the Valid String", "url": "https://www.hackerrank.com/challenges/sherlock-and-valid-string/problem", "level": "Medium" },
+        { "title": "Sherlock and Anagrams", "url": "https://www.hackerrank.com/challenges/sherlock-and-anagrams/problem", "level": "Medium" },
+        { "title": "Count Triplets", "url": "https://www.hackerrank.com/challenges/count-triplets-1/problem", "level": "Medium" },
+        { "title": "Frequency Queries", "url": "https://www.hackerrank.com/challenges/frequency-queries/problem", "level": "Medium" },
+        { "title": "New Year Chaos", "url": "https://www.hackerrank.com/challenges/new-year-chaos/problem", "level": "Medium" },
+        { "title": "Minimum Swaps 2", "url": "https://www.hackerrank.com/challenges/minimum-swaps-2/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "Tech Interview Handbook: Hash table", "url": "https://www.techinterviewhandbook.org/algorithms/hash-table/" },
+        { "type": "visual", "title": "VisuAlgo: Hash Table", "url": "https://visualgo.net/en/hashtable" },
+        { "type": "practice", "title": "NeetCode Roadmap", "url": "https://neetcode.io/roadmap" },
+        { "type": "practice", "title": "LeetCode tag: Hash Table", "url": "https://leetcode.com/problem-list/hash-table/" }
+      ]
+    },
+    {
+      "id": "p1-prefix",
+      "type": "practice",
+      "title": { "vi": "Dạng bài Prefix sum và difference array", "en": "Prefix sum and difference array problems" },
+      "description": {
+        "vi": "Prefix sum cho tổng đoạn [l, r] trong O(1) sau O(n) chuẩn bị. Difference array làm ngược lại: cộng 1 giá trị cho cả đoạn trong O(1), cuối cùng cộng dồn để ra mảng kết quả.",
+        "en": "A prefix sum answers range sums [l, r] in O(1) after O(n) preprocessing. A difference array does the reverse: add a value to a whole range in O(1), then take a running sum at the end to get the result."
+      },
+      "keyPoints": {
+        "vi": [
+          "`pre[i]` = tổng `a[0..i-1]`, nên `sum(l..r) = pre[r+1] - pre[l]`. Thêm số 0 ở đầu để đỡ xét biên",
+          "Prefix sum + hash map: đếm đoạn con có tổng bằng k bằng cách tìm xem `pre - k` đã gặp bao nhiêu lần",
+          "Các biến thể: prefix tích, prefix XOR, prefix đếm",
+          "Difference array: cộng v cho đoạn [l, r] bằng `d[l] += v`, `d[r+1] -= v`, rồi cộng dồn"
+        ],
+        "en": [
+          "`pre[i]` = sum of `a[0..i-1]`, so `sum(l..r) = pre[r+1] - pre[l]`. A leading 0 saves you from edge cases",
+          "Prefix sum + hash map: count subarrays summing to k by looking up how many times `pre - k` has appeared",
+          "Variants: prefix product, prefix XOR, prefix counts",
+          "Difference array: add v to [l, r] with `d[l] += v`, `d[r+1] -= v`, then take the running sum"
+        ]
+      },
+      "examples": [
+        {
+          "title": "Subarray Sum Equals K",
+          "input": "nums = [1, 1, 1], k = 2",
+          "output": "2",
+          "explain": {
+            "vi": "Tổng tiền tố lần lượt là 1, 2, 3. Tại 2 tìm 0 (1 lần), tại 3 tìm 1 (1 lần) → 2 đoạn.",
+            "en": "Prefix sums are 1, 2, 3. At 2 we look up 0 (seen once), at 3 we look up 1 (seen once) → 2 subarrays."
+          }
+        }
+      ],
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "def subarray_sum(nums, k):",
+              "    count = {0: 1}                 # tổng tiền tố 0 xuất hiện 1 lần (đoạn rỗng)",
+              "    pre = ans = 0",
+              "    for x in nums:",
+              "        pre += x",
+              "        ans += count.get(pre - k, 0)",
+              "        count[pre] = count.get(pre, 0) + 1",
+              "    return ans",
+              "",
+              "def apply_ranges(n, updates):     # updates: [(l, r, v)], cộng v cho a[l..r]",
+              "    diff = [0] * (n + 1)",
+              "    for l, r, v in updates:",
+              "        diff[l] += v",
+              "        diff[r + 1] -= v",
+              "    res, run = [], 0",
+              "    for i in range(n):",
+              "        run += diff[i]",
+              "        res.append(run)",
+              "    return res"
+            ],
+            "en": [
+              "def subarray_sum(nums, k):",
+              "    count = {0: 1}                 # prefix sum 0 seen once (empty prefix)",
+              "    pre = ans = 0",
+              "    for x in nums:",
+              "        pre += x",
+              "        ans += count.get(pre - k, 0)",
+              "        count[pre] = count.get(pre, 0) + 1",
+              "    return ans",
+              "",
+              "def apply_ranges(n, updates):     # updates: [(l, r, v)], add v to a[l..r]",
+              "    diff = [0] * (n + 1)",
+              "    for l, r, v in updates:",
+              "        diff[l] += v",
+              "        diff[r + 1] -= v",
+              "    res, run = [], 0",
+              "    for i in range(n):",
+              "        run += diff[i]",
+              "        res.append(run)",
+              "    return res"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class PrefixSum {",
+              "    static int subarraySum(int[] nums, int k) {",
+              "        Map<Integer, Integer> count = new HashMap<>();",
+              "        count.put(0, 1);                          // tổng tiền tố 0 xuất hiện 1 lần (đoạn rỗng)",
+              "        int pre = 0, ans = 0;",
+              "        for (int x : nums) {",
+              "            pre += x;",
+              "            ans += count.getOrDefault(pre - k, 0);",
+              "            count.merge(pre, 1, Integer::sum);",
+              "        }",
+              "        return ans;",
+              "    }",
+              "",
+              "    static long[] applyRanges(int n, int[][] updates) {   // updates: {l, r, v}, cộng v cho a[l..r]",
+              "        long[] diff = new long[n + 1];",
+              "        for (int[] u : updates) {",
+              "            diff[u[0]] += u[2];",
+              "            diff[u[1] + 1] -= u[2];",
+              "        }",
+              "        long[] res = new long[n];",
+              "        long run = 0;",
+              "        for (int i = 0; i < n; i++) {",
+              "            run += diff[i];",
+              "            res[i] = run;",
+              "        }",
+              "        return res;",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class PrefixSum {",
+              "    static int subarraySum(int[] nums, int k) {",
+              "        Map<Integer, Integer> count = new HashMap<>();",
+              "        count.put(0, 1);                          // prefix sum 0 seen once (empty prefix)",
+              "        int pre = 0, ans = 0;",
+              "        for (int x : nums) {",
+              "            pre += x;",
+              "            ans += count.getOrDefault(pre - k, 0);",
+              "            count.merge(pre, 1, Integer::sum);",
+              "        }",
+              "        return ans;",
+              "    }",
+              "",
+              "    static long[] applyRanges(int n, int[][] updates) {   // updates: {l, r, v}, add v to a[l..r]",
+              "        long[] diff = new long[n + 1];",
+              "        for (int[] u : updates) {",
+              "            diff[u[0]] += u[2];",
+              "            diff[u[1] + 1] -= u[2];",
+              "        }",
+              "        long[] res = new long[n];",
+              "        long run = 0;",
+              "        for (int i = 0; i < n; i++) {",
+              "            run += diff[i];",
+              "            res[i] = run;",
+              "        }",
+              "        return res;",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "complexity": "O(n) time, O(n) space.",
+      "pitfalls": {
+        "vi": [
+          "Quên khởi tạo `count[0] = 1` nên bỏ sót các đoạn bắt đầu từ chỉ số 0",
+          "Có số âm thì sliding window không dùng được, còn prefix sum + hash map thì được"
+        ],
+        "en": [
+          "Forgetting `count[0] = 1`, which misses subarrays starting at index 0",
+          "With negative numbers, sliding window fails but prefix sum + hash map still works"
+        ]
+      },
+      "problems": [
+        { "title": "Range Sum Query - Immutable", "url": "https://leetcode.com/problems/range-sum-query-immutable/", "level": "Easy" },
+        { "title": "Subarray Sum Equals K", "url": "https://leetcode.com/problems/subarray-sum-equals-k/", "level": "Medium" },
+        { "title": "Contiguous Array", "url": "https://leetcode.com/problems/contiguous-array/", "level": "Medium" },
+        { "title": "Continuous Subarray Sum", "url": "https://leetcode.com/problems/continuous-subarray-sum/", "level": "Medium" },
+        { "title": "Corporate Flight Bookings", "url": "https://leetcode.com/problems/corporate-flight-bookings/", "level": "Medium" },
+        { "title": "Range Sum Query 2D - Immutable", "url": "https://leetcode.com/problems/range-sum-query-2d-immutable/", "level": "Medium" },
+        { "title": "Sherlock and Array", "url": "https://www.hackerrank.com/challenges/sherlock-and-array/problem", "level": "Easy" },
+        { "title": "Array Manipulation", "url": "https://www.hackerrank.com/challenges/crush/problem", "level": "Hard" },
+        { "title": "Maximum Subarray Sum", "url": "https://www.hackerrank.com/challenges/maximum-subarray-sum/problem", "level": "Hard" }
+      ],
+      "resources": [
+        { "type": "article", "title": "USACO Guide: Introduction to Prefix Sums", "url": "https://usaco.guide/silver/prefix-sums" },
+        { "type": "practice", "title": "LeetCode tag: Prefix Sum", "url": "https://leetcode.com/problem-list/prefix-sum/" }
+      ]
+    },
+    {
+      "id": "p1-twoptr",
+      "type": "practice",
+      "title": { "vi": "Dạng bài Two Pointers", "en": "Two Pointers problems" },
+      "description": {
+        "vi": "Dùng 2 chỉ số di chuyển trên mảng (thường đã sort) để loại bớt những cặp chắc chắn không phải đáp án, đưa O(n²) về O(n).",
+        "en": "Move two indices over an array (usually sorted) to skip pairs that can't be the answer, bringing O(n²) down to O(n)."
+      },
+      "keyPoints": {
+        "vi": [
+          "Hai đầu tiến vào giữa: mảng đã sort, tìm cặp có tổng bằng target",
+          "Nhanh/chậm cùng chiều: loại phần tử trùng, dồn phần tử về đầu mảng tại chỗ",
+          "3Sum = sort + cố định 1 số + two pointers cho phần còn lại, O(n²)",
+          "Luôn tự hỏi: khi tổng quá lớn thì dịch con trỏ nào, và vì sao bỏ qua được các cặp kia"
+        ],
+        "en": [
+          "Both ends moving inward: on a sorted array, find a pair that sums to target",
+          "Fast/slow in the same direction: remove duplicates, compact elements to the front in place",
+          "3Sum = sort + fix one number + two pointers on the rest, O(n²)",
+          "Always ask: when the sum is too big, which pointer moves, and why is it safe to skip those pairs?"
+        ]
+      },
+      "examples": [
+        {
+          "title": "Two Sum II",
+          "input": "numbers = [2, 7, 11, 15], target = 9",
+          "output": "[1, 2]",
+          "explain": {
+            "vi": "2 + 15 > 9 nên dịch r sang trái... đến 2 + 7 = 9. Đề đánh chỉ số từ 1.",
+            "en": "2 + 15 > 9, so move r left... until 2 + 7 = 9. The problem uses 1-based indices."
+          }
+        }
+      ],
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "def two_sum_sorted(nums, target):",
+              "    l, r = 0, len(nums) - 1",
+              "    while l < r:",
+              "        s = nums[l] + nums[r]",
+              "        if s == target:",
+              "            return [l + 1, r + 1]",
+              "        if s < target:",
+              "            l += 1                 # cần tổng lớn hơn",
+              "        else:",
+              "            r -= 1                 # cần tổng nhỏ hơn",
+              "    return []",
+              "",
+              "def three_sum(nums):",
+              "    nums.sort()",
+              "    res = []",
+              "    for i in range(len(nums) - 2):",
+              "        if i > 0 and nums[i] == nums[i - 1]:",
+              "            continue               # bỏ số trùng",
+              "        l, r = i + 1, len(nums) - 1",
+              "        while l < r:",
+              "            s = nums[i] + nums[l] + nums[r]",
+              "            if s < 0:",
+              "                l += 1",
+              "            elif s > 0:",
+              "                r -= 1",
+              "            else:",
+              "                res.append([nums[i], nums[l], nums[r]])",
+              "                l += 1",
+              "                while l < r and nums[l] == nums[l - 1]:",
+              "                    l += 1",
+              "    return res"
+            ],
+            "en": [
+              "def two_sum_sorted(nums, target):",
+              "    l, r = 0, len(nums) - 1",
+              "    while l < r:",
+              "        s = nums[l] + nums[r]",
+              "        if s == target:",
+              "            return [l + 1, r + 1]",
+              "        if s < target:",
+              "            l += 1                 # need a bigger sum",
+              "        else:",
+              "            r -= 1                 # need a smaller sum",
+              "    return []",
+              "",
+              "def three_sum(nums):",
+              "    nums.sort()",
+              "    res = []",
+              "    for i in range(len(nums) - 2):",
+              "        if i > 0 and nums[i] == nums[i - 1]:",
+              "            continue               # skip duplicates",
+              "        l, r = i + 1, len(nums) - 1",
+              "        while l < r:",
+              "            s = nums[i] + nums[l] + nums[r]",
+              "            if s < 0:",
+              "                l += 1",
+              "            elif s > 0:",
+              "                r -= 1",
+              "            else:",
+              "                res.append([nums[i], nums[l], nums[r]])",
+              "                l += 1",
+              "                while l < r and nums[l] == nums[l - 1]:",
+              "                    l += 1",
+              "    return res"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class TwoPointers {",
+              "    static int[] twoSumSorted(int[] nums, int target) {",
+              "        int l = 0, r = nums.length - 1;",
+              "        while (l < r) {",
+              "            int s = nums[l] + nums[r];",
+              "            if (s == target) return new int[]{l + 1, r + 1};",
+              "            if (s < target) l++;                 // cần tổng lớn hơn",
+              "            else r--;                            // cần tổng nhỏ hơn",
+              "        }",
+              "        return new int[0];",
+              "    }",
+              "",
+              "    static List<List<Integer>> threeSum(int[] nums) {",
+              "        Arrays.sort(nums);",
+              "        List<List<Integer>> res = new ArrayList<>();",
+              "        for (int i = 0; i < nums.length - 2; i++) {",
+              "            if (i > 0 && nums[i] == nums[i - 1]) continue;   // bỏ số trùng",
+              "            int l = i + 1, r = nums.length - 1;",
+              "            while (l < r) {",
+              "                int s = nums[i] + nums[l] + nums[r];",
+              "                if (s < 0) l++;",
+              "                else if (s > 0) r--;",
+              "                else {",
+              "                    res.add(List.of(nums[i], nums[l], nums[r]));",
+              "                    l++;",
+              "                    while (l < r && nums[l] == nums[l - 1]) l++;",
+              "                }",
+              "            }",
+              "        }",
+              "        return res;",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class TwoPointers {",
+              "    static int[] twoSumSorted(int[] nums, int target) {",
+              "        int l = 0, r = nums.length - 1;",
+              "        while (l < r) {",
+              "            int s = nums[l] + nums[r];",
+              "            if (s == target) return new int[]{l + 1, r + 1};",
+              "            if (s < target) l++;                 // need a bigger sum",
+              "            else r--;                            // need a smaller sum",
+              "        }",
+              "        return new int[0];",
+              "    }",
+              "",
+              "    static List<List<Integer>> threeSum(int[] nums) {",
+              "        Arrays.sort(nums);",
+              "        List<List<Integer>> res = new ArrayList<>();",
+              "        for (int i = 0; i < nums.length - 2; i++) {",
+              "            if (i > 0 && nums[i] == nums[i - 1]) continue;   // skip duplicates",
+              "            int l = i + 1, r = nums.length - 1;",
+              "            while (l < r) {",
+              "                int s = nums[i] + nums[l] + nums[r];",
+              "                if (s < 0) l++;",
+              "                else if (s > 0) r--;",
+              "                else {",
+              "                    res.add(List.of(nums[i], nums[l], nums[r]));",
+              "                    l++;",
+              "                    while (l < r && nums[l] == nums[l - 1]) l++;",
+              "                }",
+              "            }",
+              "        }",
+              "        return res;",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "complexity": {
+        "vi": "O(n) cho mỗi lượt quét, cộng O(n log n) nếu phải sort.",
+        "en": "O(n) per scan, plus O(n log n) if you need to sort."
+      },
+      "pitfalls": {
+        "vi": [
+          "3Sum: quên bỏ qua số trùng nên ra các bộ ba trùng nhau",
+          "Container With Most Water: phải dịch cạnh thấp hơn, không phải cạnh cao hơn"
+        ],
+        "en": [
+          "3Sum: forgetting to skip duplicates, which produces repeated triplets",
+          "Container With Most Water: move the shorter side, not the taller one"
+        ]
+      },
+      "problems": [
+        { "title": "Valid Palindrome", "url": "https://leetcode.com/problems/valid-palindrome/", "level": "Easy" },
+        { "title": "Two Sum II - Input Array Is Sorted", "url": "https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/", "level": "Medium" },
+        { "title": "3Sum", "url": "https://leetcode.com/problems/3sum/", "level": "Medium" },
+        { "title": "Container With Most Water", "url": "https://leetcode.com/problems/container-with-most-water/", "level": "Medium" },
+        { "title": "Trapping Rain Water", "url": "https://leetcode.com/problems/trapping-rain-water/", "level": "Hard" },
+        { "title": "Pairs", "url": "https://www.hackerrank.com/challenges/pairs/problem", "level": "Medium" },
+        { "title": "Triple sum", "url": "https://www.hackerrank.com/challenges/triple-sum/problem", "level": "Medium" },
+        { "title": "Game of Two Stacks", "url": "https://www.hackerrank.com/challenges/game-of-two-stacks/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "USACO Guide: Two Pointers", "url": "https://usaco.guide/silver/two-pointers" },
+        { "type": "practice", "title": "LeetCode tag: Two Pointers", "url": "https://leetcode.com/problem-list/two-pointers/" }
+      ]
+    },
+    {
+      "id": "p1-window",
+      "type": "practice",
+      "title": { "vi": "Dạng bài Sliding Window", "en": "Sliding Window problems" },
+      "description": {
+        "vi": "Một dạng two pointers cho bài 'đoạn con liên tiếp tốt nhất'. Cửa sổ [l, r]: mở rộng r, khi cửa sổ vi phạm điều kiện thì co l lại.",
+        "en": "A two-pointer variant for 'best contiguous subarray/substring' problems. Window [l, r]: extend r, and shrink l whenever the window breaks the condition."
+      },
+      "keyPoints": {
+        "vi": [
+          "Cửa sổ cố định kích thước k: thêm phần tử mới, bỏ phần tử cũ",
+          "Cửa sổ co giãn: `for r` để mở rộng, `while` vi phạm thì co `l`",
+          "Trạng thái của cửa sổ thường là `Counter` hoặc một tổng",
+          "Chỉ dùng được khi co cửa sổ không làm nó tệ hơn. Có số âm thì thường phải đổi sang prefix sum"
+        ],
+        "en": [
+          "Fixed window of size k: add the new element, drop the old one",
+          "Variable window: `for r` to extend, `while` invalid shrink `l`",
+          "The window's state is usually a `Counter` or a running sum",
+          "Only works when shrinking never makes the window worse. With negative numbers, switch to prefix sums"
+        ]
+      },
+      "examples": [
+        {
+          "title": "Longest Substring Without Repeating Characters",
+          "input": "s = 'abcabcbb'",
+          "output": "3",
+          "explain": {
+            "vi": "Cửa sổ dài nhất không lặp ký tự là 'abc'.",
+            "en": "The longest window without a repeated character is 'abc'."
+          }
+        }
+      ],
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "def length_of_longest_substring(s):",
+              "    last = {}                      # ký tự -> vị trí gần nhất",
+              "    l = best = 0",
+              "    for r, ch in enumerate(s):",
+              "        if ch in last and last[ch] >= l:",
+              "            l = last[ch] + 1       # co cửa sổ qua ký tự bị trùng",
+              "        last[ch] = r",
+              "        best = max(best, r - l + 1)",
+              "    return best",
+              "",
+              "# Khung tổng quát",
+              "def sliding_window(a):",
+              "    l = 0",
+              "    state = ...                    # Counter, tổng, ...",
+              "    for r in range(len(a)):",
+              "        # thêm a[r] vào state",
+              "        while ...:                 # cửa sổ vi phạm điều kiện",
+              "            # bỏ a[l] khỏi state",
+              "            l += 1",
+              "        # cập nhật đáp án với cửa sổ [l, r]"
+            ],
+            "en": [
+              "def length_of_longest_substring(s):",
+              "    last = {}                      # char -> last seen index",
+              "    l = best = 0",
+              "    for r, ch in enumerate(s):",
+              "        if ch in last and last[ch] >= l:",
+              "            l = last[ch] + 1       # shrink past the repeated char",
+              "        last[ch] = r",
+              "        best = max(best, r - l + 1)",
+              "    return best",
+              "",
+              "# General template",
+              "def sliding_window(a):",
+              "    l = 0",
+              "    state = ...                    # Counter, sum, ...",
+              "    for r in range(len(a)):",
+              "        # add a[r] to state",
+              "        while ...:                 # window breaks the condition",
+              "            # remove a[l] from state",
+              "            l += 1",
+              "        # update the answer with window [l, r]"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class SlidingWindow {",
+              "    static int lengthOfLongestSubstring(String s) {",
+              "        Map<Character, Integer> last = new HashMap<>();   // ký tự -> vị trí gần nhất",
+              "        int l = 0, best = 0;",
+              "        for (int r = 0; r < s.length(); r++) {",
+              "            char ch = s.charAt(r);",
+              "            Integer prev = last.get(ch);",
+              "            if (prev != null && prev >= l) l = prev + 1;    // co cửa sổ qua ký tự bị trùng",
+              "            last.put(ch, r);",
+              "            best = Math.max(best, r - l + 1);",
+              "        }",
+              "        return best;",
+              "    }",
+              "",
+              "    // Khung tổng quát: đoạn con dài nhất có tổng <= k (mảng không âm)",
+              "    static int longestAtMostK(int[] a, int k) {",
+              "        int l = 0, sum = 0, best = 0;",
+              "        for (int r = 0; r < a.length; r++) {",
+              "            sum += a[r];                         // thêm a[r] vào state",
+              "            while (sum > k) sum -= a[l++];       // cửa sổ vi phạm điều kiện -> co l",
+              "            best = Math.max(best, r - l + 1);    // cập nhật đáp án với cửa sổ [l, r]",
+              "        }",
+              "        return best;",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class SlidingWindow {",
+              "    static int lengthOfLongestSubstring(String s) {",
+              "        Map<Character, Integer> last = new HashMap<>();   // char -> last seen index",
+              "        int l = 0, best = 0;",
+              "        for (int r = 0; r < s.length(); r++) {",
+              "            char ch = s.charAt(r);",
+              "            Integer prev = last.get(ch);",
+              "            if (prev != null && prev >= l) l = prev + 1;    // shrink past the repeated char",
+              "            last.put(ch, r);",
+              "            best = Math.max(best, r - l + 1);",
+              "        }",
+              "        return best;",
+              "    }",
+              "",
+              "    // General template: longest subarray with sum <= k (non-negative values)",
+              "    static int longestAtMostK(int[] a, int k) {",
+              "        int l = 0, sum = 0, best = 0;",
+              "        for (int r = 0; r < a.length; r++) {",
+              "            sum += a[r];                         // add a[r] to state",
+              "            while (sum > k) sum -= a[l++];       // window breaks the condition -> shrink l",
+              "            best = Math.max(best, r - l + 1);    // update the answer with window [l, r]",
+              "        }",
+              "        return best;",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "complexity": {
+        "vi": "O(n): mỗi phần tử vào và ra khỏi cửa sổ tối đa 1 lần.",
+        "en": "O(n): each element enters and leaves the window at most once."
+      },
+      "pitfalls": {
+        "vi": [
+          "Cập nhật đáp án sai chỗ: bài tìm đoạn dài nhất cập nhật sau khi co, bài tìm đoạn ngắn nhất cập nhật bên trong vòng while"
+        ],
+        "en": [
+          "Updating the answer in the wrong place: for the longest window update after shrinking, for the shortest window update inside the while loop"
+        ]
+      },
+      "problems": [
+        { "title": "Best Time to Buy and Sell Stock", "url": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/", "level": "Easy" },
+        { "title": "Longest Substring Without Repeating Characters", "url": "https://leetcode.com/problems/longest-substring-without-repeating-characters/", "level": "Medium" },
+        { "title": "Longest Repeating Character Replacement", "url": "https://leetcode.com/problems/longest-repeating-character-replacement/", "level": "Medium" },
+        { "title": "Permutation in String", "url": "https://leetcode.com/problems/permutation-in-string/", "level": "Medium" },
+        { "title": "Minimum Window Substring", "url": "https://leetcode.com/problems/minimum-window-substring/", "level": "Hard" },
+        { "title": "Sliding Window Maximum", "url": "https://leetcode.com/problems/sliding-window-maximum/", "level": "Hard" },
+        { "title": "Max Min", "url": "https://www.hackerrank.com/challenges/angry-children/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "GeeksforGeeks: Sliding Window Technique", "url": "https://www.geeksforgeeks.org/dsa/window-sliding-technique/" },
+        { "type": "practice", "title": "LeetCode tag: Sliding Window", "url": "https://leetcode.com/problem-list/sliding-window/" }
+      ]
+    },
+    {
+      "id": "p1-cses",
+      "type": "practice",
+      "title": "CSES: Introductory Problems",
+      "description": {
+        "vi": "CSES là bộ bài cổ điển có chấm tự động, đề ngắn và chuẩn. Phần Introductory luyện cài đặt cẩn thận và xử lý input/output.\n\nKhông bắt buộc nếu bạn chỉ luyện phỏng vấn, nhưng rất tốt để tăng tốc độ code.",
+        "en": "CSES is a classic problem set with an online judge and short, precise statements. The Introductory section trains careful implementation and input/output handling.\n\nOptional if you only prepare for interviews, but great for coding speed."
+      },
+      "keyPoints": {
+        "vi": [
+          "Đọc kỹ giới hạn, dùng `long long` hoặc số nguyên lớn khi cần",
+          "Python dễ bị quá thời gian ở CSES. Bị TLE thì thử viết lại bằng C++"
+        ],
+        "en": [
+          "Read the limits carefully and use `long long` or big integers when needed",
+          "Python often hits the time limit on CSES. If you get TLE, try rewriting in C++"
+        ]
+      },
+      "problems": [
+        { "title": "Weird Algorithm", "url": "https://cses.fi/problemset/task/1068" },
+        { "title": "Missing Number", "url": "https://cses.fi/problemset/task/1083" },
+        { "title": "Repetitions", "url": "https://cses.fi/problemset/task/1069" },
+        { "title": "Increasing Array", "url": "https://cses.fi/problemset/task/1094" },
+        { "title": "Permutations", "url": "https://cses.fi/problemset/task/1070" }
+      ],
+      "resources": [
+        { "type": "book", "title": "Competitive Programmer's Handbook (PDF)", "url": "https://cses.fi/book/book.pdf" },
+        {
+          "type": "practice",
+          "title": { "vi": "Toàn bộ CSES Problem Set", "en": "Full CSES Problem Set" },
+          "url": "https://cses.fi/problemset/"
+        }
+      ]
+    }
+  ]
+}

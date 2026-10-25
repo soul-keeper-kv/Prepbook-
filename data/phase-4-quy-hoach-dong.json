@@ -1,0 +1,1186 @@
+{
+  "id": "p4",
+  "name": {
+    "vi": "Giai đoạn 4 · Quy hoạch động và đồ thị nâng cao",
+    "en": "Phase 4 · Dynamic programming and advanced graphs"
+  },
+  "time": { "vi": "6–8 tuần", "en": "6–8 weeks" },
+  "items": [
+    {
+      "id": "p4-dp",
+      "type": "theory",
+      "title": {
+        "vi": "DP cổ điển: knapsack, LIS, LCS, edit distance",
+        "en": "Classic DP: knapsack, LIS, LCS, edit distance"
+      },
+      "description": {
+        "vi": "DP = đệ quy + nhớ lại kết quả của các bài con. Bài làm được bằng DP khi có **bài con lặp lại** và **lời giải tối ưu được xây từ lời giải tối ưu của bài con**.\n\nLàm theo 4 bước: định nghĩa trạng thái, viết công thức chuyển, xác định trường hợp cơ sở, chọn thứ tự tính.",
+        "en": "DP = recursion + remembering subproblem results. A problem fits DP when it has **overlapping subproblems** and **an optimal solution built from optimal sub-solutions**.\n\nFollow 4 steps: define the state, write the transition, set the base cases, choose the evaluation order."
+      },
+      "keyPoints": {
+        "vi": [
+          "Bắt đầu bằng đệ quy + `@cache` (top-down). Chạy đúng rồi mới chuyển sang bảng (bottom-up) nếu cần",
+          "Knapsack 0/1: `dp[w] = max(dp[w], dp[w - wt] + val)`, duyệt w **giảm dần**",
+          "Knapsack không giới hạn số lượng (Coin Change): duyệt w **tăng dần**",
+          "LIS O(n log n): mảng `tails` kết hợp binary search",
+          "LCS / Edit Distance: bảng 2 chiều `dp[i][j]` trên tiền tố của 2 chuỗi"
+        ],
+        "en": [
+          "Start with recursion + `@cache` (top-down). Once it's correct, convert to a table (bottom-up) if needed",
+          "0/1 knapsack: `dp[w] = max(dp[w], dp[w - wt] + val)`, iterate w in **decreasing** order",
+          "Unbounded knapsack (Coin Change): iterate w in **increasing** order",
+          "LIS in O(n log n): a `tails` array plus binary search",
+          "LCS / Edit Distance: a 2D table `dp[i][j]` over prefixes of the two strings"
+        ]
+      },
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "from functools import cache",
+              "import bisect",
+              "",
+              "def knapsack_01(weights, values, W):",
+              "    dp = [0] * (W + 1)             # dp[w] = giá trị lớn nhất với sức chứa w",
+              "    for wt, val in zip(weights, values):",
+              "        for w in range(W, wt - 1, -1):   # duyệt giảm: mỗi món dùng 1 lần",
+              "            dp[w] = max(dp[w], dp[w - wt] + val)",
+              "    return dp[W]",
+              "",
+              "def coin_change(coins, amount):",
+              "    INF = float('inf')",
+              "    dp = [0] + [INF] * amount      # dp[a] = số xu ít nhất để được a",
+              "    for a in range(1, amount + 1):",
+              "        for c in coins:",
+              "            if c <= a:",
+              "                dp[a] = min(dp[a], dp[a - c] + 1)",
+              "    return dp[amount] if dp[amount] != INF else -1",
+              "",
+              "def length_of_lis(nums):           # O(n log n)",
+              "    tails = []                     # tails[k] = phần tử cuối nhỏ nhất của dãy tăng dài k + 1",
+              "    for x in nums:",
+              "        i = bisect.bisect_left(tails, x)",
+              "        if i == len(tails):",
+              "            tails.append(x)",
+              "        else:",
+              "            tails[i] = x",
+              "    return len(tails)",
+              "",
+              "def lcs(a, b):                     # top-down cho dễ nghĩ",
+              "    @cache",
+              "    def go(i, j):",
+              "        if i == len(a) or j == len(b):",
+              "            return 0",
+              "        if a[i] == b[j]:",
+              "            return 1 + go(i + 1, j + 1)",
+              "        return max(go(i + 1, j), go(i, j + 1))",
+              "    return go(0, 0)"
+            ],
+            "en": [
+              "from functools import cache",
+              "import bisect",
+              "",
+              "def knapsack_01(weights, values, W):",
+              "    dp = [0] * (W + 1)             # dp[w] = best value with capacity w",
+              "    for wt, val in zip(weights, values):",
+              "        for w in range(W, wt - 1, -1):   # go down: each item used once",
+              "            dp[w] = max(dp[w], dp[w - wt] + val)",
+              "    return dp[W]",
+              "",
+              "def coin_change(coins, amount):",
+              "    INF = float('inf')",
+              "    dp = [0] + [INF] * amount      # dp[a] = fewest coins to make a",
+              "    for a in range(1, amount + 1):",
+              "        for c in coins:",
+              "            if c <= a:",
+              "                dp[a] = min(dp[a], dp[a - c] + 1)",
+              "    return dp[amount] if dp[amount] != INF else -1",
+              "",
+              "def length_of_lis(nums):           # O(n log n)",
+              "    tails = []                     # tails[k] = smallest tail of an increasing run of length k + 1",
+              "    for x in nums:",
+              "        i = bisect.bisect_left(tails, x)",
+              "        if i == len(tails):",
+              "            tails.append(x)",
+              "        else:",
+              "            tails[i] = x",
+              "    return len(tails)",
+              "",
+              "def lcs(a, b):                     # top-down, easier to reason about",
+              "    @cache",
+              "    def go(i, j):",
+              "        if i == len(a) or j == len(b):",
+              "            return 0",
+              "        if a[i] == b[j]:",
+              "            return 1 + go(i + 1, j + 1)",
+              "        return max(go(i + 1, j), go(i, j + 1))",
+              "    return go(0, 0)"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class ClassicDP {",
+              "    static int knapsack01(int[] weights, int[] values, int W) {",
+              "        int[] dp = new int[W + 1];                 // dp[w] = giá trị lớn nhất với sức chứa w",
+              "        for (int i = 0; i < weights.length; i++)",
+              "            for (int w = W; w >= weights[i]; w--)  // duyệt giảm: mỗi món dùng 1 lần",
+              "                dp[w] = Math.max(dp[w], dp[w - weights[i]] + values[i]);",
+              "        return dp[W];",
+              "    }",
+              "",
+              "    static int coinChange(int[] coins, int amount) {",
+              "        int INF = Integer.MAX_VALUE / 2;",
+              "        int[] dp = new int[amount + 1];            // dp[a] = số xu ít nhất để được a",
+              "        Arrays.fill(dp, INF);",
+              "        dp[0] = 0;",
+              "        for (int a = 1; a <= amount; a++)",
+              "            for (int c : coins)",
+              "                if (c <= a) dp[a] = Math.min(dp[a], dp[a - c] + 1);",
+              "        return dp[amount] >= INF ? -1 : dp[amount];",
+              "    }",
+              "",
+              "    static int lengthOfLIS(int[] nums) {           // O(n log n)",
+              "        int[] tails = new int[nums.length];        // tails[k] = phần tử cuối nhỏ nhất của dãy tăng dài k + 1",
+              "        int size = 0;",
+              "        for (int x : nums) {",
+              "            int lo = 0, hi = size;",
+              "            while (lo < hi) {",
+              "                int mid = (lo + hi) >>> 1;",
+              "                if (tails[mid] < x) lo = mid + 1;",
+              "                else hi = mid;",
+              "            }",
+              "            tails[lo] = x;",
+              "            if (lo == size) size++;",
+              "        }",
+              "        return size;",
+              "    }",
+              "",
+              "    static int lcs(String a, String b) {           // bottom-up",
+              "        int n = a.length(), m = b.length();",
+              "        int[][] dp = new int[n + 1][m + 1];        // dp[i][j] = LCS của a[i:] và b[j:]",
+              "        for (int i = n - 1; i >= 0; i--)",
+              "            for (int j = m - 1; j >= 0; j--)",
+              "                dp[i][j] = a.charAt(i) == b.charAt(j)",
+              "                        ? 1 + dp[i + 1][j + 1]",
+              "                        : Math.max(dp[i + 1][j], dp[i][j + 1]);",
+              "        return dp[0][0];",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class ClassicDP {",
+              "    static int knapsack01(int[] weights, int[] values, int W) {",
+              "        int[] dp = new int[W + 1];                 // dp[w] = best value with capacity w",
+              "        for (int i = 0; i < weights.length; i++)",
+              "            for (int w = W; w >= weights[i]; w--)  // go down: each item used once",
+              "                dp[w] = Math.max(dp[w], dp[w - weights[i]] + values[i]);",
+              "        return dp[W];",
+              "    }",
+              "",
+              "    static int coinChange(int[] coins, int amount) {",
+              "        int INF = Integer.MAX_VALUE / 2;",
+              "        int[] dp = new int[amount + 1];            // dp[a] = fewest coins to make a",
+              "        Arrays.fill(dp, INF);",
+              "        dp[0] = 0;",
+              "        for (int a = 1; a <= amount; a++)",
+              "            for (int c : coins)",
+              "                if (c <= a) dp[a] = Math.min(dp[a], dp[a - c] + 1);",
+              "        return dp[amount] >= INF ? -1 : dp[amount];",
+              "    }",
+              "",
+              "    static int lengthOfLIS(int[] nums) {           // O(n log n)",
+              "        int[] tails = new int[nums.length];        // tails[k] = smallest tail of an increasing run of length k + 1",
+              "        int size = 0;",
+              "        for (int x : nums) {",
+              "            int lo = 0, hi = size;",
+              "            while (lo < hi) {",
+              "                int mid = (lo + hi) >>> 1;",
+              "                if (tails[mid] < x) lo = mid + 1;",
+              "                else hi = mid;",
+              "            }",
+              "            tails[lo] = x;",
+              "            if (lo == size) size++;",
+              "        }",
+              "        return size;",
+              "    }",
+              "",
+              "    static int lcs(String a, String b) {           // bottom-up",
+              "        int n = a.length(), m = b.length();",
+              "        int[][] dp = new int[n + 1][m + 1];        // dp[i][j] = LCS of a[i:] and b[j:]",
+              "        for (int i = n - 1; i >= 0; i--)",
+              "            for (int j = m - 1; j >= 0; j--)",
+              "                dp[i][j] = a.charAt(i) == b.charAt(j)",
+              "                        ? 1 + dp[i + 1][j + 1]",
+              "                        : Math.max(dp[i + 1][j], dp[i][j + 1]);",
+              "        return dp[0][0];",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "complexity": "Knapsack O(n·W). LIS O(n log n). LCS / Edit Distance O(n·m).",
+      "pitfalls": {
+        "vi": [
+          "Định nghĩa trạng thái mơ hồ. Hãy viết rõ thành câu: 'dp[i] là ...'",
+          "Knapsack 0/1 mà duyệt w tăng dần thì 1 món bị chọn nhiều lần"
+        ],
+        "en": [
+          "A vague state definition. Write it out as a sentence: 'dp[i] is ...'",
+          "Iterating w upward in 0/1 knapsack lets one item be taken multiple times"
+        ]
+      },
+      "problems": [
+        { "title": "Coin Change", "url": "https://leetcode.com/problems/coin-change/", "level": "Medium" },
+        { "title": "Longest Increasing Subsequence", "url": "https://leetcode.com/problems/longest-increasing-subsequence/", "level": "Medium" },
+        { "title": "Longest Common Subsequence", "url": "https://leetcode.com/problems/longest-common-subsequence/", "level": "Medium" },
+        { "title": "Edit Distance", "url": "https://leetcode.com/problems/edit-distance/", "level": "Medium" },
+        { "title": "Partition Equal Subset Sum", "url": "https://leetcode.com/problems/partition-equal-subset-sum/", "level": "Medium" },
+        { "title": "Target Sum", "url": "https://leetcode.com/problems/target-sum/", "level": "Medium" },
+        { "title": "Max Array Sum", "url": "https://www.hackerrank.com/challenges/max-array-sum/problem", "level": "Medium" },
+        { "title": "The Coin Change Problem", "url": "https://www.hackerrank.com/challenges/coin-change/problem", "level": "Medium" },
+        { "title": "Knapsack", "url": "https://www.hackerrank.com/challenges/unbounded-knapsack/problem", "level": "Medium" },
+        { "title": "The Longest Common Subsequence", "url": "https://www.hackerrank.com/challenges/dynamic-programming-classics-the-longest-common-subsequence/problem", "level": "Medium" },
+        { "title": "Common Child", "url": "https://www.hackerrank.com/challenges/common-child/problem", "level": "Medium" },
+        { "title": "Abbreviation", "url": "https://www.hackerrank.com/challenges/abbr/problem", "level": "Medium" },
+        { "title": "Candies", "url": "https://www.hackerrank.com/challenges/candies/problem", "level": "Medium" },
+        { "title": "The Longest Increasing Subsequence", "url": "https://www.hackerrank.com/challenges/longest-increasing-subsequent/problem", "level": "Advanced" }
+      ],
+      "resources": [
+        { "type": "article", "title": "cp-algorithms: Introduction to Dynamic Programming", "url": "https://cp-algorithms.com/dynamic_programming/intro-to-dp.html" },
+        { "type": "article", "title": "cp-algorithms: Knapsack problem", "url": "https://cp-algorithms.com/dynamic_programming/knapsack.html" },
+        { "type": "video", "title": "freeCodeCamp: Dynamic Programming - Learn to Solve Algorithmic Problems", "url": "https://www.youtube.com/watch?v=oBt53YbR9Kk" },
+        { "type": "practice", "title": "LeetCode study plan: Dynamic Programming", "url": "https://leetcode.com/studyplan/dynamic-programming/" },
+        { "type": "practice", "title": "LeetCode tag: Dynamic Programming", "url": "https://leetcode.com/problem-list/dynamic-programming/" }
+      ]
+    },
+    {
+      "id": "p4-dp-adv",
+      "type": "theory",
+      "title": { "vi": "DP lưới, DP đoạn, DP bitmask, DP trên cây", "en": "Grid DP, interval DP, bitmask DP, tree DP" },
+      "description": {
+        "vi": "Các dạng DP này khác nhau ở cách định nghĩa trạng thái, còn tư duy vẫn như DP cổ điển.",
+        "en": "These DP families differ in how the state is defined; the thinking is the same as classic DP."
+      },
+      "keyPoints": {
+        "vi": [
+          "DP lưới: `dp[i][j]` tính từ ô bên trên và ô bên trái",
+          "DP đoạn: `dp[l][r]` trên đoạn con, duyệt theo độ dài đoạn tăng dần (Burst Balloons)",
+          "DP bitmask: `dp[mask]` với mask là tập đã chọn, dùng khi n ≤ 20",
+          "DP trên cây: DFS trả về nhiều trạng thái cho mỗi node, vd. (lấy node này, không lấy node này)"
+        ],
+        "en": [
+          "Grid DP: `dp[i][j]` comes from the cell above and the cell to the left",
+          "Interval DP: `dp[l][r]` over a subarray, iterate by increasing length (Burst Balloons)",
+          "Bitmask DP: `dp[mask]` where mask is the chosen set, for n ≤ 20",
+          "Tree DP: DFS returns several states per node, e.g. (take this node, skip this node)"
+        ]
+      },
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "def unique_paths(m, n):            # DP lưới, rút gọn còn 1 hàng",
+              "    dp = [1] * n",
+              "    for _ in range(1, m):",
+              "        for j in range(1, n):",
+              "            dp[j] += dp[j - 1]",
+              "    return dp[-1]",
+              "",
+              "def rob_tree(root):                # House Robber III: DP trên cây",
+              "    def dfs(node):                 # trả về (lấy node, không lấy node)",
+              "        if not node:",
+              "            return 0, 0",
+              "        l_take, l_skip = dfs(node.left)",
+              "        r_take, r_skip = dfs(node.right)",
+              "        take = node.val + l_skip + r_skip",
+              "        skip = max(l_take, l_skip) + max(r_take, r_skip)",
+              "        return take, skip",
+              "    return max(dfs(root))",
+              "",
+              "def max_coins(nums):               # Burst Balloons: DP đoạn",
+              "    a = [1] + nums + [1]",
+              "    n = len(a)",
+              "    dp = [[0] * n for _ in range(n)]   # dp[l][r]: đoạn mở (l, r)",
+              "    for length in range(2, n):",
+              "        for l in range(n - length):",
+              "            r = l + length",
+              "            for k in range(l + 1, r):  # k là quả bóng nổ cuối cùng trong (l, r)",
+              "                dp[l][r] = max(dp[l][r], dp[l][k] + dp[k][r] + a[l] * a[k] * a[r])",
+              "    return dp[0][n - 1]"
+            ],
+            "en": [
+              "def unique_paths(m, n):            # grid DP, reduced to one row",
+              "    dp = [1] * n",
+              "    for _ in range(1, m):",
+              "        for j in range(1, n):",
+              "            dp[j] += dp[j - 1]",
+              "    return dp[-1]",
+              "",
+              "def rob_tree(root):                # House Robber III: tree DP",
+              "    def dfs(node):                 # returns (take node, skip node)",
+              "        if not node:",
+              "            return 0, 0",
+              "        l_take, l_skip = dfs(node.left)",
+              "        r_take, r_skip = dfs(node.right)",
+              "        take = node.val + l_skip + r_skip",
+              "        skip = max(l_take, l_skip) + max(r_take, r_skip)",
+              "        return take, skip",
+              "    return max(dfs(root))",
+              "",
+              "def max_coins(nums):               # Burst Balloons: interval DP",
+              "    a = [1] + nums + [1]",
+              "    n = len(a)",
+              "    dp = [[0] * n for _ in range(n)]   # dp[l][r]: open interval (l, r)",
+              "    for length in range(2, n):",
+              "        for l in range(n - length):",
+              "            r = l + length",
+              "            for k in range(l + 1, r):  # k is the last balloon to burst in (l, r)",
+              "                dp[l][r] = max(dp[l][r], dp[l][k] + dp[k][r] + a[l] * a[k] * a[r])",
+              "    return dp[0][n - 1]"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class AdvancedDP {",
+              "    static int uniquePaths(int m, int n) {         // DP lưới, rút gọn còn 1 hàng",
+              "        int[] dp = new int[n];",
+              "        Arrays.fill(dp, 1);",
+              "        for (int i = 1; i < m; i++)",
+              "            for (int j = 1; j < n; j++)",
+              "                dp[j] += dp[j - 1];",
+              "        return dp[n - 1];",
+              "    }",
+              "",
+              "    // House Robber III: DP trên cây",
+              "    static int rob(TreeNode root) {",
+              "        int[] r = dfs(root);",
+              "        return Math.max(r[0], r[1]);",
+              "    }",
+              "",
+              "    static int[] dfs(TreeNode node) {              // trả về {lấy node, không lấy node}",
+              "        if (node == null) return new int[]{0, 0};",
+              "        int[] l = dfs(node.left), r = dfs(node.right);",
+              "        int take = node.val + l[1] + r[1];",
+              "        int skip = Math.max(l[0], l[1]) + Math.max(r[0], r[1]);",
+              "        return new int[]{take, skip};",
+              "    }",
+              "",
+              "    static int maxCoins(int[] nums) {              // Burst Balloons: DP đoạn",
+              "        int n = nums.length + 2;",
+              "        int[] a = new int[n];",
+              "        a[0] = a[n - 1] = 1;",
+              "        for (int i = 0; i < nums.length; i++) a[i + 1] = nums[i];",
+              "        int[][] dp = new int[n][n];                // dp[l][r]: đoạn mở (l, r)",
+              "        for (int len = 2; len < n; len++)",
+              "            for (int l = 0; l + len < n; l++) {",
+              "                int r = l + len;",
+              "                for (int k = l + 1; k < r; k++)    // k là quả bóng nổ cuối cùng trong (l, r)",
+              "                    dp[l][r] = Math.max(dp[l][r], dp[l][k] + dp[k][r] + a[l] * a[k] * a[r]);",
+              "            }",
+              "        return dp[0][n - 1];",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class AdvancedDP {",
+              "    static int uniquePaths(int m, int n) {         // grid DP, reduced to one row",
+              "        int[] dp = new int[n];",
+              "        Arrays.fill(dp, 1);",
+              "        for (int i = 1; i < m; i++)",
+              "            for (int j = 1; j < n; j++)",
+              "                dp[j] += dp[j - 1];",
+              "        return dp[n - 1];",
+              "    }",
+              "",
+              "    // House Robber III: tree DP",
+              "    static int rob(TreeNode root) {",
+              "        int[] r = dfs(root);",
+              "        return Math.max(r[0], r[1]);",
+              "    }",
+              "",
+              "    static int[] dfs(TreeNode node) {              // returns {take node, skip node}",
+              "        if (node == null) return new int[]{0, 0};",
+              "        int[] l = dfs(node.left), r = dfs(node.right);",
+              "        int take = node.val + l[1] + r[1];",
+              "        int skip = Math.max(l[0], l[1]) + Math.max(r[0], r[1]);",
+              "        return new int[]{take, skip};",
+              "    }",
+              "",
+              "    static int maxCoins(int[] nums) {              // Burst Balloons: interval DP",
+              "        int n = nums.length + 2;",
+              "        int[] a = new int[n];",
+              "        a[0] = a[n - 1] = 1;",
+              "        for (int i = 0; i < nums.length; i++) a[i + 1] = nums[i];",
+              "        int[][] dp = new int[n][n];                // dp[l][r]: open interval (l, r)",
+              "        for (int len = 2; len < n; len++)",
+              "            for (int l = 0; l + len < n; l++) {",
+              "                int r = l + len;",
+              "                for (int k = l + 1; k < r; k++)    // k is the last balloon to burst in (l, r)",
+              "                    dp[l][r] = Math.max(dp[l][r], dp[l][k] + dp[k][r] + a[l] * a[k] * a[r]);",
+              "            }",
+              "        return dp[0][n - 1];",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "problems": [
+        { "title": "Unique Paths", "url": "https://leetcode.com/problems/unique-paths/", "level": "Medium" },
+        { "title": "Minimum Path Sum", "url": "https://leetcode.com/problems/minimum-path-sum/", "level": "Medium" },
+        { "title": "Longest Palindromic Subsequence", "url": "https://leetcode.com/problems/longest-palindromic-subsequence/", "level": "Medium" },
+        { "title": "House Robber III", "url": "https://leetcode.com/problems/house-robber-iii/", "level": "Medium" },
+        { "title": "Partition to K Equal Sum Subsets", "url": "https://leetcode.com/problems/partition-to-k-equal-sum-subsets/", "level": "Medium" },
+        { "title": "Burst Balloons", "url": "https://leetcode.com/problems/burst-balloons/", "level": "Hard" },
+        { "title": "Shortest Path Visiting All Nodes", "url": "https://leetcode.com/problems/shortest-path-visiting-all-nodes/", "level": "Hard" },
+        { "title": "Sherlock and Cost", "url": "https://www.hackerrank.com/challenges/sherlock-and-cost/problem", "level": "Medium" },
+        { "title": "Construct the Array", "url": "https://www.hackerrank.com/challenges/construct-the-array/problem", "level": "Medium" },
+        { "title": "Kingdom Division", "url": "https://www.hackerrank.com/challenges/kingdom-division/problem", "level": "Medium" },
+        { "title": "Red John is Back", "url": "https://www.hackerrank.com/challenges/red-john-is-back/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "USACO Guide: DP on Trees", "url": "https://usaco.guide/gold/dp-trees" },
+        { "type": "article", "title": "USACO Guide: Bitmask DP", "url": "https://usaco.guide/gold/dp-bitmasks" },
+        { "type": "article", "title": "USACO Guide: Range DP", "url": "https://usaco.guide/gold/dp-ranges" },
+        { "type": "practice", "title": "LeetCode tag: Bitmask", "url": "https://leetcode.com/problem-list/bitmask/" }
+      ]
+    },
+    {
+      "id": "p4-sp",
+      "type": "theory",
+      "title": "Dijkstra, Bellman-Ford, Floyd-Warshall",
+      "description": {
+        "vi": "Ba thuật toán đường đi ngắn nhất trên đồ thị có trọng số. Chọn thuật toán dựa vào trọng số có âm không và cần đường đi từ 1 đỉnh hay giữa mọi cặp đỉnh.",
+        "en": "Three shortest-path algorithms for weighted graphs. Choose based on whether weights can be negative and whether you need paths from one source or between all pairs."
+      },
+      "keyPoints": {
+        "vi": [
+          "Dijkstra: trọng số không âm, dùng heap, O((V + E) log V)",
+          "Bellman-Ford: chấp nhận trọng số âm, O(V·E), phát hiện được chu trình âm. Biến thể giới hạn tối đa k cạnh (Cheapest Flights)",
+          "Floyd-Warshall: mọi cặp đỉnh, O(V³), chỉ dùng khi V khoảng ≤ 400",
+          "0-1 BFS: trọng số chỉ là 0 hoặc 1, dùng deque thay cho heap"
+        ],
+        "en": [
+          "Dijkstra: non-negative weights, uses a heap, O((V + E) log V)",
+          "Bellman-Ford: handles negative weights, O(V·E), detects negative cycles. Variant with at most k edges (Cheapest Flights)",
+          "Floyd-Warshall: all pairs, O(V³), only for V up to about 400",
+          "0-1 BFS: weights are only 0 or 1, use a deque instead of a heap"
+        ]
+      },
+      "examples": [
+        {
+          "title": "Network Delay Time",
+          "input": "times = [[2,1,1], [2,3,1], [3,4,1]], n = 4, k = 2",
+          "output": "2",
+          "explain": {
+            "vi": "Từ đỉnh 2, đỉnh xa nhất là 4 với khoảng cách 2 → 3 → 4 = 2.",
+            "en": "From node 2, the farthest node is 4, at distance 2 → 3 → 4 = 2."
+          }
+        }
+      ],
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "import heapq",
+              "from collections import defaultdict",
+              "",
+              "def dijkstra(n, edges, src):       # edges: (u, v, w) với w >= 0",
+              "    g = defaultdict(list)",
+              "    for u, v, w in edges:",
+              "        g[u].append((v, w))",
+              "    dist = [float('inf')] * n",
+              "    dist[src] = 0",
+              "    h = [(0, src)]",
+              "    while h:",
+              "        d, u = heapq.heappop(h)",
+              "        if d > dist[u]:",
+              "            continue               # bản ghi cũ, đã có đường ngắn hơn",
+              "        for v, w in g[u]:",
+              "            if d + w < dist[v]:",
+              "                dist[v] = d + w",
+              "                heapq.heappush(h, (dist[v], v))",
+              "    return dist"
+            ],
+            "en": [
+              "import heapq",
+              "from collections import defaultdict",
+              "",
+              "def dijkstra(n, edges, src):       # edges: (u, v, w) with w >= 0",
+              "    g = defaultdict(list)",
+              "    for u, v, w in edges:",
+              "        g[u].append((v, w))",
+              "    dist = [float('inf')] * n",
+              "    dist[src] = 0",
+              "    h = [(0, src)]",
+              "    while h:",
+              "        d, u = heapq.heappop(h)",
+              "        if d > dist[u]:",
+              "            continue               # stale entry, a shorter path exists",
+              "        for v, w in g[u]:",
+              "            if d + w < dist[v]:",
+              "                dist[v] = d + w",
+              "                heapq.heappush(h, (dist[v], v))",
+              "    return dist"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class ShortestPath {",
+              "    static long[] dijkstra(int n, int[][] edges, int src) {   // edges: {u, v, w} với w >= 0",
+              "        List<List<int[]>> g = new ArrayList<>();",
+              "        for (int i = 0; i < n; i++) g.add(new ArrayList<>());",
+              "        for (int[] e : edges) g.get(e[0]).add(new int[]{e[1], e[2]});",
+              "",
+              "        long[] dist = new long[n];",
+              "        Arrays.fill(dist, Long.MAX_VALUE);",
+              "        dist[src] = 0;",
+              "        PriorityQueue<long[]> h = new PriorityQueue<>((a, b) -> Long.compare(a[0], b[0]));",
+              "        h.offer(new long[]{0, src});",
+              "        while (!h.isEmpty()) {",
+              "            long[] top = h.poll();",
+              "            long d = top[0];",
+              "            int u = (int) top[1];",
+              "            if (d > dist[u]) continue;           // bản ghi cũ, đã có đường ngắn hơn",
+              "            for (int[] e : g.get(u)) {",
+              "                int v = e[0], w = e[1];",
+              "                if (d + w < dist[v]) {",
+              "                    dist[v] = d + w;",
+              "                    h.offer(new long[]{dist[v], v});",
+              "                }",
+              "            }",
+              "        }",
+              "        return dist;",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class ShortestPath {",
+              "    static long[] dijkstra(int n, int[][] edges, int src) {   // edges: {u, v, w} with w >= 0",
+              "        List<List<int[]>> g = new ArrayList<>();",
+              "        for (int i = 0; i < n; i++) g.add(new ArrayList<>());",
+              "        for (int[] e : edges) g.get(e[0]).add(new int[]{e[1], e[2]});",
+              "",
+              "        long[] dist = new long[n];",
+              "        Arrays.fill(dist, Long.MAX_VALUE);",
+              "        dist[src] = 0;",
+              "        PriorityQueue<long[]> h = new PriorityQueue<>((a, b) -> Long.compare(a[0], b[0]));",
+              "        h.offer(new long[]{0, src});",
+              "        while (!h.isEmpty()) {",
+              "            long[] top = h.poll();",
+              "            long d = top[0];",
+              "            int u = (int) top[1];",
+              "            if (d > dist[u]) continue;           // stale entry, a shorter path exists",
+              "            for (int[] e : g.get(u)) {",
+              "                int v = e[0], w = e[1];",
+              "                if (d + w < dist[v]) {",
+              "                    dist[v] = d + w;",
+              "                    h.offer(new long[]{dist[v], v});",
+              "                }",
+              "            }",
+              "        }",
+              "        return dist;",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "pitfalls": {
+        "vi": [
+          "Dijkstra: quên bỏ qua các phần tử cũ trong heap (`if d > dist[u]: continue`) nên bị chậm",
+          "Dùng Dijkstra khi có trọng số âm sẽ cho kết quả sai"
+        ],
+        "en": [
+          "Dijkstra: not skipping stale heap entries (`if d > dist[u]: continue`), which makes it slow",
+          "Running Dijkstra with negative weights gives wrong answers"
+        ]
+      },
+      "problems": [
+        { "title": "Network Delay Time", "url": "https://leetcode.com/problems/network-delay-time/", "level": "Medium" },
+        { "title": "Path With Minimum Effort", "url": "https://leetcode.com/problems/path-with-minimum-effort/", "level": "Medium" },
+        { "title": "Cheapest Flights Within K Stops", "url": "https://leetcode.com/problems/cheapest-flights-within-k-stops/", "level": "Medium" },
+        { "title": "Find the City With the Smallest Number of Neighbors at a Threshold Distance", "url": "https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/", "level": "Medium" },
+        { "title": "Swim in Rising Water", "url": "https://leetcode.com/problems/swim-in-rising-water/", "level": "Hard" },
+        { "title": "Jack goes to Rapture", "url": "https://www.hackerrank.com/challenges/jack-goes-to-rapture/problem", "level": "Medium" },
+        { "title": "Dijkstra: Shortest Reach 2", "url": "https://www.hackerrank.com/challenges/dijkstrashortreach/problem", "level": "Hard" },
+        { "title": "Floyd : City of Blinding Lights", "url": "https://www.hackerrank.com/challenges/floyd-city-of-blinding-lights/problem", "level": "Hard" }
+      ],
+      "resources": [
+        { "type": "article", "title": "cp-algorithms: Dijkstra's algorithm", "url": "https://cp-algorithms.com/graph/dijkstra.html" },
+        { "type": "article", "title": "cp-algorithms: Bellman-Ford", "url": "https://cp-algorithms.com/graph/bellman_ford.html" },
+        { "type": "article", "title": "cp-algorithms: Floyd-Warshall", "url": "https://cp-algorithms.com/graph/all-pair-shortest-path-floyd-warshall.html" },
+        { "type": "visual", "title": "VisuAlgo: Single-Source Shortest Paths", "url": "https://visualgo.net/en/sssp" },
+        { "type": "practice", "title": "LeetCode tag: Shortest Path", "url": "https://leetcode.com/problem-list/shortest-path/" }
+      ]
+    },
+    {
+      "id": "p4-dsu",
+      "type": "theory",
+      "title": {
+        "vi": "DSU, Kruskal/Prim, khớp và cầu, SCC",
+        "en": "DSU, Kruskal/Prim, articulation points and bridges, SCC"
+      },
+      "description": {
+        "vi": "DSU (Disjoint Set Union) quản lý các nhóm phần tử và gộp nhóm gần như O(1). Đây là nền cho Kruskal (cây khung nhỏ nhất) và nhiều bài gộp nhóm.",
+        "en": "DSU (Disjoint Set Union) tracks groups of elements and merges them in near O(1). It powers Kruskal (minimum spanning tree) and many grouping problems."
+      },
+      "keyPoints": {
+        "vi": [
+          "DSU: `find` có nén đường đi + `union` theo kích thước, gần O(1) mỗi thao tác",
+          "Dùng DSU khi cần gộp nhóm dần dần và hỏi 2 phần tử có cùng nhóm không",
+          "Kruskal: sort cạnh theo trọng số, lấy cạnh nếu 2 đầu đang ở 2 nhóm khác nhau",
+          "Prim: giống Dijkstra nhưng so sánh trọng số cạnh thay vì tổng đường đi",
+          "Khớp, cầu (Tarjan) và thành phần liên thông mạnh (Kosaraju/Tarjan) ít gặp khi phỏng vấn, nắm ý tưởng là đủ"
+        ],
+        "en": [
+          "DSU: `find` with path compression + `union` by size, near O(1) per operation",
+          "Use DSU when groups merge over time and you ask whether two elements share a group",
+          "Kruskal: sort edges by weight, take an edge if its endpoints are in different groups",
+          "Prim: like Dijkstra, but compares edge weights instead of path lengths",
+          "Articulation points, bridges (Tarjan) and strongly connected components (Kosaraju/Tarjan) are rare in interviews; knowing the idea is enough"
+        ]
+      },
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "class DSU:",
+              "    def __init__(self, n):",
+              "        self.parent = list(range(n))",
+              "        self.size = [1] * n",
+              "",
+              "    def find(self, x):",
+              "        while self.parent[x] != x:",
+              "            self.parent[x] = self.parent[self.parent[x]]   # nén đường đi",
+              "            x = self.parent[x]",
+              "        return x",
+              "",
+              "    def union(self, a, b):",
+              "        a, b = self.find(a), self.find(b)",
+              "        if a == b:",
+              "            return False",
+              "        if self.size[a] < self.size[b]:",
+              "            a, b = b, a",
+              "        self.parent[b] = a",
+              "        self.size[a] += self.size[b]",
+              "        return True",
+              "",
+              "def kruskal(n, edges):             # edges: (w, u, v)",
+              "    dsu, total = DSU(n), 0",
+              "    for w, u, v in sorted(edges):",
+              "        if dsu.union(u, v):",
+              "            total += w",
+              "    return total"
+            ],
+            "en": [
+              "class DSU:",
+              "    def __init__(self, n):",
+              "        self.parent = list(range(n))",
+              "        self.size = [1] * n",
+              "",
+              "    def find(self, x):",
+              "        while self.parent[x] != x:",
+              "            self.parent[x] = self.parent[self.parent[x]]   # path compression",
+              "            x = self.parent[x]",
+              "        return x",
+              "",
+              "    def union(self, a, b):",
+              "        a, b = self.find(a), self.find(b)",
+              "        if a == b:",
+              "            return False",
+              "        if self.size[a] < self.size[b]:",
+              "            a, b = b, a",
+              "        self.parent[b] = a",
+              "        self.size[a] += self.size[b]",
+              "        return True",
+              "",
+              "def kruskal(n, edges):             # edges: (w, u, v)",
+              "    dsu, total = DSU(n), 0",
+              "    for w, u, v in sorted(edges):",
+              "        if dsu.union(u, v):",
+              "            total += w",
+              "    return total"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class DSU {",
+              "    private final int[] parent, size;",
+              "",
+              "    DSU(int n) {",
+              "        parent = new int[n];",
+              "        size = new int[n];",
+              "        for (int i = 0; i < n; i++) { parent[i] = i; size[i] = 1; }",
+              "    }",
+              "",
+              "    int find(int x) {",
+              "        while (parent[x] != x) {",
+              "            parent[x] = parent[parent[x]];       // nén đường đi",
+              "            x = parent[x];",
+              "        }",
+              "        return x;",
+              "    }",
+              "",
+              "    boolean union(int a, int b) {",
+              "        a = find(a);",
+              "        b = find(b);",
+              "        if (a == b) return false;",
+              "        if (size[a] < size[b]) { int t = a; a = b; b = t; }",
+              "        parent[b] = a;",
+              "        size[a] += size[b];",
+              "        return true;",
+              "    }",
+              "",
+              "    static long kruskal(int n, int[][] edges) {    // edges: {w, u, v}",
+              "        int[][] sorted = edges.clone();",
+              "        Arrays.sort(sorted, (x, y) -> Integer.compare(x[0], y[0]));",
+              "        DSU dsu = new DSU(n);",
+              "        long total = 0;",
+              "        for (int[] e : sorted)",
+              "            if (dsu.union(e[1], e[2])) total += e[0];",
+              "        return total;",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class DSU {",
+              "    private final int[] parent, size;",
+              "",
+              "    DSU(int n) {",
+              "        parent = new int[n];",
+              "        size = new int[n];",
+              "        for (int i = 0; i < n; i++) { parent[i] = i; size[i] = 1; }",
+              "    }",
+              "",
+              "    int find(int x) {",
+              "        while (parent[x] != x) {",
+              "            parent[x] = parent[parent[x]];       // path compression",
+              "            x = parent[x];",
+              "        }",
+              "        return x;",
+              "    }",
+              "",
+              "    boolean union(int a, int b) {",
+              "        a = find(a);",
+              "        b = find(b);",
+              "        if (a == b) return false;",
+              "        if (size[a] < size[b]) { int t = a; a = b; b = t; }",
+              "        parent[b] = a;",
+              "        size[a] += size[b];",
+              "        return true;",
+              "    }",
+              "",
+              "    static long kruskal(int n, int[][] edges) {    // edges: {w, u, v}",
+              "        int[][] sorted = edges.clone();",
+              "        Arrays.sort(sorted, (x, y) -> Integer.compare(x[0], y[0]));",
+              "        DSU dsu = new DSU(n);",
+              "        long total = 0;",
+              "        for (int[] e : sorted)",
+              "            if (dsu.union(e[1], e[2])) total += e[0];",
+              "        return total;",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "complexity": {
+        "vi": "DSU: gần O(1) mỗi thao tác. Kruskal: O(E log E) do sort.",
+        "en": "DSU: near O(1) per operation. Kruskal: O(E log E) because of sorting."
+      },
+      "problems": [
+        { "title": "Number of Provinces", "url": "https://leetcode.com/problems/number-of-provinces/", "level": "Medium" },
+        { "title": "Redundant Connection", "url": "https://leetcode.com/problems/redundant-connection/", "level": "Medium" },
+        { "title": "Accounts Merge", "url": "https://leetcode.com/problems/accounts-merge/", "level": "Medium" },
+        { "title": "Min Cost to Connect All Points", "url": "https://leetcode.com/problems/min-cost-to-connect-all-points/", "level": "Medium" },
+        { "title": "Critical Connections in a Network", "url": "https://leetcode.com/problems/critical-connections-in-a-network/", "level": "Hard" },
+        { "title": "Components in a graph", "url": "https://www.hackerrank.com/challenges/components-in-graph/problem", "level": "Medium" },
+        { "title": "Friend Circle Queries", "url": "https://www.hackerrank.com/challenges/friend-circle-queries/problem", "level": "Medium" },
+        { "title": "Merging Communities", "url": "https://www.hackerrank.com/challenges/merging-communities/problem", "level": "Hard" },
+        { "title": "Kruskal (MST): Really Special Subtree", "url": "https://www.hackerrank.com/challenges/kruskalmstrsub/problem", "level": "Medium" },
+        { "title": "Prim's (MST) : Special Subtree", "url": "https://www.hackerrank.com/challenges/primsmstsub/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "cp-algorithms: Disjoint Set Union", "url": "https://cp-algorithms.com/data_structures/disjoint_set_union.html" },
+        { "type": "article", "title": "cp-algorithms: Kruskal with DSU", "url": "https://cp-algorithms.com/graph/mst_kruskal_with_dsu.html" },
+        { "type": "visual", "title": "VisuAlgo: Union-Find", "url": "https://visualgo.net/en/ufds" },
+        { "type": "practice", "title": "LeetCode tag: Union-Find", "url": "https://leetcode.com/problem-list/union-find/" },
+        { "type": "practice", "title": "LeetCode tag: Minimum Spanning Tree", "url": "https://leetcode.com/problem-list/minimum-spanning-tree/" }
+      ]
+    },
+    {
+      "id": "p4-neet-dp",
+      "type": "practice",
+      "title": { "vi": "Dạng bài 1-D DP và 2-D DP (NeetCode)", "en": "1-D DP and 2-D DP problems (NeetCode)" },
+      "description": {
+        "vi": "Bộ bài DP hay gặp nhất khi phỏng vấn. Mỗi bài, viết rõ định nghĩa `dp[i]` ra giấy trước khi code.",
+        "en": "The DP problems you are most likely to meet in interviews. For each one, write the definition of `dp[i]` on paper before coding."
+      },
+      "keyPoints": {
+        "vi": [
+          "1-D DP: trạng thái phụ thuộc vài trạng thái liền trước, thường rút gọn được còn O(1) bộ nhớ",
+          "2-D DP: thường là 2 chuỗi (LCS, Edit Distance) hoặc lưới (Unique Paths)",
+          "Chưa nghĩ ra công thức thì viết đệ quy brute force trước, rồi thêm cache"
+        ],
+        "en": [
+          "1-D DP: each state depends on a few previous states, often reducible to O(1) memory",
+          "2-D DP: usually two strings (LCS, Edit Distance) or a grid (Unique Paths)",
+          "Can't find the recurrence? Write the brute-force recursion first, then add a cache"
+        ]
+      },
+      "examples": [
+        {
+          "title": "House Robber",
+          "input": "nums = [2, 7, 9, 3, 1]",
+          "output": "12",
+          "explain": {
+            "vi": "Lấy nhà 1, 3, 5: 2 + 9 + 1 = 12. Tại mỗi nhà, hoặc lấy nó cộng tốt nhất đến nhà i − 2, hoặc bỏ nó.",
+            "en": "Rob houses 1, 3, 5: 2 + 9 + 1 = 12. At each house, either rob it plus the best up to house i − 2, or skip it."
+          }
+        }
+      ],
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "def rob(nums):                     # House Robber",
+              "    take = skip = 0                # tốt nhất khi lấy / không lấy nhà trước đó",
+              "    for x in nums:",
+              "        take, skip = skip + x, max(take, skip)",
+              "    return max(take, skip)"
+            ],
+            "en": [
+              "def rob(nums):                     # House Robber",
+              "    take = skip = 0                # best when taking / skipping the previous house",
+              "    for x in nums:",
+              "        take, skip = skip + x, max(take, skip)",
+              "    return max(take, skip)"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "class HouseRobber {",
+              "    static int rob(int[] nums) {",
+              "        int take = 0, skip = 0;                    // tốt nhất khi lấy / không lấy nhà trước đó",
+              "        for (int x : nums) {",
+              "            int newTake = skip + x;",
+              "            skip = Math.max(take, skip);",
+              "            take = newTake;",
+              "        }",
+              "        return Math.max(take, skip);",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "class HouseRobber {",
+              "    static int rob(int[] nums) {",
+              "        int take = 0, skip = 0;                    // best when taking / skipping the previous house",
+              "        for (int x : nums) {",
+              "            int newTake = skip + x;",
+              "            skip = Math.max(take, skip);",
+              "            take = newTake;",
+              "        }",
+              "        return Math.max(take, skip);",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "problems": [
+        { "title": "Climbing Stairs", "url": "https://leetcode.com/problems/climbing-stairs/", "level": "Easy" },
+        { "title": "Min Cost Climbing Stairs", "url": "https://leetcode.com/problems/min-cost-climbing-stairs/", "level": "Easy" },
+        { "title": "House Robber", "url": "https://leetcode.com/problems/house-robber/", "level": "Medium" },
+        { "title": "House Robber II", "url": "https://leetcode.com/problems/house-robber-ii/", "level": "Medium" },
+        { "title": "Longest Palindromic Substring", "url": "https://leetcode.com/problems/longest-palindromic-substring/", "level": "Medium" },
+        { "title": "Palindromic Substrings", "url": "https://leetcode.com/problems/palindromic-substrings/", "level": "Medium" },
+        { "title": "Decode Ways", "url": "https://leetcode.com/problems/decode-ways/", "level": "Medium" },
+        { "title": "Coin Change", "url": "https://leetcode.com/problems/coin-change/", "level": "Medium" },
+        { "title": "Maximum Product Subarray", "url": "https://leetcode.com/problems/maximum-product-subarray/", "level": "Medium" },
+        { "title": "Word Break", "url": "https://leetcode.com/problems/word-break/", "level": "Medium" },
+        { "title": "Longest Increasing Subsequence", "url": "https://leetcode.com/problems/longest-increasing-subsequence/", "level": "Medium" },
+        { "title": "Unique Paths", "url": "https://leetcode.com/problems/unique-paths/", "level": "Medium" },
+        { "title": "Longest Common Subsequence", "url": "https://leetcode.com/problems/longest-common-subsequence/", "level": "Medium" },
+        { "title": "Coin Change II", "url": "https://leetcode.com/problems/coin-change-ii/", "level": "Medium" },
+        { "title": "Edit Distance", "url": "https://leetcode.com/problems/edit-distance/", "level": "Medium" },
+        { "title": "The Maximum Subarray", "url": "https://www.hackerrank.com/challenges/maxsubarray/problem", "level": "Medium" },
+        { "title": "Stock Maximize", "url": "https://www.hackerrank.com/challenges/stockmax/problem", "level": "Medium" },
+        { "title": "Equal", "url": "https://www.hackerrank.com/challenges/equal/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "Tech Interview Handbook: Dynamic programming", "url": "https://www.techinterviewhandbook.org/algorithms/dynamic-programming/" },
+        { "type": "practice", "title": "NeetCode Roadmap", "url": "https://neetcode.io/roadmap" },
+        { "type": "practice", "title": "LeetCode study plan: Dynamic Programming", "url": "https://leetcode.com/studyplan/dynamic-programming/" }
+      ]
+    },
+    {
+      "id": "p4-adv-graph",
+      "type": "practice",
+      "title": { "vi": "Dạng bài Advanced Graphs", "en": "Advanced Graph problems" },
+      "description": {
+        "vi": "Kết hợp Dijkstra, cây khung nhỏ nhất và sắp xếp topo với các mô hình đồ thị khó nhận ra hơn.",
+        "en": "Combine Dijkstra, minimum spanning trees and topological sort with graph models that are harder to spot."
+      },
+      "keyPoints": {
+        "vi": [
+          "Biến thể Dijkstra: chi phí đường đi là max (hoặc min) trên đường thay vì tổng (Swim in Rising Water, Path With Minimum Effort)",
+          "Cheapest Flights: giới hạn số cạnh nên dùng Bellman-Ford k vòng",
+          "Alien Dictionary: so sánh 2 từ liền kề để lấy cạnh, rồi sắp xếp topo",
+          "Reconstruct Itinerary: đường đi Euler (thuật toán Hierholzer)"
+        ],
+        "en": [
+          "Dijkstra variants: the path cost is the max (or min) along the path instead of the sum (Swim in Rising Water, Path With Minimum Effort)",
+          "Cheapest Flights: the edge limit calls for k rounds of Bellman-Ford",
+          "Alien Dictionary: compare adjacent words to get edges, then topologically sort",
+          "Reconstruct Itinerary: Eulerian path (Hierholzer's algorithm)"
+        ]
+      },
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "import heapq",
+              "",
+              "def swim_in_water(grid):           # Dijkstra với chi phí = max trên đường đi",
+              "    n = len(grid)",
+              "    seen = {(0, 0)}",
+              "    h = [(grid[0][0], 0, 0)]",
+              "    while h:",
+              "        t, r, c = heapq.heappop(h)",
+              "        if r == c == n - 1:",
+              "            return t",
+              "        for nr, nc in ((r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)):",
+              "            if 0 <= nr < n and 0 <= nc < n and (nr, nc) not in seen:",
+              "                seen.add((nr, nc))",
+              "                heapq.heappush(h, (max(t, grid[nr][nc]), nr, nc))"
+            ],
+            "en": [
+              "import heapq",
+              "",
+              "def swim_in_water(grid):           # Dijkstra where cost = max along the path",
+              "    n = len(grid)",
+              "    seen = {(0, 0)}",
+              "    h = [(grid[0][0], 0, 0)]",
+              "    while h:",
+              "        t, r, c = heapq.heappop(h)",
+              "        if r == c == n - 1:",
+              "            return t",
+              "        for nr, nc in ((r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)):",
+              "            if 0 <= nr < n and 0 <= nc < n and (nr, nc) not in seen:",
+              "                seen.add((nr, nc))",
+              "                heapq.heappush(h, (max(t, grid[nr][nc]), nr, nc))"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class SwimInWater {",
+              "    static int swimInWater(int[][] grid) {         // Dijkstra với chi phí = max trên đường đi",
+              "        int n = grid.length;",
+              "        boolean[][] seen = new boolean[n][n];",
+              "        PriorityQueue<int[]> h = new PriorityQueue<>((a, b) -> Integer.compare(a[0], b[0]));",
+              "        h.offer(new int[]{grid[0][0], 0, 0});",
+              "        seen[0][0] = true;",
+              "        int[][] dirs = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};",
+              "        while (true) {",
+              "            int[] cur = h.poll();",
+              "            int t = cur[0], r = cur[1], c = cur[2];",
+              "            if (r == n - 1 && c == n - 1) return t;",
+              "            for (int[] d : dirs) {",
+              "                int nr = r + d[0], nc = c + d[1];",
+              "                if (nr >= 0 && nr < n && nc >= 0 && nc < n && !seen[nr][nc]) {",
+              "                    seen[nr][nc] = true;",
+              "                    h.offer(new int[]{Math.max(t, grid[nr][nc]), nr, nc});",
+              "                }",
+              "            }",
+              "        }",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class SwimInWater {",
+              "    static int swimInWater(int[][] grid) {         // Dijkstra where cost = max along the path",
+              "        int n = grid.length;",
+              "        boolean[][] seen = new boolean[n][n];",
+              "        PriorityQueue<int[]> h = new PriorityQueue<>((a, b) -> Integer.compare(a[0], b[0]));",
+              "        h.offer(new int[]{grid[0][0], 0, 0});",
+              "        seen[0][0] = true;",
+              "        int[][] dirs = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};",
+              "        while (true) {",
+              "            int[] cur = h.poll();",
+              "            int t = cur[0], r = cur[1], c = cur[2];",
+              "            if (r == n - 1 && c == n - 1) return t;",
+              "            for (int[] d : dirs) {",
+              "                int nr = r + d[0], nc = c + d[1];",
+              "                if (nr >= 0 && nr < n && nc >= 0 && nc < n && !seen[nr][nc]) {",
+              "                    seen[nr][nc] = true;",
+              "                    h.offer(new int[]{Math.max(t, grid[nr][nc]), nr, nc});",
+              "                }",
+              "            }",
+              "        }",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "problems": [
+        { "title": "Network Delay Time", "url": "https://leetcode.com/problems/network-delay-time/", "level": "Medium" },
+        { "title": "Min Cost to Connect All Points", "url": "https://leetcode.com/problems/min-cost-to-connect-all-points/", "level": "Medium" },
+        { "title": "Cheapest Flights Within K Stops", "url": "https://leetcode.com/problems/cheapest-flights-within-k-stops/", "level": "Medium" },
+        { "title": "Reconstruct Itinerary", "url": "https://leetcode.com/problems/reconstruct-itinerary/", "level": "Hard" },
+        { "title": "Swim in Rising Water", "url": "https://leetcode.com/problems/swim-in-rising-water/", "level": "Hard" },
+        { "title": "Alien Dictionary", "url": "https://leetcode.com/problems/alien-dictionary/", "level": "Hard", "note": "Premium" },
+        { "title": "Roads in HackerLand", "url": "https://www.hackerrank.com/challenges/johnland/problem", "level": "Medium" },
+        { "title": "Rust & Murderer", "url": "https://www.hackerrank.com/challenges/rust-murderer/problem", "level": "Medium" },
+        { "title": "Matrix", "url": "https://www.hackerrank.com/challenges/matrix/problem", "level": "Hard" }
+      ],
+      "resources": [
+        { "type": "video", "title": "freeCodeCamp: Graph Theory Tutorial from a Google Engineer", "url": "https://www.youtube.com/watch?v=09_LlHjoEiY" },
+        { "type": "article", "title": "cp-algorithms: Eulerian path", "url": "https://cp-algorithms.com/graph/euler_path.html" },
+        { "type": "practice", "title": "LeetCode tag: Shortest Path", "url": "https://leetcode.com/problem-list/shortest-path/" },
+        { "type": "practice", "title": "LeetCode tag: Eulerian Circuit", "url": "https://leetcode.com/problem-list/eulerian-circuit/" }
+      ]
+    },
+    {
+      "id": "p4-atcoder",
+      "type": "practice",
+      "title": "AtCoder Educational DP Contest (A → Z)",
+      "description": {
+        "vi": "26 bài DP xếp từ dễ đến khó, mỗi bài là một dạng DP chuẩn. Bộ bài tốt nhất để luyện DP có hệ thống.",
+        "en": "26 DP problems ordered from easy to hard, each a standard DP pattern. The best set for systematic DP practice."
+      },
+      "keyPoints": {
+        "vi": [
+          "A–H: DP cơ bản (Frog, Knapsack, LCS, đường đi dài nhất trên DAG, lưới)",
+          "I–T: DP xác suất, DP đoạn, bitmask, DP trên cây",
+          "U–Z: khó, dành cho khi muốn đi sâu vào lập trình thi đấu"
+        ],
+        "en": [
+          "A–H: basic DP (Frog, Knapsack, LCS, longest path in a DAG, grids)",
+          "I–T: probability DP, interval DP, bitmask, tree DP",
+          "U–Z: hard, for when you want to go deep into competitive programming"
+        ]
+      },
+      "problems": [
+        { "title": "A - Frog 1", "url": "https://atcoder.jp/contests/dp/tasks/dp_a" },
+        { "title": "B - Frog 2", "url": "https://atcoder.jp/contests/dp/tasks/dp_b" },
+        { "title": "C - Vacation", "url": "https://atcoder.jp/contests/dp/tasks/dp_c" },
+        { "title": "D - Knapsack 1", "url": "https://atcoder.jp/contests/dp/tasks/dp_d" },
+        { "title": "E - Knapsack 2", "url": "https://atcoder.jp/contests/dp/tasks/dp_e" },
+        { "title": "F - LCS", "url": "https://atcoder.jp/contests/dp/tasks/dp_f" },
+        { "title": "G - Longest Path", "url": "https://atcoder.jp/contests/dp/tasks/dp_g" },
+        { "title": "H - Grid 1", "url": "https://atcoder.jp/contests/dp/tasks/dp_h" }
+      ],
+      "resources": [
+        {
+          "type": "practice",
+          "title": { "vi": "Toàn bộ DP Contest", "en": "Full DP Contest" },
+          "url": "https://atcoder.jp/contests/dp/tasks"
+        }
+      ]
+    },
+    {
+      "id": "p4-cses",
+      "type": "practice",
+      "title": { "vi": "CSES Dynamic Programming (làm hết)", "en": "CSES Dynamic Programming (do them all)" },
+      "description": {
+        "vi": "Khoảng 19 bài DP chuẩn của CSES. Làm hết thì bạn đã gặp gần như mọi dạng DP phổ biến.",
+        "en": "About 19 standard DP problems on CSES. Finish them and you will have seen almost every common DP pattern."
+      },
+      "keyPoints": {
+        "vi": [
+          "Chú ý lấy mod 10⁹ + 7 ở các bài đếm",
+          "Các bài đếm cách (Coin Combinations I và II) khác nhau ở thứ tự 2 vòng lặp: đếm hoán vị hay đếm tổ hợp"
+        ],
+        "en": [
+          "Remember to take mod 10⁹ + 7 in counting problems",
+          "The counting problems (Coin Combinations I and II) differ only in loop order: counting ordered ways vs unordered combinations"
+        ]
+      },
+      "problems": [
+        { "title": "Dice Combinations", "url": "https://cses.fi/problemset/task/1633" },
+        { "title": "Minimizing Coins", "url": "https://cses.fi/problemset/task/1634" },
+        { "title": "Coin Combinations I", "url": "https://cses.fi/problemset/task/1635" },
+        { "title": "Grid Paths", "url": "https://cses.fi/problemset/task/1638" },
+        { "title": "Book Shop", "url": "https://cses.fi/problemset/task/1158" },
+        { "title": "Edit Distance", "url": "https://cses.fi/problemset/task/1639" }
+      ],
+      "resources": [
+        { "type": "book", "title": "Competitive Programmer's Handbook (PDF)", "url": "https://cses.fi/book/book.pdf" },
+        {
+          "type": "practice",
+          "title": { "vi": "Toàn bộ CSES Problem Set", "en": "Full CSES Problem Set" },
+          "url": "https://cses.fi/problemset/"
+        }
+      ]
+    },
+    {
+      "id": "p4-cf",
+      "type": "practice",
+      "title": "Codeforces 1300–1600",
+      "description": {
+        "vi": "Mức rating này tương đương nhiều bài Medium khó trên LeetCode. Luyện để tăng khả năng tự nghĩ ra ý tưởng khi đề không nói rõ dạng bài.",
+        "en": "This rating range is comparable to many harder LeetCode Mediums. Practice it to get better at finding the idea when the problem doesn't reveal its pattern."
+      },
+      "keyPoints": {
+        "vi": [
+          "Đặt giới hạn 45–60 phút mỗi bài, quá giờ thì đọc editorial",
+          "Ghi chú ý tưởng chính của mỗi bài, vì đó là thứ cần nhớ chứ không phải code"
+        ],
+        "en": [
+          "Give each problem 45–60 minutes, then read the editorial",
+          "Write down each problem's key idea; that's what you need to remember, not the code"
+        ]
+      },
+      "resources": [
+        { "type": "practice", "title": "Codeforces rating 1300–1600", "url": "https://codeforces.com/problemset?order=BY_RATING_ASC&tags=1300-1600" }
+      ]
+    }
+  ]
+}

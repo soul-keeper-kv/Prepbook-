@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DSA Roadmap</title>
+  <link rel="stylesheet" href="index.css">
+  <!-- Áp giao diện Sáng/Tối đã chọn trước khi vẽ trang để không bị nháy màu. Key giống KEY_THEME trong main.js -->
+  <script>
+    try {
+      const theme = JSON.parse(localStorage.getItem("dsa_theme"));
+      if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
+    } catch {}
+  </script>
+</head>
+<body>
+  <!-- Chữ giao diện nằm trong i18n.js (data-i18n = key), nội dung lộ trình nằm trong data/ -->
+  <main class="wrap">
+    <div class="topbar">
+      <div id="theme-switch" class="switch" role="group" data-i18n-aria="theme.switch">
+        <button type="button" data-set-theme="auto" data-i18n="theme.auto"></button>
+        <button type="button" data-set-theme="light" data-i18n="theme.light"></button>
+        <button type="button" data-set-theme="dark" data-i18n="theme.dark"></button>
+      </div>
+      <div id="lang-switch" class="switch" role="group" data-i18n-aria="lang.switch"></div>
+    </div>
+
+    <!-- Hiện khi không đọc được thư mục data (thường do mở thẳng file index.html) -->
+    <section id="loader" class="loader" hidden>
+      <h1 data-i18n="loader.title"></h1>
+      <p data-i18n-html="loader.intro"></p>
+      <ol>
+        <li data-i18n-html="loader.server"></li>
+        <li data-i18n-html="loader.picker"></li>
+      </ol>
+      <label class="btn primary">
+        <span data-i18n="loader.pick"></span>
+        <input type="file" id="data-picker" webkitdirectory multiple hidden>
+      </label>
+      <p id="loader-error" class="error" hidden></p>
+    </section>
+
+    <div id="app" hidden>
+      <header>
+        <h1 id="title"></h1>
+        <p id="subtitle" class="sub"></p>
+      </header>
+
+      <section class="stats">
+        <div class="stat">
+          <div class="stat-label" data-i18n="stats.progress"></div>
+          <div class="stat-value" id="stat-pct">0%</div>
+          <div class="stat-sub" id="stat-done"></div>
+        </div>
+        <div class="stat">
+          <div class="stat-label" data-i18n="stats.current"></div>
+          <div class="stat-value" id="stat-current">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label" data-i18n="stats.solved"></div>
+          <div class="stat-value" id="stat-solved">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label" data-i18n="stats.review"></div>
+          <div class="stat-value" id="stat-review">0</div>
+        </div>
+      </section>
+
+      <nav class="toolbar">
+        <div class="filters" role="group" data-i18n-aria="filter.label">
+          <button type="button" data-filter="all" data-i18n="filter.all"></button>
+          <button type="button" data-filter="todo" data-i18n="filter.todo"></button>
+          <button type="button" data-filter="review" data-i18n="filter.review"></button>
+        </div>
+        <button type="button" id="btn-expand"></button>
+        <span class="legend">
+          <span class="tag tag-theory" data-i18n="type.theory"></span>
+          <span class="tag tag-practice" data-i18n="type.practice"></span>
+        </span>
+      </nav>
+
+      <div id="phases"></div>
+
+      <footer class="footer">
+        <p id="sync-status" class="sync-status"></p>
+        <button type="button" id="btn-export" data-i18n="footer.export"></button>
+        <button type="button" id="btn-import" data-i18n="footer.import"></button>
+        <button type="button" id="btn-reload-data" data-i18n="footer.reloadData" hidden></button>
+        <button type="button" id="btn-reset" class="danger" data-i18n="footer.reset"></button>
+        <input type="file" id="import-picker" accept=".json,application/json" hidden>
+      </footer>
+    </div>
+  </main>
+
+  <dialog id="detail" class="detail-dialog" aria-labelledby="detail-title">
+    <div id="detail-body" class="detail"></div>
+  </dialog>
+
+  <script src="i18n.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

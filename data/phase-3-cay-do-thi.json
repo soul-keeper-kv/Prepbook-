@@ -1,0 +1,1356 @@
+{
+  "id": "p3",
+  "name": {
+    "vi": "Giai đoạn 3 · Đệ quy, tham lam, cây, đồ thị cơ bản",
+    "en": "Phase 3 · Recursion, greedy, trees, basic graphs"
+  },
+  "time": { "vi": "5–6 tuần", "en": "5–6 weeks" },
+  "items": [
+    {
+      "id": "p3-recur",
+      "type": "theory",
+      "title": { "vi": "Đệ quy, chia để trị, đếm nghịch thế", "en": "Recursion, divide and conquer, counting inversions" },
+      "description": {
+        "vi": "Đệ quy là giải bài lớn bằng lời giải của bài nhỏ hơn cùng dạng. Chia để trị: chia đôi, giải từng nửa, rồi gộp kết quả.\n\nĐếm nghịch thế là ví dụ kinh điển: đếm số cặp i < j mà a[i] > a[j] ngay trong lúc merge sort.",
+        "en": "Recursion solves a big problem using solutions to smaller problems of the same shape. Divide and conquer: split in half, solve each half, combine the results.\n\nCounting inversions is the classic example: count pairs i < j with a[i] > a[j] during merge sort."
+      },
+      "keyPoints": {
+        "vi": [
+          "Luôn xác định 3 thứ: trường hợp cơ sở, cách thu nhỏ bài toán, cách gộp kết quả",
+          "Tin rằng lời gọi đệ quy trả về đúng, đừng cố lần theo từng tầng",
+          "Chia để trị: T(n) = 2T(n/2) + O(n) cho ra O(n log n)",
+          "Python: đệ quy sâu thì tăng `sys.setrecursionlimit` hoặc chuyển sang vòng lặp với stack"
+        ],
+        "en": [
+          "Always pin down three things: the base case, how to shrink the problem, how to combine results",
+          "Trust that the recursive call returns the right answer; don't try to trace every level",
+          "Divide and conquer: T(n) = 2T(n/2) + O(n) gives O(n log n)",
+          "Python: for deep recursion, raise `sys.setrecursionlimit` or switch to a loop with an explicit stack"
+        ]
+      },
+      "examples": [
+        {
+          "title": { "vi": "Đếm nghịch thế", "en": "Counting inversions" },
+          "input": "a = [2, 4, 1, 3, 5]",
+          "output": "3",
+          "explain": {
+            "vi": "Các cặp nghịch thế là (2, 1), (4, 1), (4, 3).",
+            "en": "The inversions are (2, 1), (4, 1), (4, 3)."
+          }
+        }
+      ],
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "def count_inversions(a):",
+              "    # Trả về (mảng đã sort, số nghịch thế)",
+              "    if len(a) <= 1:",
+              "        return a, 0",
+              "    mid = len(a) // 2",
+              "    left, x = count_inversions(a[:mid])",
+              "    right, y = count_inversions(a[mid:])",
+              "    merged, i, j, inv = [], 0, 0, x + y",
+              "    while i < len(left) and j < len(right):",
+              "        if left[i] <= right[j]:",
+              "            merged.append(left[i]); i += 1",
+              "        else:",
+              "            merged.append(right[j]); j += 1",
+              "            inv += len(left) - i   # mọi phần tử còn lại bên trái đều > right[j]",
+              "    merged += left[i:] + right[j:]",
+              "    return merged, inv"
+            ],
+            "en": [
+              "def count_inversions(a):",
+              "    # Returns (sorted array, inversion count)",
+              "    if len(a) <= 1:",
+              "        return a, 0",
+              "    mid = len(a) // 2",
+              "    left, x = count_inversions(a[:mid])",
+              "    right, y = count_inversions(a[mid:])",
+              "    merged, i, j, inv = [], 0, 0, x + y",
+              "    while i < len(left) and j < len(right):",
+              "        if left[i] <= right[j]:",
+              "            merged.append(left[i]); i += 1",
+              "        else:",
+              "            merged.append(right[j]); j += 1",
+              "            inv += len(left) - i   # every remaining left element is > right[j]",
+              "    merged += left[i:] + right[j:]",
+              "    return merged, inv"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "class Inversions {",
+              "    // Trả về số nghịch thế, đồng thời sort a[lo..hi)",
+              "    static long countInversions(int[] a, int lo, int hi, int[] tmp) {",
+              "        if (hi - lo <= 1) return 0;",
+              "        int mid = (lo + hi) >>> 1;",
+              "        long inv = countInversions(a, lo, mid, tmp) + countInversions(a, mid, hi, tmp);",
+              "        int i = lo, j = mid, k = lo;",
+              "        while (i < mid && j < hi) {",
+              "            if (a[i] <= a[j]) tmp[k++] = a[i++];",
+              "            else {",
+              "                inv += mid - i;                  // mọi phần tử còn lại bên trái đều > a[j]",
+              "                tmp[k++] = a[j++];",
+              "            }",
+              "        }",
+              "        while (i < mid) tmp[k++] = a[i++];",
+              "        while (j < hi) tmp[k++] = a[j++];",
+              "        System.arraycopy(tmp, lo, a, lo, hi - lo);",
+              "        return inv;",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "class Inversions {",
+              "    // Returns the inversion count and sorts a[lo..hi)",
+              "    static long countInversions(int[] a, int lo, int hi, int[] tmp) {",
+              "        if (hi - lo <= 1) return 0;",
+              "        int mid = (lo + hi) >>> 1;",
+              "        long inv = countInversions(a, lo, mid, tmp) + countInversions(a, mid, hi, tmp);",
+              "        int i = lo, j = mid, k = lo;",
+              "        while (i < mid && j < hi) {",
+              "            if (a[i] <= a[j]) tmp[k++] = a[i++];",
+              "            else {",
+              "                inv += mid - i;                  // every remaining left element is > a[j]",
+              "                tmp[k++] = a[j++];",
+              "            }",
+              "        }",
+              "        while (i < mid) tmp[k++] = a[i++];",
+              "        while (j < hi) tmp[k++] = a[j++];",
+              "        System.arraycopy(tmp, lo, a, lo, hi - lo);",
+              "        return inv;",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "complexity": "O(n log n) time, O(n) space.",
+      "problems": [
+        { "title": "Fibonacci Number", "url": "https://leetcode.com/problems/fibonacci-number/", "level": "Easy" },
+        { "title": "Pow(x, n)", "url": "https://leetcode.com/problems/powx-n/", "level": "Medium" },
+        { "title": "Sort an Array", "url": "https://leetcode.com/problems/sort-an-array/", "level": "Medium" },
+        { "title": "Reverse Pairs", "url": "https://leetcode.com/problems/reverse-pairs/", "level": "Hard" },
+        { "title": "Count of Smaller Numbers After Self", "url": "https://leetcode.com/problems/count-of-smaller-numbers-after-self/", "level": "Hard" },
+        { "title": "Recursion: Fibonacci Numbers", "url": "https://www.hackerrank.com/challenges/ctci-fibonacci-numbers/problem", "level": "Easy" },
+        { "title": "Recursion: Davis' Staircase", "url": "https://www.hackerrank.com/challenges/ctci-recursive-staircase/problem", "level": "Medium" },
+        { "title": "Recursive Digit Sum", "url": "https://www.hackerrank.com/challenges/recursive-digit-sum/problem", "level": "Medium" },
+        { "title": "The Power Sum", "url": "https://www.hackerrank.com/challenges/the-power-sum/problem", "level": "Medium" },
+        { "title": "Merge Sort: Counting Inversions", "url": "https://www.hackerrank.com/challenges/ctci-merge-sort/problem", "level": "Hard" }
+      ],
+      "resources": [
+        { "type": "video", "title": "freeCodeCamp: Recursion in Programming - Full Course", "url": "https://www.youtube.com/watch?v=IJDJ0kBx2LM" },
+        { "type": "article", "title": "Tech Interview Handbook: Recursion", "url": "https://www.techinterviewhandbook.org/algorithms/recursion/" },
+        { "type": "practice", "title": "LeetCode tag: Recursion", "url": "https://leetcode.com/problem-list/recursion/" },
+        { "type": "practice", "title": "LeetCode tag: Divide and Conquer", "url": "https://leetcode.com/problem-list/divide-and-conquer/" }
+      ]
+    },
+    {
+      "id": "p3-tree",
+      "type": "theory",
+      "title": { "vi": "Cây: duyệt pre/in/post/level-order, BST", "en": "Trees: pre/in/post/level-order traversal, BST" },
+      "description": {
+        "vi": "Gần như mọi bài cây đều là một kiểu duyệt cây. Chọn đúng thứ tự duyệt là đã giải được một nửa.",
+        "en": "Almost every tree problem is some kind of traversal. Picking the right traversal order is half the solution."
+      },
+      "keyPoints": {
+        "vi": [
+          "Pre-order (gốc → trái → phải): sao chép hoặc serialize cây",
+          "In-order (trái → gốc → phải) trên BST cho ra dãy tăng dần",
+          "Post-order (trái → phải → gốc): tính giá trị từ con lên cha, như chiều cao hay đường kính",
+          "Level-order: BFS bằng queue, xử lý từng tầng bằng `for _ in range(len(q))`",
+          "BST: mọi node cây con trái < gốc < mọi node cây con phải (cả cây con, không chỉ con trực tiếp)"
+        ],
+        "en": [
+          "Pre-order (root → left → right): copying or serializing a tree",
+          "In-order (left → root → right) on a BST yields sorted order",
+          "Post-order (left → right → root): compute values bottom-up, like height or diameter",
+          "Level-order: BFS with a queue, one level at a time with `for _ in range(len(q))`",
+          "BST: every node in the left subtree < root < every node in the right subtree (whole subtrees, not just direct children)"
+        ]
+      },
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "from collections import deque",
+              "",
+              "def max_depth(root):              # post-order: tính từ con lên",
+              "    if not root:",
+              "        return 0",
+              "    return 1 + max(max_depth(root.left), max_depth(root.right))",
+              "",
+              "def level_order(root):",
+              "    if not root:",
+              "        return []",
+              "    res, q = [], deque([root])",
+              "    while q:",
+              "        level = []",
+              "        for _ in range(len(q)):    # xử lý đúng 1 tầng",
+              "            node = q.popleft()",
+              "            level.append(node.val)",
+              "            if node.left: q.append(node.left)",
+              "            if node.right: q.append(node.right)",
+              "        res.append(level)",
+              "    return res",
+              "",
+              "def inorder(root):                 # không đệ quy, dùng stack",
+              "    res, stack, node = [], [], root",
+              "    while stack or node:",
+              "        while node:",
+              "            stack.append(node)",
+              "            node = node.left",
+              "        node = stack.pop()",
+              "        res.append(node.val)",
+              "        node = node.right",
+              "    return res"
+            ],
+            "en": [
+              "from collections import deque",
+              "",
+              "def max_depth(root):              # post-order: computed bottom-up",
+              "    if not root:",
+              "        return 0",
+              "    return 1 + max(max_depth(root.left), max_depth(root.right))",
+              "",
+              "def level_order(root):",
+              "    if not root:",
+              "        return []",
+              "    res, q = [], deque([root])",
+              "    while q:",
+              "        level = []",
+              "        for _ in range(len(q)):    # process exactly one level",
+              "            node = q.popleft()",
+              "            level.append(node.val)",
+              "            if node.left: q.append(node.left)",
+              "            if node.right: q.append(node.right)",
+              "        res.append(level)",
+              "    return res",
+              "",
+              "def inorder(root):                 # iterative, with a stack",
+              "    res, stack, node = [], [], root",
+              "    while stack or node:",
+              "        while node:",
+              "            stack.append(node)",
+              "            node = node.left",
+              "        node = stack.pop()",
+              "        res.append(node.val)",
+              "        node = node.right",
+              "    return res"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class TreeNode {",
+              "    int val;",
+              "    TreeNode left, right;",
+              "    TreeNode(int val) { this.val = val; }",
+              "}",
+              "",
+              "class Traversals {",
+              "    static int maxDepth(TreeNode root) {             // post-order: tính từ con lên",
+              "        if (root == null) return 0;",
+              "        return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));",
+              "    }",
+              "",
+              "    static List<List<Integer>> levelOrder(TreeNode root) {",
+              "        List<List<Integer>> res = new ArrayList<>();",
+              "        if (root == null) return res;",
+              "        Deque<TreeNode> q = new ArrayDeque<>();",
+              "        q.offer(root);",
+              "        while (!q.isEmpty()) {",
+              "            List<Integer> level = new ArrayList<>();",
+              "            for (int size = q.size(); size > 0; size--) {   // xử lý đúng 1 tầng",
+              "                TreeNode node = q.poll();",
+              "                level.add(node.val);",
+              "                if (node.left != null) q.offer(node.left);",
+              "                if (node.right != null) q.offer(node.right);",
+              "            }",
+              "            res.add(level);",
+              "        }",
+              "        return res;",
+              "    }",
+              "",
+              "    static List<Integer> inorder(TreeNode root) {    // không đệ quy, dùng stack",
+              "        List<Integer> res = new ArrayList<>();",
+              "        Deque<TreeNode> stack = new ArrayDeque<>();",
+              "        TreeNode node = root;",
+              "        while (node != null || !stack.isEmpty()) {",
+              "            while (node != null) {",
+              "                stack.push(node);",
+              "                node = node.left;",
+              "            }",
+              "            node = stack.pop();",
+              "            res.add(node.val);",
+              "            node = node.right;",
+              "        }",
+              "        return res;",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class TreeNode {",
+              "    int val;",
+              "    TreeNode left, right;",
+              "    TreeNode(int val) { this.val = val; }",
+              "}",
+              "",
+              "class Traversals {",
+              "    static int maxDepth(TreeNode root) {             // post-order: computed bottom-up",
+              "        if (root == null) return 0;",
+              "        return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));",
+              "    }",
+              "",
+              "    static List<List<Integer>> levelOrder(TreeNode root) {",
+              "        List<List<Integer>> res = new ArrayList<>();",
+              "        if (root == null) return res;",
+              "        Deque<TreeNode> q = new ArrayDeque<>();",
+              "        q.offer(root);",
+              "        while (!q.isEmpty()) {",
+              "            List<Integer> level = new ArrayList<>();",
+              "            for (int size = q.size(); size > 0; size--) {   // process exactly one level",
+              "                TreeNode node = q.poll();",
+              "                level.add(node.val);",
+              "                if (node.left != null) q.offer(node.left);",
+              "                if (node.right != null) q.offer(node.right);",
+              "            }",
+              "            res.add(level);",
+              "        }",
+              "        return res;",
+              "    }",
+              "",
+              "    static List<Integer> inorder(TreeNode root) {    // iterative, with a stack",
+              "        List<Integer> res = new ArrayList<>();",
+              "        Deque<TreeNode> stack = new ArrayDeque<>();",
+              "        TreeNode node = root;",
+              "        while (node != null || !stack.isEmpty()) {",
+              "            while (node != null) {",
+              "                stack.push(node);",
+              "                node = node.left;",
+              "            }",
+              "            node = stack.pop();",
+              "            res.add(node.val);",
+              "            node = node.right;",
+              "        }",
+              "        return res;",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "complexity": {
+        "vi": "O(n) time, O(h) space với h là chiều cao cây.",
+        "en": "O(n) time, O(h) space where h is the tree height."
+      },
+      "problems": [
+        { "title": "Binary Tree Inorder Traversal", "url": "https://leetcode.com/problems/binary-tree-inorder-traversal/", "level": "Easy" },
+        { "title": "Binary Tree Preorder Traversal", "url": "https://leetcode.com/problems/binary-tree-preorder-traversal/", "level": "Easy" },
+        { "title": "Search in a Binary Search Tree", "url": "https://leetcode.com/problems/search-in-a-binary-search-tree/", "level": "Easy" },
+        { "title": "Binary Tree Level Order Traversal", "url": "https://leetcode.com/problems/binary-tree-level-order-traversal/", "level": "Medium" },
+        { "title": "Insert into a Binary Search Tree", "url": "https://leetcode.com/problems/insert-into-a-binary-search-tree/", "level": "Medium" },
+        { "title": "Delete Node in a BST", "url": "https://leetcode.com/problems/delete-node-in-a-bst/", "level": "Medium" },
+        { "title": "Tree: Preorder Traversal", "url": "https://www.hackerrank.com/challenges/tree-preorder-traversal/problem", "level": "Easy" },
+        { "title": "Tree: Inorder Traversal", "url": "https://www.hackerrank.com/challenges/tree-inorder-traversal/problem", "level": "Easy" },
+        { "title": "Tree: Postorder Traversal", "url": "https://www.hackerrank.com/challenges/tree-postorder-traversal/problem", "level": "Easy" },
+        { "title": "Tree: Level Order Traversal", "url": "https://www.hackerrank.com/challenges/tree-level-order-traversal/problem", "level": "Easy" },
+        { "title": "Tree: Height of a Binary Tree", "url": "https://www.hackerrank.com/challenges/tree-height-of-a-binary-tree/problem", "level": "Easy" },
+        { "title": "Tree : Top View", "url": "https://www.hackerrank.com/challenges/tree-top-view/problem", "level": "Easy" },
+        { "title": "Binary Search Tree : Insertion", "url": "https://www.hackerrank.com/challenges/binary-search-tree-insertion/problem", "level": "Easy" }
+      ],
+      "resources": [
+        { "type": "visual", "title": "VisuAlgo: Binary Search Tree", "url": "https://visualgo.net/en/bst" },
+        { "type": "article", "title": "Tech Interview Handbook: Tree", "url": "https://www.techinterviewhandbook.org/algorithms/tree/" },
+        { "type": "video", "title": "freeCodeCamp: Binary Tree Algorithms for Technical Interviews", "url": "https://www.youtube.com/watch?v=fAAZixBzIAI" },
+        { "type": "practice", "title": "LeetCode tag: Tree", "url": "https://leetcode.com/problem-list/tree/" }
+      ]
+    },
+    {
+      "id": "p3-graph",
+      "type": "theory",
+      "title": {
+        "vi": "Đồ thị: danh sách kề, BFS, DFS, sắp xếp topo",
+        "en": "Graphs: adjacency lists, BFS, DFS, topological sort"
+      },
+      "description": {
+        "vi": "Nhiều bài không nói là đồ thị nhưng thực ra là đồ thị: lưới, quan hệ phụ thuộc, biến đổi trạng thái. Việc đầu tiên là nhận ra đâu là đỉnh, đâu là cạnh.",
+        "en": "Many problems never say 'graph' but are graphs: grids, dependencies, state transitions. The first step is to identify the vertices and the edges."
+      },
+      "keyPoints": {
+        "vi": [
+          "Biểu diễn bằng danh sách kề `defaultdict(list)` cho hầu hết các bài",
+          "BFS: đường đi ngắn nhất khi mọi cạnh có trọng số như nhau",
+          "DFS: duyệt thành phần liên thông, phát hiện chu trình, quay lui",
+          "Đánh dấu visited khi **đẩy vào** queue chứ không phải khi lấy ra, để không thêm 1 đỉnh nhiều lần",
+          "Sắp xếp topo (Kahn): lần lượt lấy các đỉnh có bậc vào bằng 0. Không lấy hết được thì đồ thị có chu trình"
+        ],
+        "en": [
+          "Use an adjacency list `defaultdict(list)` for most problems",
+          "BFS: shortest paths when all edges have the same weight",
+          "DFS: connected components, cycle detection, backtracking",
+          "Mark visited when **pushing** onto the queue, not when popping, so a vertex is never added twice",
+          "Topological sort (Kahn): repeatedly take vertices with in-degree 0. If you can't take them all, the graph has a cycle"
+        ]
+      },
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "from collections import defaultdict, deque",
+              "",
+              "def build(edges, directed=False):",
+              "    g = defaultdict(list)",
+              "    for u, v in edges:",
+              "        g[u].append(v)",
+              "        if not directed:",
+              "            g[v].append(u)",
+              "    return g",
+              "",
+              "def bfs(g, start):                 # khoảng cách ngắn nhất (số cạnh)",
+              "    dist = {start: 0}",
+              "    q = deque([start])",
+              "    while q:",
+              "        u = q.popleft()",
+              "        for v in g[u]:",
+              "            if v not in dist:      # đánh dấu khi đẩy vào queue",
+              "                dist[v] = dist[u] + 1",
+              "                q.append(v)",
+              "    return dist",
+              "",
+              "def topo_sort(n, edges):           # Kahn; trả về [] nếu có chu trình",
+              "    g, indeg = defaultdict(list), [0] * n",
+              "    for u, v in edges:",
+              "        g[u].append(v)",
+              "        indeg[v] += 1",
+              "    q = deque(i for i in range(n) if indeg[i] == 0)",
+              "    order = []",
+              "    while q:",
+              "        u = q.popleft()",
+              "        order.append(u)",
+              "        for v in g[u]:",
+              "            indeg[v] -= 1",
+              "            if indeg[v] == 0:",
+              "                q.append(v)",
+              "    return order if len(order) == n else []"
+            ],
+            "en": [
+              "from collections import defaultdict, deque",
+              "",
+              "def build(edges, directed=False):",
+              "    g = defaultdict(list)",
+              "    for u, v in edges:",
+              "        g[u].append(v)",
+              "        if not directed:",
+              "            g[v].append(u)",
+              "    return g",
+              "",
+              "def bfs(g, start):                 # shortest distance (in edges)",
+              "    dist = {start: 0}",
+              "    q = deque([start])",
+              "    while q:",
+              "        u = q.popleft()",
+              "        for v in g[u]:",
+              "            if v not in dist:      # mark when pushing to the queue",
+              "                dist[v] = dist[u] + 1",
+              "                q.append(v)",
+              "    return dist",
+              "",
+              "def topo_sort(n, edges):           # Kahn; returns [] if there is a cycle",
+              "    g, indeg = defaultdict(list), [0] * n",
+              "    for u, v in edges:",
+              "        g[u].append(v)",
+              "        indeg[v] += 1",
+              "    q = deque(i for i in range(n) if indeg[i] == 0)",
+              "    order = []",
+              "    while q:",
+              "        u = q.popleft()",
+              "        order.append(u)",
+              "        for v in g[u]:",
+              "            indeg[v] -= 1",
+              "            if indeg[v] == 0:",
+              "                q.append(v)",
+              "    return order if len(order) == n else []"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class Graphs {",
+              "    static List<List<Integer>> build(int n, int[][] edges, boolean directed) {",
+              "        List<List<Integer>> g = new ArrayList<>();",
+              "        for (int i = 0; i < n; i++) g.add(new ArrayList<>());",
+              "        for (int[] e : edges) {",
+              "            g.get(e[0]).add(e[1]);",
+              "            if (!directed) g.get(e[1]).add(e[0]);",
+              "        }",
+              "        return g;",
+              "    }",
+              "",
+              "    static int[] bfs(List<List<Integer>> g, int start) {   // khoảng cách ngắn nhất (số cạnh)",
+              "        int[] dist = new int[g.size()];",
+              "        Arrays.fill(dist, -1);",
+              "        dist[start] = 0;",
+              "        Deque<Integer> q = new ArrayDeque<>(List.of(start));",
+              "        while (!q.isEmpty()) {",
+              "            int u = q.poll();",
+              "            for (int v : g.get(u)) {",
+              "                if (dist[v] == -1) {             // đánh dấu khi đẩy vào queue",
+              "                    dist[v] = dist[u] + 1;",
+              "                    q.offer(v);",
+              "                }",
+              "            }",
+              "        }",
+              "        return dist;",
+              "    }",
+              "",
+              "    static List<Integer> topoSort(int n, int[][] edges) {   // Kahn; trả về [] nếu có chu trình",
+              "        List<List<Integer>> g = build(n, edges, true);",
+              "        int[] indeg = new int[n];",
+              "        for (int[] e : edges) indeg[e[1]]++;",
+              "        Deque<Integer> q = new ArrayDeque<>();",
+              "        for (int i = 0; i < n; i++) if (indeg[i] == 0) q.offer(i);",
+              "        List<Integer> order = new ArrayList<>();",
+              "        while (!q.isEmpty()) {",
+              "            int u = q.poll();",
+              "            order.add(u);",
+              "            for (int v : g.get(u)) if (--indeg[v] == 0) q.offer(v);",
+              "        }",
+              "        return order.size() == n ? order : List.of();",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class Graphs {",
+              "    static List<List<Integer>> build(int n, int[][] edges, boolean directed) {",
+              "        List<List<Integer>> g = new ArrayList<>();",
+              "        for (int i = 0; i < n; i++) g.add(new ArrayList<>());",
+              "        for (int[] e : edges) {",
+              "            g.get(e[0]).add(e[1]);",
+              "            if (!directed) g.get(e[1]).add(e[0]);",
+              "        }",
+              "        return g;",
+              "    }",
+              "",
+              "    static int[] bfs(List<List<Integer>> g, int start) {   // shortest distance (in edges)",
+              "        int[] dist = new int[g.size()];",
+              "        Arrays.fill(dist, -1);",
+              "        dist[start] = 0;",
+              "        Deque<Integer> q = new ArrayDeque<>(List.of(start));",
+              "        while (!q.isEmpty()) {",
+              "            int u = q.poll();",
+              "            for (int v : g.get(u)) {",
+              "                if (dist[v] == -1) {             // mark when pushing to the queue",
+              "                    dist[v] = dist[u] + 1;",
+              "                    q.offer(v);",
+              "                }",
+              "            }",
+              "        }",
+              "        return dist;",
+              "    }",
+              "",
+              "    static List<Integer> topoSort(int n, int[][] edges) {   // Kahn; returns [] if there is a cycle",
+              "        List<List<Integer>> g = build(n, edges, true);",
+              "        int[] indeg = new int[n];",
+              "        for (int[] e : edges) indeg[e[1]]++;",
+              "        Deque<Integer> q = new ArrayDeque<>();",
+              "        for (int i = 0; i < n; i++) if (indeg[i] == 0) q.offer(i);",
+              "        List<Integer> order = new ArrayList<>();",
+              "        while (!q.isEmpty()) {",
+              "            int u = q.poll();",
+              "            order.add(u);",
+              "            for (int v : g.get(u)) if (--indeg[v] == 0) q.offer(v);",
+              "        }",
+              "        return order.size() == n ? order : List.of();",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "complexity": { "vi": "O(V + E) cho BFS, DFS và sắp xếp topo.", "en": "O(V + E) for BFS, DFS and topological sort." },
+      "problems": [
+        { "title": "Find if Path Exists in Graph", "url": "https://leetcode.com/problems/find-if-path-exists-in-graph/", "level": "Easy" },
+        { "title": "Clone Graph", "url": "https://leetcode.com/problems/clone-graph/", "level": "Medium" },
+        { "title": "All Paths From Source to Target", "url": "https://leetcode.com/problems/all-paths-from-source-to-target/", "level": "Medium" },
+        { "title": "Course Schedule", "url": "https://leetcode.com/problems/course-schedule/", "level": "Medium" },
+        { "title": "Course Schedule II", "url": "https://leetcode.com/problems/course-schedule-ii/", "level": "Medium" },
+        { "title": "Breadth First Search: Shortest Reach", "url": "https://www.hackerrank.com/challenges/bfsshortreach/problem", "level": "Medium" },
+        { "title": "Roads and Libraries", "url": "https://www.hackerrank.com/challenges/torque-and-development/problem", "level": "Medium" },
+        { "title": "Journey to the Moon", "url": "https://www.hackerrank.com/challenges/journey-to-the-moon/problem", "level": "Medium" },
+        { "title": "Even Tree", "url": "https://www.hackerrank.com/challenges/even-tree/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "cp-algorithms: Breadth-first search", "url": "https://cp-algorithms.com/graph/breadth-first-search.html" },
+        { "type": "article", "title": "cp-algorithms: Topological sorting", "url": "https://cp-algorithms.com/graph/topological-sort.html" },
+        { "type": "visual", "title": "VisuAlgo: Graph Traversal (DFS/BFS)", "url": "https://visualgo.net/en/dfsbfs" },
+        { "type": "video", "title": "freeCodeCamp: Graph Algorithms for Technical Interviews", "url": "https://www.youtube.com/watch?v=tWVWeAqZ0WU" },
+        { "type": "practice", "title": "LeetCode tag: Breadth-First Search", "url": "https://leetcode.com/problem-list/breadth-first-search/" },
+        { "type": "practice", "title": "LeetCode tag: Topological Sort", "url": "https://leetcode.com/problem-list/topological-sort/" }
+      ]
+    },
+    {
+      "id": "p3-backtrack",
+      "type": "practice",
+      "title": {
+        "vi": "Dạng bài Backtracking (hoán vị, tổ hợp, N-Queens)",
+        "en": "Backtracking problems (permutations, combinations, N-Queens)"
+      },
+      "description": {
+        "vi": "Thử lần lượt từng lựa chọn, đi sâu xuống, rồi hoàn tác để thử lựa chọn khác. Dùng khi đề yêu cầu liệt kê **tất cả** tập con, hoán vị, tổ hợp hoặc cấu hình hợp lệ.",
+        "en": "Try each choice in turn, go deeper, then undo it to try the next one. Use it when the problem asks you to list **all** subsets, permutations, combinations or valid configurations."
+      },
+      "keyPoints": {
+        "vi": [
+          "Khung: chọn → đệ quy → bỏ chọn",
+          "Tập con/tổ hợp: truyền `start` để không chọn lại phần tử đứng trước",
+          "Hoán vị: dùng mảng `used`",
+          "Có phần tử trùng: sort trước, rồi bỏ qua `nums[i] == nums[i-1]` trong cùng 1 tầng",
+          "Cắt nhánh sớm khi chắc chắn nhánh đó không ra đáp án"
+        ],
+        "en": [
+          "Skeleton: choose → recurse → unchoose",
+          "Subsets/combinations: pass `start` so earlier elements aren't picked again",
+          "Permutations: use a `used` array",
+          "With duplicates: sort first, then skip `nums[i] == nums[i-1]` within the same level",
+          "Prune early when a branch can't lead to an answer"
+        ]
+      },
+      "examples": [
+        {
+          "title": "Subsets",
+          "input": "nums = [1, 2, 3]",
+          "output": "[[], [1], [1, 2], [1, 2, 3], [1, 3], [2], [2, 3], [3]]",
+          "explain": {
+            "vi": "Mỗi tầng đệ quy chọn thêm 1 phần tử đứng sau phần tử vừa chọn.",
+            "en": "Each recursion level adds one element that comes after the last chosen one."
+          }
+        }
+      ],
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "def subsets(nums):",
+              "    res, path = [], []",
+              "    def dfs(start):",
+              "        res.append(path[:])        # copy, không append path trực tiếp",
+              "        for i in range(start, len(nums)):",
+              "            path.append(nums[i])   # chọn",
+              "            dfs(i + 1)             # đi tiếp",
+              "            path.pop()             # bỏ chọn",
+              "    dfs(0)",
+              "    return res",
+              "",
+              "def permute(nums):",
+              "    res, path, used = [], [], [False] * len(nums)",
+              "    def dfs():",
+              "        if len(path) == len(nums):",
+              "            res.append(path[:])",
+              "            return",
+              "        for i, x in enumerate(nums):",
+              "            if used[i]:",
+              "                continue",
+              "            used[i] = True; path.append(x)",
+              "            dfs()",
+              "            used[i] = False; path.pop()",
+              "    dfs()",
+              "    return res"
+            ],
+            "en": [
+              "def subsets(nums):",
+              "    res, path = [], []",
+              "    def dfs(start):",
+              "        res.append(path[:])        # copy, don't append path itself",
+              "        for i in range(start, len(nums)):",
+              "            path.append(nums[i])   # choose",
+              "            dfs(i + 1)             # explore",
+              "            path.pop()             # unchoose",
+              "    dfs(0)",
+              "    return res",
+              "",
+              "def permute(nums):",
+              "    res, path, used = [], [], [False] * len(nums)",
+              "    def dfs():",
+              "        if len(path) == len(nums):",
+              "            res.append(path[:])",
+              "            return",
+              "        for i, x in enumerate(nums):",
+              "            if used[i]:",
+              "                continue",
+              "            used[i] = True; path.append(x)",
+              "            dfs()",
+              "            used[i] = False; path.pop()",
+              "    dfs()",
+              "    return res"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class Backtracking {",
+              "    static List<List<Integer>> subsets(int[] nums) {",
+              "        List<List<Integer>> res = new ArrayList<>();",
+              "        dfs(nums, 0, new ArrayList<>(), res);",
+              "        return res;",
+              "    }",
+              "",
+              "    static void dfs(int[] nums, int start, List<Integer> path, List<List<Integer>> res) {",
+              "        res.add(new ArrayList<>(path));              // copy, không add path trực tiếp",
+              "        for (int i = start; i < nums.length; i++) {",
+              "            path.add(nums[i]);                       // chọn",
+              "            dfs(nums, i + 1, path, res);             // đi tiếp",
+              "            path.remove(path.size() - 1);            // bỏ chọn",
+              "        }",
+              "    }",
+              "",
+              "    static List<List<Integer>> permute(int[] nums) {",
+              "        List<List<Integer>> res = new ArrayList<>();",
+              "        permuteDfs(nums, new boolean[nums.length], new ArrayList<>(), res);",
+              "        return res;",
+              "    }",
+              "",
+              "    static void permuteDfs(int[] nums, boolean[] used, List<Integer> path, List<List<Integer>> res) {",
+              "        if (path.size() == nums.length) {",
+              "            res.add(new ArrayList<>(path));",
+              "            return;",
+              "        }",
+              "        for (int i = 0; i < nums.length; i++) {",
+              "            if (used[i]) continue;",
+              "            used[i] = true; path.add(nums[i]);",
+              "            permuteDfs(nums, used, path, res);",
+              "            used[i] = false; path.remove(path.size() - 1);",
+              "        }",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class Backtracking {",
+              "    static List<List<Integer>> subsets(int[] nums) {",
+              "        List<List<Integer>> res = new ArrayList<>();",
+              "        dfs(nums, 0, new ArrayList<>(), res);",
+              "        return res;",
+              "    }",
+              "",
+              "    static void dfs(int[] nums, int start, List<Integer> path, List<List<Integer>> res) {",
+              "        res.add(new ArrayList<>(path));              // copy, don't add path itself",
+              "        for (int i = start; i < nums.length; i++) {",
+              "            path.add(nums[i]);                       // choose",
+              "            dfs(nums, i + 1, path, res);             // explore",
+              "            path.remove(path.size() - 1);            // unchoose",
+              "        }",
+              "    }",
+              "",
+              "    static List<List<Integer>> permute(int[] nums) {",
+              "        List<List<Integer>> res = new ArrayList<>();",
+              "        permuteDfs(nums, new boolean[nums.length], new ArrayList<>(), res);",
+              "        return res;",
+              "    }",
+              "",
+              "    static void permuteDfs(int[] nums, boolean[] used, List<Integer> path, List<List<Integer>> res) {",
+              "        if (path.size() == nums.length) {",
+              "            res.add(new ArrayList<>(path));",
+              "            return;",
+              "        }",
+              "        for (int i = 0; i < nums.length; i++) {",
+              "            if (used[i]) continue;",
+              "            used[i] = true; path.add(nums[i]);",
+              "            permuteDfs(nums, used, path, res);",
+              "            used[i] = false; path.remove(path.size() - 1);",
+              "        }",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "complexity": { "vi": "Tập con: O(2ⁿ · n). Hoán vị: O(n! · n).", "en": "Subsets: O(2ⁿ · n). Permutations: O(n! · n)." },
+      "pitfalls": {
+        "vi": [
+          "Thêm `path` vào kết quả mà không copy (`path[:]`), cuối cùng toàn là list rỗng"
+        ],
+        "en": [
+          "Appending `path` without copying it (`path[:]`), so every result ends up as an empty list"
+        ]
+      },
+      "problems": [
+        { "title": "Subsets", "url": "https://leetcode.com/problems/subsets/", "level": "Medium" },
+        { "title": "Combination Sum", "url": "https://leetcode.com/problems/combination-sum/", "level": "Medium" },
+        { "title": "Permutations", "url": "https://leetcode.com/problems/permutations/", "level": "Medium" },
+        { "title": "Subsets II", "url": "https://leetcode.com/problems/subsets-ii/", "level": "Medium" },
+        { "title": "Combination Sum II", "url": "https://leetcode.com/problems/combination-sum-ii/", "level": "Medium" },
+        { "title": "Word Search", "url": "https://leetcode.com/problems/word-search/", "level": "Medium" },
+        { "title": "Palindrome Partitioning", "url": "https://leetcode.com/problems/palindrome-partitioning/", "level": "Medium" },
+        { "title": "Letter Combinations of a Phone Number", "url": "https://leetcode.com/problems/letter-combinations-of-a-phone-number/", "level": "Medium" },
+        { "title": "N-Queens", "url": "https://leetcode.com/problems/n-queens/", "level": "Hard" },
+        { "title": "Crossword Puzzle", "url": "https://www.hackerrank.com/challenges/crossword-puzzle/problem", "level": "Medium" },
+        { "title": "Password Cracker", "url": "https://www.hackerrank.com/challenges/password-cracker/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "USACO Guide: Complete Search with Recursion", "url": "https://usaco.guide/bronze/complete-rec" },
+        { "type": "practice", "title": "LeetCode tag: Backtracking", "url": "https://leetcode.com/problem-list/backtracking/" }
+      ]
+    },
+    {
+      "id": "p3-greedy",
+      "type": "practice",
+      "title": { "vi": "Dạng bài Greedy (xếp lịch, khoảng)", "en": "Greedy problems (scheduling, intervals)" },
+      "description": {
+        "vi": "Mỗi bước chọn phương án tốt nhất lúc đó và không quay lại. Khó nhất là **chứng minh** tham lam đúng. Khi phỏng vấn, ít nhất phải giải thích được vì sao.",
+        "en": "At each step take the best option available and never look back. The hard part is **proving** the greedy choice is correct. In an interview, at least be able to explain why."
+      },
+      "keyPoints": {
+        "vi": [
+          "Bài khoảng: sort theo điểm đầu để gộp; sort theo điểm cuối để chọn được nhiều khoảng không chồng nhau nhất",
+          "Thử tìm phản ví dụ nhỏ trước khi tin vào tham lam. Có phản ví dụ thì thường phải dùng DP",
+          "Jump Game: giữ chỉ số xa nhất có thể tới"
+        ],
+        "en": [
+          "Intervals: sort by start to merge; sort by end to pick the most non-overlapping intervals",
+          "Look for a small counterexample before trusting a greedy idea. If you find one, it's usually DP",
+          "Jump Game: track the farthest reachable index"
+        ]
+      },
+      "examples": [
+        {
+          "title": "Merge Intervals",
+          "input": "[[1, 3], [2, 6], [8, 10], [15, 18]]",
+          "output": "[[1, 6], [8, 10], [15, 18]]",
+          "explain": {
+            "vi": "Sau khi sort theo điểm đầu, [2, 6] bắt đầu trước khi [1, 3] kết thúc nên gộp lại.",
+            "en": "After sorting by start, [2, 6] begins before [1, 3] ends, so they merge."
+          }
+        }
+      ],
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "def merge(intervals):",
+              "    intervals.sort(key=lambda x: x[0])",
+              "    res = []",
+              "    for start, end in intervals:",
+              "        if res and start <= res[-1][1]:",
+              "            res[-1][1] = max(res[-1][1], end)   # chồng nhau -> gộp",
+              "        else:",
+              "            res.append([start, end])",
+              "    return res",
+              "",
+              "def can_jump(nums):",
+              "    reach = 0",
+              "    for i, x in enumerate(nums):",
+              "        if i > reach:",
+              "            return False",
+              "        reach = max(reach, i + x)",
+              "    return True"
+            ],
+            "en": [
+              "def merge(intervals):",
+              "    intervals.sort(key=lambda x: x[0])",
+              "    res = []",
+              "    for start, end in intervals:",
+              "        if res and start <= res[-1][1]:",
+              "            res[-1][1] = max(res[-1][1], end)   # overlapping -> merge",
+              "        else:",
+              "            res.append([start, end])",
+              "    return res",
+              "",
+              "def can_jump(nums):",
+              "    reach = 0",
+              "    for i, x in enumerate(nums):",
+              "        if i > reach:",
+              "            return False",
+              "        reach = max(reach, i + x)",
+              "    return True"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class Greedy {",
+              "    static int[][] merge(int[][] intervals) {",
+              "        Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));",
+              "        List<int[]> res = new ArrayList<>();",
+              "        for (int[] cur : intervals) {",
+              "            if (!res.isEmpty() && cur[0] <= res.get(res.size() - 1)[1]) {",
+              "                int[] last = res.get(res.size() - 1);",
+              "                last[1] = Math.max(last[1], cur[1]);   // chồng nhau -> gộp",
+              "            } else {",
+              "                res.add(new int[]{cur[0], cur[1]});",
+              "            }",
+              "        }",
+              "        return res.toArray(new int[0][]);",
+              "    }",
+              "",
+              "    static boolean canJump(int[] nums) {",
+              "        int reach = 0;",
+              "        for (int i = 0; i < nums.length; i++) {",
+              "            if (i > reach) return false;",
+              "            reach = Math.max(reach, i + nums[i]);",
+              "        }",
+              "        return true;",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class Greedy {",
+              "    static int[][] merge(int[][] intervals) {",
+              "        Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));",
+              "        List<int[]> res = new ArrayList<>();",
+              "        for (int[] cur : intervals) {",
+              "            if (!res.isEmpty() && cur[0] <= res.get(res.size() - 1)[1]) {",
+              "                int[] last = res.get(res.size() - 1);",
+              "                last[1] = Math.max(last[1], cur[1]);   // overlapping -> merge",
+              "            } else {",
+              "                res.add(new int[]{cur[0], cur[1]});",
+              "            }",
+              "        }",
+              "        return res.toArray(new int[0][]);",
+              "    }",
+              "",
+              "    static boolean canJump(int[] nums) {",
+              "        int reach = 0;",
+              "        for (int i = 0; i < nums.length; i++) {",
+              "            if (i > reach) return false;",
+              "            reach = Math.max(reach, i + nums[i]);",
+              "        }",
+              "        return true;",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "problems": [
+        { "title": "Maximum Subarray", "url": "https://leetcode.com/problems/maximum-subarray/", "level": "Medium" },
+        { "title": "Jump Game", "url": "https://leetcode.com/problems/jump-game/", "level": "Medium" },
+        { "title": "Jump Game II", "url": "https://leetcode.com/problems/jump-game-ii/", "level": "Medium" },
+        { "title": "Gas Station", "url": "https://leetcode.com/problems/gas-station/", "level": "Medium" },
+        { "title": "Hand of Straights", "url": "https://leetcode.com/problems/hand-of-straights/", "level": "Medium" },
+        { "title": "Merge Intervals", "url": "https://leetcode.com/problems/merge-intervals/", "level": "Medium" },
+        { "title": "Insert Interval", "url": "https://leetcode.com/problems/insert-interval/", "level": "Medium" },
+        { "title": "Non-overlapping Intervals", "url": "https://leetcode.com/problems/non-overlapping-intervals/", "level": "Medium" },
+        { "title": "Partition Labels", "url": "https://leetcode.com/problems/partition-labels/", "level": "Medium" },
+        { "title": "Minimum Absolute Difference in an Array", "url": "https://www.hackerrank.com/challenges/minimum-absolute-difference-in-an-array/problem", "level": "Easy" },
+        { "title": "Luck Balance", "url": "https://www.hackerrank.com/challenges/luck-balance/problem", "level": "Easy" },
+        { "title": "Grid Challenge", "url": "https://www.hackerrank.com/challenges/grid-challenge/problem", "level": "Easy" },
+        { "title": "Greedy Florist", "url": "https://www.hackerrank.com/challenges/greedy-florist/problem", "level": "Medium" },
+        { "title": "Truck Tour", "url": "https://www.hackerrank.com/challenges/truck-tour/problem", "level": "Hard" }
+      ],
+      "resources": [
+        { "type": "article", "title": "USACO Guide: Greedy Algorithms with Sorting", "url": "https://usaco.guide/silver/greedy-sorting" },
+        { "type": "article", "title": "Tech Interview Handbook: Interval", "url": "https://www.techinterviewhandbook.org/algorithms/interval/" },
+        { "type": "practice", "title": "LeetCode tag: Greedy", "url": "https://leetcode.com/problem-list/greedy/" }
+      ]
+    },
+    {
+      "id": "p3-trees",
+      "type": "practice",
+      "title": { "vi": "Dạng bài Trees", "en": "Tree problems" },
+      "description": {
+        "vi": "Phần lớn bài cây là một hàm DFS trả về 1 giá trị từ con lên cha. Hãy tự hỏi: mỗi node cần biết gì từ 2 con để tính được đáp án của nó?",
+        "en": "Most tree problems are a DFS that returns one value from children to parent. Ask yourself: what does each node need from its two children to compute its answer?"
+      },
+      "keyPoints": {
+        "vi": [
+          "Cần 2 thông tin (vd. đường kính cần chiều cao và đáp án toàn cục): trả về 1 cái, cập nhật biến bên ngoài cho cái còn lại",
+          "Validate BST: truyền khoảng (low, high) hợp lệ xuống các con",
+          "LCA trên BST: đi theo giá trị. Trên cây thường: node đầu tiên thấy cả 2 node ở 2 phía chính là LCA"
+        ],
+        "en": [
+          "Need two pieces of information (e.g. diameter needs height and a global best): return one, update an outer variable for the other",
+          "Validate BST: pass the valid range (low, high) down to the children",
+          "LCA in a BST: follow the values. In a general tree: the first node that finds the two targets on different sides is the LCA"
+        ]
+      },
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "def diameter_of_binary_tree(root):",
+              "    best = 0",
+              "    def height(node):",
+              "        nonlocal best",
+              "        if not node:",
+              "            return 0",
+              "        l, r = height(node.left), height(node.right)",
+              "        best = max(best, l + r)    # đường đi đi qua node này",
+              "        return 1 + max(l, r)       # trả về cho cha",
+              "    height(root)",
+              "    return best",
+              "",
+              "def is_valid_bst(root, low=float('-inf'), high=float('inf')):",
+              "    if not root:",
+              "        return True",
+              "    if not (low < root.val < high):",
+              "        return False",
+              "    return (is_valid_bst(root.left, low, root.val)",
+              "            and is_valid_bst(root.right, root.val, high))"
+            ],
+            "en": [
+              "def diameter_of_binary_tree(root):",
+              "    best = 0",
+              "    def height(node):",
+              "        nonlocal best",
+              "        if not node:",
+              "            return 0",
+              "        l, r = height(node.left), height(node.right)",
+              "        best = max(best, l + r)    # path through this node",
+              "        return 1 + max(l, r)       # return to the parent",
+              "    height(root)",
+              "    return best",
+              "",
+              "def is_valid_bst(root, low=float('-inf'), high=float('inf')):",
+              "    if not root:",
+              "        return True",
+              "    if not (low < root.val < high):",
+              "        return False",
+              "    return (is_valid_bst(root.left, low, root.val)",
+              "            and is_valid_bst(root.right, root.val, high))"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "class TreeProblems {",
+              "    private int best = 0;",
+              "",
+              "    int diameterOfBinaryTree(TreeNode root) {",
+              "        best = 0;",
+              "        height(root);",
+              "        return best;",
+              "    }",
+              "",
+              "    private int height(TreeNode node) {",
+              "        if (node == null) return 0;",
+              "        int l = height(node.left), r = height(node.right);",
+              "        best = Math.max(best, l + r);            // đường đi đi qua node này",
+              "        return 1 + Math.max(l, r);               // trả về cho cha",
+              "    }",
+              "",
+              "    boolean isValidBST(TreeNode root) {",
+              "        return valid(root, Long.MIN_VALUE, Long.MAX_VALUE);",
+              "    }",
+              "",
+              "    private boolean valid(TreeNode node, long low, long high) {",
+              "        if (node == null) return true;",
+              "        if (node.val <= low || node.val >= high) return false;",
+              "        return valid(node.left, low, node.val) && valid(node.right, node.val, high);",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "class TreeProblems {",
+              "    private int best = 0;",
+              "",
+              "    int diameterOfBinaryTree(TreeNode root) {",
+              "        best = 0;",
+              "        height(root);",
+              "        return best;",
+              "    }",
+              "",
+              "    private int height(TreeNode node) {",
+              "        if (node == null) return 0;",
+              "        int l = height(node.left), r = height(node.right);",
+              "        best = Math.max(best, l + r);            // path through this node",
+              "        return 1 + Math.max(l, r);               // return to the parent",
+              "    }",
+              "",
+              "    boolean isValidBST(TreeNode root) {",
+              "        return valid(root, Long.MIN_VALUE, Long.MAX_VALUE);",
+              "    }",
+              "",
+              "    private boolean valid(TreeNode node, long low, long high) {",
+              "        if (node == null) return true;",
+              "        if (node.val <= low || node.val >= high) return false;",
+              "        return valid(node.left, low, node.val) && valid(node.right, node.val, high);",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "complexity": "O(n) time, O(h) space.",
+      "problems": [
+        { "title": "Invert Binary Tree", "url": "https://leetcode.com/problems/invert-binary-tree/", "level": "Easy" },
+        { "title": "Maximum Depth of Binary Tree", "url": "https://leetcode.com/problems/maximum-depth-of-binary-tree/", "level": "Easy" },
+        { "title": "Diameter of Binary Tree", "url": "https://leetcode.com/problems/diameter-of-binary-tree/", "level": "Easy" },
+        { "title": "Balanced Binary Tree", "url": "https://leetcode.com/problems/balanced-binary-tree/", "level": "Easy" },
+        { "title": "Same Tree", "url": "https://leetcode.com/problems/same-tree/", "level": "Easy" },
+        { "title": "Subtree of Another Tree", "url": "https://leetcode.com/problems/subtree-of-another-tree/", "level": "Easy" },
+        { "title": "Lowest Common Ancestor of a Binary Search Tree", "url": "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/", "level": "Medium" },
+        { "title": "Binary Tree Right Side View", "url": "https://leetcode.com/problems/binary-tree-right-side-view/", "level": "Medium" },
+        { "title": "Count Good Nodes in Binary Tree", "url": "https://leetcode.com/problems/count-good-nodes-in-binary-tree/", "level": "Medium" },
+        { "title": "Validate Binary Search Tree", "url": "https://leetcode.com/problems/validate-binary-search-tree/", "level": "Medium" },
+        { "title": "Kth Smallest Element in a BST", "url": "https://leetcode.com/problems/kth-smallest-element-in-a-bst/", "level": "Medium" },
+        { "title": "Construct Binary Tree from Preorder and Inorder Traversal", "url": "https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/", "level": "Medium" },
+        { "title": "Binary Tree Maximum Path Sum", "url": "https://leetcode.com/problems/binary-tree-maximum-path-sum/", "level": "Hard" },
+        { "title": "Serialize and Deserialize Binary Tree", "url": "https://leetcode.com/problems/serialize-and-deserialize-binary-tree/", "level": "Hard" },
+        { "title": "Binary Search Tree : Lowest Common Ancestor", "url": "https://www.hackerrank.com/challenges/binary-search-tree-lowest-common-ancestor/problem", "level": "Easy" },
+        { "title": "Trees: Is This a Binary Search Tree?", "url": "https://www.hackerrank.com/challenges/ctci-is-binary-search-tree/problem", "level": "Medium" },
+        { "title": "Tree: Huffman Decoding", "url": "https://www.hackerrank.com/challenges/tree-huffman-decoding/problem", "level": "Medium" },
+        { "title": "Swap Nodes [Algo]", "url": "https://www.hackerrank.com/challenges/swap-nodes-algo/problem", "level": "Medium" },
+        { "title": "Balanced Forest", "url": "https://www.hackerrank.com/challenges/balanced-forest/problem", "level": "Hard" }
+      ],
+      "resources": [
+        { "type": "practice", "title": "LeetCode tag: Binary Tree", "url": "https://leetcode.com/problem-list/binary-tree/" },
+        { "type": "practice", "title": "LeetCode tag: Binary Search Tree", "url": "https://leetcode.com/problem-list/binary-search-tree/" }
+      ]
+    },
+    {
+      "id": "p3-graphs",
+      "type": "practice",
+      "title": {
+        "vi": "Dạng bài Graphs (loang lưới, thành phần liên thông)",
+        "en": "Graph problems (grid flood fill, connected components)"
+      },
+      "description": {
+        "vi": "Lưới 2 chiều là dạng đồ thị gặp nhiều nhất khi phỏng vấn: mỗi ô là 1 đỉnh, 4 ô kề là các cạnh.",
+        "en": "2D grids are the most common graphs in interviews: each cell is a vertex, its 4 neighbours are the edges."
+      },
+      "keyPoints": {
+        "vi": [
+          "Loang nhiều nguồn: đẩy mọi nguồn vào queue ngay từ đầu (Rotting Oranges)",
+          "Đi ngược từ biên vào trong thay vì từ trong ra (Pacific Atlantic, Surrounded Regions)",
+          "Có thể đánh dấu đã thăm bằng cách sửa trực tiếp lưới, nếu đề cho phép",
+          "Đếm thành phần liên thông: mỗi lần gặp ô chưa thăm thì tăng đếm và loang"
+        ],
+        "en": [
+          "Multi-source BFS: push every source onto the queue at the start (Rotting Oranges)",
+          "Search inward from the border instead of outward from each cell (Pacific Atlantic, Surrounded Regions)",
+          "You can mark cells visited by modifying the grid itself, if allowed",
+          "Counting components: each time you find an unvisited cell, increment the count and flood fill"
+        ]
+      },
+      "examples": [
+        {
+          "title": "Number of Islands",
+          "input": "grid = [['1','1','0'], ['0','1','0'], ['0','0','1']]",
+          "output": "2",
+          "explain": {
+            "vi": "3 ô '1' ở góc trên trái nối với nhau thành 1 đảo, ô góc dưới phải là đảo thứ 2.",
+            "en": "The three '1' cells in the top-left form one island; the bottom-right cell is the second."
+          }
+        }
+      ],
+      "template": [
+        {
+          "lang": "python",
+          "code": {
+            "vi": [
+              "from collections import deque",
+              "",
+              "DIRS = ((1, 0), (-1, 0), (0, 1), (0, -1))",
+              "",
+              "def num_islands(grid):",
+              "    rows, cols = len(grid), len(grid[0])",
+              "    count = 0",
+              "    for r in range(rows):",
+              "        for c in range(cols):",
+              "            if grid[r][c] != '1':",
+              "                continue",
+              "            count += 1",
+              "            grid[r][c] = '0'                 # đánh dấu đã thăm",
+              "            q = deque([(r, c)])",
+              "            while q:",
+              "                x, y = q.popleft()",
+              "                for dx, dy in DIRS:",
+              "                    nx, ny = x + dx, y + dy",
+              "                    if 0 <= nx < rows and 0 <= ny < cols and grid[nx][ny] == '1':",
+              "                        grid[nx][ny] = '0'",
+              "                        q.append((nx, ny))",
+              "    return count"
+            ],
+            "en": [
+              "from collections import deque",
+              "",
+              "DIRS = ((1, 0), (-1, 0), (0, 1), (0, -1))",
+              "",
+              "def num_islands(grid):",
+              "    rows, cols = len(grid), len(grid[0])",
+              "    count = 0",
+              "    for r in range(rows):",
+              "        for c in range(cols):",
+              "            if grid[r][c] != '1':",
+              "                continue",
+              "            count += 1",
+              "            grid[r][c] = '0'                 # mark visited",
+              "            q = deque([(r, c)])",
+              "            while q:",
+              "                x, y = q.popleft()",
+              "                for dx, dy in DIRS:",
+              "                    nx, ny = x + dx, y + dy",
+              "                    if 0 <= nx < rows and 0 <= ny < cols and grid[nx][ny] == '1':",
+              "                        grid[nx][ny] = '0'",
+              "                        q.append((nx, ny))",
+              "    return count"
+            ]
+          }
+        },
+        {
+          "lang": "java",
+          "code": {
+            "vi": [
+              "import java.util.*;",
+              "",
+              "class Islands {",
+              "    static final int[][] DIRS = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};",
+              "",
+              "    static int numIslands(char[][] grid) {",
+              "        int rows = grid.length, cols = grid[0].length, count = 0;",
+              "        for (int r = 0; r < rows; r++) {",
+              "            for (int c = 0; c < cols; c++) {",
+              "                if (grid[r][c] != '1') continue;",
+              "                count++;",
+              "                grid[r][c] = '0';                        // đánh dấu đã thăm",
+              "                Deque<int[]> q = new ArrayDeque<>();",
+              "                q.offer(new int[]{r, c});",
+              "                while (!q.isEmpty()) {",
+              "                    int[] cell = q.poll();",
+              "                    for (int[] d : DIRS) {",
+              "                        int nr = cell[0] + d[0], nc = cell[1] + d[1];",
+              "                        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && grid[nr][nc] == '1') {",
+              "                            grid[nr][nc] = '0';",
+              "                            q.offer(new int[]{nr, nc});",
+              "                        }",
+              "                    }",
+              "                }",
+              "            }",
+              "        }",
+              "        return count;",
+              "    }",
+              "}"
+            ],
+            "en": [
+              "import java.util.*;",
+              "",
+              "class Islands {",
+              "    static final int[][] DIRS = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};",
+              "",
+              "    static int numIslands(char[][] grid) {",
+              "        int rows = grid.length, cols = grid[0].length, count = 0;",
+              "        for (int r = 0; r < rows; r++) {",
+              "            for (int c = 0; c < cols; c++) {",
+              "                if (grid[r][c] != '1') continue;",
+              "                count++;",
+              "                grid[r][c] = '0';                        // mark visited",
+              "                Deque<int[]> q = new ArrayDeque<>();",
+              "                q.offer(new int[]{r, c});",
+              "                while (!q.isEmpty()) {",
+              "                    int[] cell = q.poll();",
+              "                    for (int[] d : DIRS) {",
+              "                        int nr = cell[0] + d[0], nc = cell[1] + d[1];",
+              "                        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && grid[nr][nc] == '1') {",
+              "                            grid[nr][nc] = '0';",
+              "                            q.offer(new int[]{nr, nc});",
+              "                        }",
+              "                    }",
+              "                }",
+              "            }",
+              "        }",
+              "        return count;",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "complexity": { "vi": "O(rows × cols) time và space.", "en": "O(rows × cols) time and space." },
+      "problems": [
+        { "title": "Number of Islands", "url": "https://leetcode.com/problems/number-of-islands/", "level": "Medium" },
+        { "title": "Max Area of Island", "url": "https://leetcode.com/problems/max-area-of-island/", "level": "Medium" },
+        { "title": "Clone Graph", "url": "https://leetcode.com/problems/clone-graph/", "level": "Medium" },
+        { "title": "Rotting Oranges", "url": "https://leetcode.com/problems/rotting-oranges/", "level": "Medium" },
+        { "title": "Pacific Atlantic Water Flow", "url": "https://leetcode.com/problems/pacific-atlantic-water-flow/", "level": "Medium" },
+        { "title": "Surrounded Regions", "url": "https://leetcode.com/problems/surrounded-regions/", "level": "Medium" },
+        { "title": "Course Schedule", "url": "https://leetcode.com/problems/course-schedule/", "level": "Medium" },
+        { "title": "Course Schedule II", "url": "https://leetcode.com/problems/course-schedule-ii/", "level": "Medium" },
+        { "title": "Word Ladder", "url": "https://leetcode.com/problems/word-ladder/", "level": "Hard" },
+        { "title": "Connected Cells in a Grid", "url": "https://www.hackerrank.com/challenges/connected-cell-in-a-grid/problem", "level": "Medium" },
+        { "title": "Count Luck", "url": "https://www.hackerrank.com/challenges/count-luck/problem", "level": "Medium" },
+        { "title": "Castle on the Grid", "url": "https://www.hackerrank.com/challenges/castle-on-the-grid/problem", "level": "Medium" },
+        { "title": "KnightL on a Chessboard", "url": "https://www.hackerrank.com/challenges/knightl-on-chessboard/problem", "level": "Medium" },
+        { "title": "Find the nearest clone", "url": "https://www.hackerrank.com/challenges/find-the-nearest-clone/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "USACO Guide: Flood Fill", "url": "https://usaco.guide/silver/flood-fill" },
+        { "type": "practice", "title": "LeetCode study plan: Graph Theory", "url": "https://leetcode.com/studyplan/graph-theory/" },
+        { "type": "practice", "title": "LeetCode tag: Graph Theory", "url": "https://leetcode.com/problem-list/graph/" },
+        { "type": "practice", "title": "LeetCode tag: Matrix", "url": "https://leetcode.com/problem-list/matrix/" }
+      ]
+    },
+    {
+      "id": "p3-cses",
+      "type": "practice",
+      "title": {
+        "vi": "CSES Graph Algorithms nửa đầu, Codeforces 1000–1300",
+        "en": "First half of CSES Graph Algorithms, Codeforces 1000–1300"
+      },
+      "description": {
+        "vi": "Củng cố BFS/DFS bằng các bài chuẩn trên CSES, sau đó luyện Codeforces mức 1000–1300 để quen đọc đề dài và tự nghĩ ra mô hình đồ thị.",
+        "en": "Strengthen BFS/DFS with standard CSES problems, then practice Codeforces 1000–1300 to get used to long statements and building the graph model yourself."
+      },
+      "keyPoints": {
+        "vi": [
+          "CSES: làm khoảng 10 bài đầu của mục Graph Algorithms",
+          "Codeforces: lọc theo rating, ưu tiên các bài có tag graphs, dfs and similar",
+          "Python thường bị TLE ở CSES, nên dùng C++ hoặc PyPy"
+        ],
+        "en": [
+          "CSES: do roughly the first 10 problems of Graph Algorithms",
+          "Codeforces: filter by rating and prefer problems tagged graphs, dfs and similar",
+          "Python often gets TLE on CSES; use C++ or PyPy"
+        ]
+      },
+      "problems": [
+        { "title": "Counting Rooms", "url": "https://cses.fi/problemset/task/1192" },
+        { "title": "Labyrinth", "url": "https://cses.fi/problemset/task/1193" },
+        { "title": "Building Roads", "url": "https://cses.fi/problemset/task/1666" },
+        { "title": "Message Route", "url": "https://cses.fi/problemset/task/1667" },
+        { "title": "Building Teams", "url": "https://cses.fi/problemset/task/1668" },
+        { "title": "Round Trip", "url": "https://cses.fi/problemset/task/1669" }
+      ],
+      "resources": [
+        { "type": "book", "title": "Competitive Programmer's Handbook (PDF)", "url": "https://cses.fi/book/book.pdf" },
+        { "type": "practice", "title": "Codeforces rating 1000–1300", "url": "https://codeforces.com/problemset?order=BY_RATING_ASC&tags=1000-1300" }
+      ]
+    }
+  ]
+}
