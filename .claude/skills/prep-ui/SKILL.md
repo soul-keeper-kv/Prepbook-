@@ -8,10 +8,23 @@ description: UI design rules for this interview-prep study app (web/ and the And
 Design rules for the app in `web/` (the Android app in `mobile/` packs the same build).
 Read this before drawing a mockup or writing a screen, so every screen looks like one app.
 
-**Status: design only.** As of 2026-10-25 none of the screens below exist in code. The
-running app is still the single DSA roadmap (`web/src/components/roadmap/`). Do not
-describe these screens as built, and do not change app code or the data model until the
-user says the open questions (bottom of this file) are settled.
+**Status (2026-10-26):** the first version is built on branch `feat/pattern-notebook`:
+- the data model (`web/src/notebook/`) and Drive sync with three-way merge
+- carrying over the old roadmap progress
+- every screen below except the ones listed as later
+- pages live in `web/src/pages/`, components in `web/src/components/{shell,common,pattern,problem}/`
+
+**Not built yet (later):**
+- images and diagrams
+- blind recognition practice
+- a solving timer
+- the mistake log across patterns
+- Obsidian-vault export
+- sharing a link from the phone into the Inbox
+- per-topic section templates beyond the four kinds
+
+Say so plainly when asked; do not describe them as working. Before changing the data model
+or a settled rule, ask.
 
 Mockups: https://claude.ai/artifact/2YeqxRgKmTPUi12qejw52o — A/B/C style options, and
 the chosen direction ("Đã chọn: C + B, màu VS Code") with the Pattern page. The mockups
@@ -36,10 +49,17 @@ Pattern → Resources, note sections, Q&A cards
 ```
 
 - **Roadmap** = the user-ordered phases and patterns of a topic.
-- **Progress is derived, never ticked by hand** (except pure-theory items with no
-  problems). Each pattern has 4 levels: Not started → Learning (has notes or problems)
-  → Got it (solved ≥ N problems alone) → Mastered (recognised in blind practice and
-  reviews on time).
+- **Progress is derived, never ticked by hand** (except pure-theory patterns, which have
+  no problems). Each pattern has 4 levels, worked out in `notebook/logic.ts`:
+
+  | Level | When |
+  | --- | --- |
+  | Not started | Nothing yet |
+  | Learning | Has notes or problems |
+  | Got it | 3 problems solved alone |
+  | Mastered | 3 problems solved alone again in a review (≥ 7 days after the first try) and nothing overdue |
+
+  A review more than 7 days overdue drops the pattern one level.
 - **Attempt outcome** has 3 values: solved alone / needed a hint / read the solution.
   Redo after 1 day (solution), 3 days (hint), growing gaps (alone).
 - The old roadmap in `web/data/` is a **suggestion source only**: shown in a "Suggestions
@@ -58,8 +78,9 @@ Sidebar, top to bottom:
 4. "Topics and patterns" tree
 5. sync status pinned at the bottom
 
-Main content is capped around 1080px wide. Below ~768px the sidebar leaves the page
-(drawer or bottom bar — not decided yet).
+Main content is capped at 1080px wide (`max-w-270`). Below 768px (`md`) the sidebar is
+hidden and a **bottom bar** with Today, Inbox, Review, Topics, Search takes its place. The
+tree then lives on the Topics page.
 
 **Today (home).** The top heading states today's load ("5 tasks, about 2h 20m"), with a
 primary "Start session" button and a secondary "Mock interview" button. Below it:
@@ -95,11 +116,17 @@ Other topics get their own template. Proposed, not settled:
 - System Design: Requirements → Estimates → Design → Deep dive → Trade-offs
 - Behavioral: a STAR story bank mapped to common questions
 
-**Problem detail.** The attempt history, newest first. Each attempt shows its outcome
-tag, minutes, mistake tags, the code and a note. A "Redo now" action starts a timer.
+**Problem detail.** It has three parts:
+- an attempt form: outcome, minutes, mistakes, note, code
+- the attempt history, newest first, each with its outcome tag, minutes, mistake tags,
+  code and note
+- a "Stuck?" panel with solution links and AI prompts
 
-**Review queue.** Due problems and Q&A cards across all topics. Blind mode hides the
-pattern name until the user has guessed it.
+Later: a timer that fills in the minutes.
+
+**Review queue.** Due problems and Q&A cards across all topics. Cards are drilled one at a
+time: answer aloud, reveal, then grade Forgot / Fuzzy / Solid. Later: blind mode, which
+hides the pattern name until the user has guessed it.
 
 **Tree view (sidebar)** is like Obsidian's file explorer:
 - Topic → Phase → Pattern, with drag to reorder (the drag order is the roadmap order)
@@ -114,10 +141,10 @@ Node colour = topic, size = number of problems, and opacity/ring = mastery level
 topic, hide problems. Clicking a node opens its page. The Pattern page can show a
 **local graph** (1–2 hops).
 
-Libraries are recommended, not installed. Ask before adding them:
-- graph: `react-force-graph-2d` (canvas, force layout)
-- tree: `@headless-tree/react` + `@headless-tree/core` (headless, so it takes the
-  app's own Tailwind styling; it has drag and drop)
+Libraries (installed):
+- graph: `react-force-graph-2d` (canvas, force layout), lazy-loaded by `pages/graph-page.tsx`
+- tree: `@headless-tree/react` + `@headless-tree/core` (headless, so it takes the app's own
+  Tailwind styling; it has drag and drop), in `components/shell/topic-tree.tsx`
 
 The graph canvas cannot read Tailwind classes. Read the colour tokens with
 `getComputedStyle(document.documentElement)` and redraw when the theme changes.
@@ -153,9 +180,10 @@ Status colours use the `Tag` tones in `web/src/components/tag.tsx`:
 
 Mastery is shown as a 4-step meter plus its text label. Never rely on colour alone.
 
-**Topic colours** do not exist yet. When needed, add a `--topic-<id>` token to
-`index.css` with a light and a dark value; both must pass 4.5:1 as text on their
-background. Topics are shown as an 8px square dot next to the name.
+**Topic colours** are the `--topic-{blue,orange,teal,purple,green,pink,gray}` tokens in
+`index.css` (light and dark values, both text-safe). Use them through `TopicDot` in
+`components/common/badges.tsx`, which also holds `LevelTag`, `LevelMeter`, `OutcomeTag`,
+`OutcomeBar` and `LevelBar`.
 
 Type and shape:
 - **Fonts: system only.** `font-sans` and `font-mono` from `index.css`, because the app
@@ -203,16 +231,18 @@ Type and shape:
 - Tables sit in an `overflow-x-auto` box. Rows wrap instead of overflowing at phone width.
 - Focus must be visible (`focus-visible:ring-2 ring-ring`).
 
+## Rules that hold the data together
+
+- **Never read the clock while rendering.** Use `useNow()` from `lib/clock.ts`.
+- **Never edit a notebook object in place.** `notebook/logic.ts` caches lookups per notebook
+  object. Every change goes through `notebookActions` in `notebook/store.ts`.
+- **Deleting marks an entity `deleted`; it never removes it.** Otherwise the other device's
+  copy brings it back on sync.
+- **A long text that loses a merge becomes a Conflict.** Show conflicts with
+  `ConflictList`, near the entity they belong to.
+
 ## Open questions — ask, do not decide
 
-1. N for "Got it", and whether a level can drop when reviews are skipped.
-2. Data-model points:
-   - many-to-many problems
-   - an attempt log instead of a single status
-   - a section template per topic
-   - images and diagrams as separate Drive files
-   - keeping both versions when a long note is edited on two devices
-   - migrating existing ticks and notes
-3. Phone navigation: drawer or bottom bar.
-4. Topic colour values.
-5. Adding the graph and tree libraries, and the Obsidian-vault export.
+1. Images and diagrams. Proposed: separate Drive files, never inside the notebook JSON.
+2. Blind recognition practice: whether it should count towards "Mastered".
+3. The Obsidian-vault export format.
