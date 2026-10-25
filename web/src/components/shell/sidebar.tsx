@@ -66,13 +66,15 @@ export function Sidebar({ route, className }: { route: Route; className?: string
   return (
     <aside
       className={cn(
-        "sticky top-0 flex h-dvh w-64 shrink-0 flex-col gap-4 overflow-y-auto border-r bg-background px-2 py-4",
+        // Fixed height: the header and the footer stay put, only the tree scrolls (like
+        // VS Code's Explorer). The footer must never sit over the tree, however long it is.
+        "sticky top-0 flex h-dvh w-64 shrink-0 flex-col gap-4 overflow-hidden border-r bg-background px-2 py-4",
         className
       )}
     >
       <a
         href={href.today}
-        className="px-2.5 font-mono text-13 text-muted-foreground no-underline hover:no-underline"
+        className="shrink-0 px-2.5 font-mono text-13 text-muted-foreground no-underline hover:no-underline"
       >
         <span className="text-ok-fill">❯</span> ~/
         <span className="text-foreground">interview-prep</span>
@@ -81,14 +83,14 @@ export function Sidebar({ route, className }: { route: Route; className?: string
       <button
         type="button"
         onClick={() => navigate(href.search)}
-        className="mx-1 flex h-8 cursor-pointer items-center gap-2 rounded-sm border border-border-strong bg-code px-2.5 text-13 text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+        className="mx-1 flex h-8 shrink-0 cursor-pointer items-center gap-2 rounded-sm border border-border-strong bg-code px-2.5 text-13 text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
       >
         <SearchIcon className="size-3.5" aria-hidden />
         <span className="flex-1 text-left">{t("nav.search")}</span>
         <kbd className="font-mono text-11">Ctrl K</kbd>
       </button>
 
-      <nav aria-label={t("nav.main")} className="flex flex-col gap-0.5">
+      <nav aria-label={t("nav.main")} className="flex shrink-0 flex-col gap-0.5">
         <NavLink
           to={href.today}
           active={route.name === "today"}
@@ -119,25 +121,27 @@ export function Sidebar({ route, className }: { route: Route; className?: string
         />
       </nav>
 
-      <div className="min-h-0">
-        <h2 className={cn(LABEL, "mb-1 px-2.5")}>{t("tree.title")}</h2>
-        <TopicTree />
-        <details className="mt-2 px-1">
-          <summary className="cursor-pointer px-1.5 text-12 text-muted-foreground">
-            {t("topic.new")}
-          </summary>
-          <InlineAdd
-            className="mt-1.5"
-            label={t("topic.add")}
-            placeholder={t("topic.namePlaceholder")}
-            onAdd={(name) =>
-              navigate(href.topic(notebookActions.addTopic(name, "concept", "gray")))
-            }
-          />
-        </details>
+      <div className="flex min-h-0 flex-1 flex-col">
+        <h2 className={cn(LABEL, "mb-1 shrink-0 px-2.5")}>{t("tree.title")}</h2>
+        <div className="min-h-0 flex-1 overflow-y-auto pb-2">
+          <TopicTree />
+          <details className="mt-2 px-1">
+            <summary className="cursor-pointer px-1.5 text-12 text-muted-foreground">
+              {t("topic.new")}
+            </summary>
+            <InlineAdd
+              className="mt-1.5"
+              label={t("topic.add")}
+              placeholder={t("topic.namePlaceholder")}
+              onAdd={(name) =>
+                navigate(href.topic(notebookActions.addTopic(name, "concept", "gray")))
+              }
+            />
+          </details>
+        </div>
       </div>
 
-      <div className="mt-auto flex items-center gap-1 border-t px-1 pt-3">
+      <div className="flex shrink-0 items-center gap-1 border-t px-1 pt-3">
         <a
           href={href.settings}
           className="flex min-w-0 flex-1 items-center rounded-sm px-1.5 py-1 text-muted-foreground no-underline hover:bg-muted hover:no-underline"
