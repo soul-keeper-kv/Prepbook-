@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest"
+import { buildContent, dataFiles } from "@/content/load"
 import { KEYS, storage } from "@/lib/storage"
 import { normalizeUrl, problemIdFor } from "@/notebook/ids"
 import { liveValues, patternsOf, phasesOf, problemsOf } from "@/notebook/logic"
@@ -122,6 +123,23 @@ describe("notebookActions", () => {
     const after = notebookActions.get()
     expect(after.patterns[p]?.sections.idea).toBe("the other device's")
     expect(after.conflicts.c1?.text).toBe("current")
+  })
+
+  it("adds every suggested item of a phase in one change, and undoes it", () => {
+    const content = buildContent(dataFiles)
+    const phase = content.phases[1]!
+    const ids = phase.items.map((i) => i.id)
+    let changes = 0
+    const stop = onLocalNotebookChange(() => changes++)
+    const added = notebookActions.addSuggestedPatterns(content, ids, "vi")
+    stop()
+    expect(changes).toBe(1)
+    expect(added).toHaveLength(ids.length)
+    expect(phasesOf(notebookActions.get(), "t_dsa")).toHaveLength(1)
+    // Adding again adds nothing new
+    expect(notebookActions.addSuggestedPatterns(content, ids, "vi")).toEqual([])
+    notebookActions.deletePatterns(added)
+    expect(liveValues(notebookActions.get().patterns)).toHaveLength(0)
   })
 
   it("start over keeps the default topics, empty", () => {

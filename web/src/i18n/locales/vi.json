@@ -427,6 +427,11 @@
     "patternIntro": "Chỉ thêm vào pattern khi bạn bấm.",
     "left_other": "{{count}} chưa thêm",
     "add": "Thêm",
+    "addAll_other": "Thêm tất cả ({{count}})",
+    "addPhase_other": "Thêm cả giai đoạn ({{count}})",
+    "addedPatterns_other": "Đã thêm {{count}} pattern.",
+    "addedItems_other": "Đã thêm {{count}} mục vào pattern.",
+    "undo": "Hoàn tác",
     "addNamed": "Thêm {{name}}",
     "added": "Đã thêm"
   },

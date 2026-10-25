@@ -2,6 +2,7 @@ import { useId, useState } from "react"
 import { useNow } from "@/lib/clock"
 import {
   ArrowDownIcon,
+  ListPlusIcon,
   ArrowUpIcon,
   CheckIcon,
   ChevronRightIcon,
@@ -10,6 +11,7 @@ import {
   Trash2Icon,
 } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { LevelBar, LevelMeter, TopicDot } from "@/components/common/badges"
 import { EditableText, InlineAdd, SELECT } from "@/components/common/editing"
@@ -30,7 +32,7 @@ import {
 } from "@/notebook/logic"
 import { TOPIC_COLORS, TOPIC_KINDS, type Pattern, type Phase, type Topic } from "@/notebook/schema"
 import { notebookActions } from "@/notebook/store"
-import { patternIdFor, roadmapSuggestions } from "@/notebook/suggestions"
+import { patternIdFor, roadmapSuggestions, type SuggestedItem } from "@/notebook/suggestions"
 import { DSA_TOPIC_ID } from "@/notebook/templates"
 import { href, navigate } from "@/state/router"
 
@@ -298,11 +300,34 @@ function Suggestions() {
   const nb = useNotebook()
   const lang = useLang()
   const phases = roadmapSuggestions(content, nb, lang)
+  const notAdded = (items: SuggestedItem[]) => items.filter((i) => !i.added).map((i) => i.itemId)
+  const allLeft = notAdded(phases.flatMap((p) => p.items))
+
+  // One change for the lot, with Undo in case of a slip: what it added is still empty
+  function addAll(itemIds: string[]) {
+    const added = notebookActions.addSuggestedPatterns(content, itemIds, lang)
+    if (!added.length) return
+    toast.success(t("suggest.addedPatterns", { count: added.length }), {
+      action: { label: t("suggest.undo"), onClick: () => notebookActions.deletePatterns(added) },
+    })
+  }
+
   return (
-    <Panel title={t("suggest.title")}>
+    <Panel
+      title={t("suggest.title")}
+      actions={
+        allLeft.length > 0 && (
+          <Button size="xs" onClick={() => addAll(allLeft)}>
+            <ListPlusIcon />
+            {t("suggest.addAll", { count: allLeft.length })}
+          </Button>
+        )
+      }
+    >
       <p className="mb-2 text-13 text-muted-foreground">{t("suggest.roadmapIntro")}</p>
       {phases.map((phase) => {
-        const left = phase.items.filter((i) => !i.added).length
+        const leftIds = notAdded(phase.items)
+        const left = leftIds.length
         return (
           <Collapsible key={phase.phaseId} className="border-t">
             <CollapsibleTrigger className="group/s flex w-full cursor-pointer items-center gap-2 py-2 text-left text-13 outline-none focus-visible:ring-2 focus-visible:ring-ring">
@@ -313,6 +338,17 @@ function Suggestions() {
               </span>
             </CollapsibleTrigger>
             <CollapsibleContent>
+              {left > 0 && (
+                <Button
+                  size="xs"
+                  variant="outline"
+                  className="mb-1 ml-5"
+                  onClick={() => addAll(leftIds)}
+                >
+                  <ListPlusIcon />
+                  {t("suggest.addPhase", { count: left })}
+                </Button>
+              )}
               <ul className="pb-2">
                 {phase.items.map((item) => (
                   <li key={item.itemId} className="flex items-center gap-2 py-1 pl-5 text-13">

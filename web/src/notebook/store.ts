@@ -366,16 +366,36 @@ export const notebookActions = {
 
   /** A pattern made from an item of the old roadmap (with its phase when that is missing) */
   addSuggestedPattern(content: Content, itemId: string, lang: Lang): string | null {
+    return notebookActions.addSuggestedPatterns(content, [itemId], lang)[0] ?? null
+  },
+
+  /**
+   * "Add all": several suggested items in one change (one save, one upload).
+   * Returns the patterns that were not in the notebook before, for Undo.
+   */
+  addSuggestedPatterns(content: Content, itemIds: string[], lang: Lang): string[] {
     return transact((tx) => {
-      const made = patternFromItem(content, itemId, lang, tx.now)
-      if (!made) return null
-      const phase = tx.get("phases", made.phase.id)
-      if (!phase) tx.put("phases", made.phase)
-      else if (phase.deleted) tx.patch("phases", phase.id, { deleted: false })
-      const pattern = tx.get("patterns", made.pattern.id)
-      if (!pattern) tx.put("patterns", made.pattern)
-      else if (pattern.deleted) tx.patch("patterns", pattern.id, { deleted: false })
-      return made.pattern.id
+      const added: string[] = []
+      for (const itemId of itemIds) {
+        const made = patternFromItem(content, itemId, lang, tx.now)
+        if (!made) continue
+        const phase = tx.get("phases", made.phase.id)
+        if (!phase) tx.put("phases", made.phase)
+        else if (phase.deleted) tx.patch("phases", phase.id, { deleted: false })
+        const pattern = tx.get("patterns", made.pattern.id)
+        if (!pattern) tx.put("patterns", made.pattern)
+        else if (pattern.deleted) tx.patch("patterns", pattern.id, { deleted: false })
+        else continue
+        added.push(made.pattern.id)
+      }
+      return added
+    })
+  },
+
+  /** Undo of "Add all": the patterns it added are still empty, so nothing is lost */
+  deletePatterns(ids: string[]) {
+    transact((tx) => {
+      for (const id of ids) deletePatternIn(tx, id)
     })
   },
 
@@ -421,6 +441,18 @@ export const notebookActions = {
     notes?: string
   }): string {
     return transact((tx) => addProblemIn(tx, input))
+  },
+
+  /** "Add all" suggested problems to one pattern, in one change */
+  addProblems(
+    inputs: { url: string; title: string; level?: string; patternIds: string[] }[]
+  ): string[] {
+    return transact((tx) => inputs.map((input) => addProblemIn(tx, input)))
+  },
+
+  /** Undo of "Add all": out of the pattern again (deleted when in no other pattern) */
+  unlinkProblems(ids: string[], patternId: string) {
+    for (const id of ids) notebookActions.unlinkProblem(id, patternId)
   },
 
   updateProblem(id: string, changes: Partial<Pick<Problem, "title" | "url" | "level" | "notes">>) {
@@ -490,6 +522,16 @@ export const notebookActions = {
     takeaway?: string
   }): string {
     return transact((tx) => addResourceIn(tx, input))
+  },
+
+  addResources(
+    inputs: { url: string; title: string; kind: ResourceKind; patternIds: string[] }[]
+  ): string[] {
+    return transact((tx) => inputs.map((input) => addResourceIn(tx, input)))
+  },
+
+  unlinkResources(ids: string[], patternId: string) {
+    for (const id of ids) notebookActions.unlinkResource(id, patternId)
   },
 
   updateResource(

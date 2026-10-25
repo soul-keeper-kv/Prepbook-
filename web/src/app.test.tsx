@@ -6,6 +6,7 @@ import i18n from "@/i18n"
 import { App } from "@/app"
 import { ContentProvider } from "@/content/context"
 import { buildContent, dataFiles } from "@/content/load"
+import { localize } from "@/content/localize"
 import { KEYS, storage } from "@/lib/storage"
 import { liveValues } from "@/notebook/logic"
 import { withDefaultTopics } from "@/notebook/migrate"
@@ -108,6 +109,20 @@ describe("App", () => {
     const doc = saved()
     expect(liveValues(doc.inbox)).toHaveLength(0)
     expect(liveValues(doc.problems)[0]?.patternIds).toEqual([pattern])
+  })
+
+  it("adds a whole phase of suggestions with one click", async () => {
+    const user = userEvent.setup()
+    renderApp()
+    await go("#/topic/t_dsa")
+    await screen.findByRole("heading", { level: 1 })
+    const firstPhase = content.phases[0]!
+    const phaseName = localize(firstPhase.name, "vi")
+    await user.click(screen.getByRole("button", { name: (name) => name.startsWith(phaseName) }))
+    await user.click(screen.getByRole("button", { name: /^Thêm cả giai đoạn/ }))
+    const names = liveValues(saved().patterns).map((p) => p.name)
+    expect(names).toHaveLength(firstPhase.items.length)
+    expect(screen.getByRole("button", { name: /^Thêm tất cả/ })).toBeInTheDocument()
   })
 
   it("switches the app to English from the settings", async () => {

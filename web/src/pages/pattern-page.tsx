@@ -1,7 +1,8 @@
 import { useState } from "react"
 import { useNow } from "@/lib/clock"
-import { PlusIcon, Trash2Icon } from "lucide-react"
+import { ListPlusIcon, PlusIcon, Trash2Icon } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { LevelTag, OutcomeBar } from "@/components/common/badges"
 import { ConflictList } from "@/components/common/conflicts"
@@ -83,8 +84,41 @@ function PatternSuggestions({ pattern }: { pattern: Pattern }) {
   const lang = useLang()
   const { problems, resources } = patternSuggestions(content, nb, pattern, lang)
   if (!pattern.sourceId || (!problems.length && !resources.length)) return null
+
+  // Every suggested problem and link in one change, with Undo
+  function addAll() {
+    const problemIds = notebookActions.addProblems(
+      problems.map((p) => ({
+        url: p.url,
+        title: p.title,
+        level: p.level,
+        patternIds: [pattern.id],
+      }))
+    )
+    const resourceIds = notebookActions.addResources(
+      resources.map((r) => ({ url: r.url, title: r.title, kind: r.kind, patternIds: [pattern.id] }))
+    )
+    toast.success(t("suggest.addedItems", { count: problemIds.length + resourceIds.length }), {
+      action: {
+        label: t("suggest.undo"),
+        onClick: () => {
+          notebookActions.unlinkProblems(problemIds, pattern.id)
+          notebookActions.unlinkResources(resourceIds, pattern.id)
+        },
+      },
+    })
+  }
+
   return (
-    <Panel title={t("suggest.title")}>
+    <Panel
+      title={t("suggest.title")}
+      actions={
+        <Button size="xs" onClick={addAll}>
+          <ListPlusIcon />
+          {t("suggest.addAll", { count: problems.length + resources.length })}
+        </Button>
+      }
+    >
       <p className="mb-2 text-12 text-faint">{t("suggest.patternIntro")}</p>
       {problems.length > 0 && (
         <ul className="mb-2">
