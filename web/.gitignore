@@ -1,0 +1,5 @@
+node_modules/
+
+# Google sign-in secrets: the OAuth client and the refresh token saved after signing in
+google-oauth.json
+progress/google-token.json

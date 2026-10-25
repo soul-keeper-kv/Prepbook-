@@ -23,7 +23,7 @@ const I18N = {
 
     "loader.title": "Chưa nạp được dữ liệu",
     "loader.intro": "Trình duyệt không cho đọc file JSON khi mở thẳng <code>index.html</code>. Chọn 1 trong 2 cách:",
-    "loader.server": "<strong>Nên dùng:</strong> chạy <code>start.sh</code> trong thư mục này (cần Node.js), app tự mở ở <code>http://localhost:8080</code> và tiến độ được lưu ra file. Live Server hay <code>python -m http.server</code> cũng mở được, nhưng tiến độ chỉ lưu trong trình duyệt.",
+    "loader.server": "<strong>Nên dùng:</strong> chạy <code>start.sh</code> trong thư mục này (cần Node.js), app tự mở ở <code>http://localhost:8080</code> và tiến độ đồng bộ được qua Google Drive. Live Server hay <code>python -m http.server</code> cũng mở được, nhưng tiến độ chỉ lưu trong trình duyệt.",
     "loader.picker": "Chọn thư mục <code>data</code> bằng nút bên dưới. App sẽ nhớ dữ liệu; sau khi sửa JSON thì bấm “Nạp lại data” ở cuối trang.",
     "loader.pick": "Chọn thư mục data",
 
@@ -57,10 +57,16 @@ const I18N = {
     "footer.reloadData": "Nạp lại data",
     "footer.reset": "Làm lại từ đầu",
 
-    "sync.file": (file) => `Tiến độ được tự lưu vào file ${file} trong thư mục project, mở bằng trình duyệt nào cũng thấy.`,
-    "sync.browser": "Tiến độ chỉ lưu trong trình duyệt này. Mở app bằng start.sh để tự lưu ra file, đổi trình duyệt không bị mất.",
-    "sync.error": (msg) => `Chưa lưu được ra file: ${msg}. Tiến độ vẫn còn trong trình duyệt này.`,
-    "sync.conflict": "Trình duyệt khác vừa lưu tiến độ vào file. Tải lại trang để gộp hai bên; thay đổi ở đây vẫn còn trong trình duyệt này.",
+    "sync.off": "Tiến độ chỉ lưu trong trình duyệt này. Mở app bằng start.sh (hoặc app Android) để đồng bộ qua Google Drive.",
+    "sync.setup": "Chưa bật đồng bộ Google Drive: thêm file google-oauth.json vào thư mục web theo README.md rồi tải lại trang. Tiến độ đang lưu trong trình duyệt này.",
+    "sync.login": "Chưa kết nối Google Drive. Tiến độ đang lưu trên máy này; kết nối để dùng chung với máy khác.",
+    "sync.syncing": "Đang đồng bộ với Google Drive…",
+    "sync.synced": (time) => `Đã đồng bộ với Google Drive lúc ${time}.`,
+    "sync.offline": "Không kết nối được Google Drive. Tiến độ vẫn lưu trên máy, có mạng lại sẽ tự đồng bộ.",
+    "sync.error": (msg) => `Chưa đồng bộ được với Google Drive: ${msg}. Tiến độ vẫn lưu trên máy này.`,
+    "sync.badFile": (file) => `file ${file} trên Drive không đúng định dạng tiến độ (sửa lại, hoặc xoá đi để app tạo file mới)`,
+    "sync.connect": "Kết nối Google Drive",
+    "sync.retry": "Đồng bộ lại",
 
     "detail.close": "Đóng",
     "tab.learn": "Kiến thức",
@@ -176,7 +182,7 @@ const I18N = {
 
     "loader.title": "Couldn't load the data",
     "loader.intro": "The browser blocks reading JSON files when you open <code>index.html</code> directly. Pick one of these:",
-    "loader.server": "<strong>Recommended:</strong> run <code>start.sh</code> in this folder (needs Node.js); the app opens at <code>http://localhost:8080</code> and progress is saved to a file. Live Server or <code>python -m http.server</code> also work, but progress then stays in the browser only.",
+    "loader.server": "<strong>Recommended:</strong> run <code>start.sh</code> in this folder (needs Node.js); the app opens at <code>http://localhost:8080</code> and progress can sync through Google Drive. Live Server or <code>python -m http.server</code> also work, but progress then stays in the browser only.",
     "loader.picker": "Choose the <code>data</code> folder with the button below. The app remembers it; after editing the JSON, click “Reload data” at the bottom of the page.",
     "loader.pick": "Choose data folder",
 
@@ -210,10 +216,16 @@ const I18N = {
     "footer.reloadData": "Reload data",
     "footer.reset": "Start over",
 
-    "sync.file": (file) => `Progress is saved automatically to ${file} in the project folder, so every browser sees it.`,
-    "sync.browser": "Progress is saved in this browser only. Open the app with start.sh to save it to a file and keep it across browsers.",
-    "sync.error": (msg) => `Couldn't save to file: ${msg}. Progress is still kept in this browser.`,
-    "sync.conflict": "Another browser just saved progress to the file. Reload the page to merge both; changes made here are still kept in this browser.",
+    "sync.off": "Progress is saved in this browser only. Open the app with start.sh (or the Android app) to sync it through Google Drive.",
+    "sync.setup": "Google Drive sync is not set up: add google-oauth.json to the web folder as described in README.md, then reload. Progress is kept in this browser for now.",
+    "sync.login": "Google Drive is not connected. Progress is kept on this device; connect to share it with your other devices.",
+    "sync.syncing": "Syncing with Google Drive…",
+    "sync.synced": (time) => `Synced with Google Drive at ${time}.`,
+    "sync.offline": "Couldn't reach Google Drive. Progress is still kept on this device and will sync when you're back online.",
+    "sync.error": (msg) => `Couldn't sync with Google Drive: ${msg}. Progress is still kept on this device.`,
+    "sync.badFile": (file) => `${file} on Drive is not a progress file (fix it, or delete it so the app creates a new one)`,
+    "sync.connect": "Connect Google Drive",
+    "sync.retry": "Sync again",
 
     "detail.close": "Close",
     "tab.learn": "Learn",

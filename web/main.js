@@ -12,17 +12,54 @@ const KEY_CODE_LANG = "dsa_code_lang";
 const KEY_AI_MODE = "dsa_ai_mode";
 const KEY_THEME = "dsa_theme";                  // index.html cũng đọc key này trong <head>
 const THEMES = ["auto", "light", "dark"];       // auto = theo hệ điều hành
-const KEY_FILE_SYNC = "dsa_progress_file_sync"; // xem phần "Lưu tiến độ ra file"
+const KEY_DRIVE_SYNC = "dsa_drive_sync";        // xem phần "Đồng bộ Google Drive"
 const LEGACY_KEYS = { v2: "dsa_roadmap_v2", v1: "dsa_roadmap_v1" };
-const PROGRESS_API = "api/progress";            // chỉ có khi chạy bằng start.sh (server.js)
-const PROGRESS_FILE = "progress/progress.json";
-const FILE_SAVE_DELAY_MS = 300;                 // gom các lần gõ phím liền nhau thành 1 lần ghi
+const GOOGLE_API = "api/google";                // chỉ có khi chạy bằng start.sh (server.js)
+const DRIVE_FILE_NAME = "dsa-roadmap-progress.json";
+const DRIVE_SAVE_DELAY_MS = 1500;               // gom các lần gõ phím liền nhau thành 1 lần ghi
 const REVIEW_AFTER_DAYS = 7;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-const TYPE_CLASS = { theory: "tag-theory", practice: "tag-practice" };
-const RESOURCE_TYPES = ["article", "video", "course", "docs", "book", "visual", "practice"];
+// Màu của các nhãn. Class Tailwind phải viết đủ cả chuỗi (không ghép chuỗi) thì Tailwind mới tìm thấy khi build
+const NEUTRAL_CLASS = "bg-soft text-fg-2";
+const TYPE_CLASS = { theory: "bg-accent-bg text-accent", practice: "bg-ok-bg text-ok" };
+const RESOURCE_CLASS = {
+  article: "bg-accent-bg text-accent",
+  video: "bg-danger-bg text-danger",
+  course: "bg-purple-bg text-purple",
+  docs: NEUTRAL_CLASS,
+  book: "bg-warn-bg text-warn",
+  visual: "bg-ok-bg text-ok",
+  practice: "bg-ok-bg text-ok",
+};
+const LEVEL_CLASS = {
+  easy: "bg-ok-bg text-ok",
+  medium: "bg-warn-bg text-warn",
+  hard: "bg-danger-bg text-danger",
+  advanced: "bg-danger-bg text-danger",
+  expert: "bg-danger-bg text-danger",
+};
 const CODE_LANG_LABEL = { python: "Python", java: "Java", cpp: "C++", javascript: "JavaScript", go: "Go" };
+// Tab của khung code mẫu, giống tab file trong VS Code: tên file + biểu tượng màu của ngôn ngữ (màu của bộ icon Seti)
+const CODE_FILES = {
+  python: { name: "solution.py", icon: "py", iconClass: "text-[#519aba]" },
+  java: { name: "Solution.java", icon: "J", iconClass: "text-[#cc3e44]" },
+  cpp: { name: "solution.cpp", icon: "C++", iconClass: "text-[#a074c4]" },
+  javascript: { name: "solution.js", icon: "JS", iconClass: "text-[#cbcb41]" },
+  go: { name: "solution.go", icon: "GO", iconClass: "text-[#519aba]" },
+};
+
+// Icon nhỏ (theo bộ codicon của VS Code)
+const ICON_CHEVRON = `<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" class="size-4 shrink-0 text-fg-2 transition-transform duration-150 group-aria-expanded/head:rotate-90"><path d="M10.07 8.02 5.72 3.67l.61-.62L11 7.72v.61L6.33 13l-.61-.62 4.35-4.36Z"/></svg>`;
+const ICON_CLOSE = `<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" class="size-4"><path d="m8 8.71 3.65 3.65.71-.71L8.71 8l3.65-3.65-.71-.71L8 7.29 4.35 3.64l-.71.71L7.29 8l-3.65 3.65.71.71L8 8.71Z"/></svg>`;
+const ICON_COPY = `<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" class="size-3.5"><path d="M4 4V2.5A1.5 1.5 0 0 1 5.5 1h7A1.5 1.5 0 0 1 14 2.5v7a1.5 1.5 0 0 1-1.5 1.5H11v1.5A1.5 1.5 0 0 1 9.5 14h-7A1.5 1.5 0 0 1 1 12.5v-7A1.5 1.5 0 0 1 2.5 4H4Zm1 0h4.5A1.5 1.5 0 0 1 11 5.5V10h1.5a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0-.5.5V4ZM2.5 5a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.5-.5h-7Z"/></svg>`;
+
+// Icon của 3 tab trong màn hình chi tiết, như icon file trong tab của VS Code
+const TAB_ICON = {
+  learn: { icon: "M↓", iconClass: "text-syn-keyword" },
+  problems: { icon: "{}", iconClass: "text-syn-function" },
+  notes: { icon: "≡", iconClass: "text-syn-comment" },
+};
 
 const FILTERS = {
   all: () => true,
@@ -94,12 +131,20 @@ const fmt = (text = "") => esc(text)
 
 const paragraphs = (text) => text
   .split(/\n{2,}/)
-  .map((p) => `<p>${fmt(p).replace(/\n/g, "<br>")}</p>`)
+  .map((p) => `<p class="mb-2 last:mb-0">${fmt(p).replace(/\n/g, "<br>")}</p>`)
   .join("");
 
-const bulletList = (items) => `<ul class="bullets">${items.map((x) => `<li>${fmt(localize(x))}</li>`).join("")}</ul>`;
-const block = (titleKey, html) => `<div class="block"><h3>${esc(t(titleKey))}</h3>${html}</div>`;
-const emptyNote = (text) => `<p class="empty-note">${esc(text)}</p>`;
+// Gạch đầu dòng "-" như markdown
+const bulletList = (items) => `<ul class="space-y-1">${items.map((x) => `
+  <li class="relative pl-4 before:absolute before:left-0.5 before:font-mono before:text-syn-keyword before:content-['-']">${fmt(localize(x))}</li>`).join("")}</ul>`;
+// Tiêu đề khung viết như heading markdown: ## MÔ TẢ
+const block = (titleKey, html) => `
+  <div>
+    <h3 class="label mb-2 before:text-syn-keyword before:content-['##_']">${esc(t(titleKey))}</h3>
+    ${html}
+  </div>`;
+const emptyNote = (text) => `<p class="text-14 text-muted">${esc(text)}</p>`;
+const ownClass = (map, key) => (Object.hasOwn(map, key) ? map[key] : NEUTRAL_CLASS);
 
 const isObject = (v) => Boolean(v) && typeof v === "object" && !Array.isArray(v);
 const codeText = (code) => (Array.isArray(code) ? code.join("\n") : code || "");
@@ -134,6 +179,124 @@ function groupBy(list, keyOf) {
     groups.get(key).push(x);
   }
   return groups;
+}
+
+// =====================================================================
+// Tô màu code mẫu theo bảng màu Light+ / Dark+ của VS Code (màu nằm trong index.css: --color-syn-*).
+// Chỉ tách comment, chuỗi, số, từ khoá, tên hàm/kiểu và cặp ngoặc: đủ cho code mẫu ngắn, không phải parser thật.
+// =====================================================================
+const wordSet = (text) => new Set(text.split(" "));
+const C_COMMENT = String.raw`\/\/[^\n]*|\/\*[\s\S]*?\*\/`;
+const C_STRING = String.raw`"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'`;
+const NUMBER = String.raw`\b(?:0[xX][\da-fA-F_]+|\d[\d_]*(?:\.\d+)?(?:[eE][+-]?\d+)?)[lLfFdDuU]*\b`;
+
+// control: từ khoá điều khiển (tím), keyword: từ khoá khai báo/hằng (xanh dương), types: kiểu dựng sẵn (xanh ngọc)
+const SYNTAX = {
+  python: {
+    comment: String.raw`#[^\n]*`,
+    string: String.raw`[rRbBuUfF]{0,2}(?:"""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*')`,
+    control: wordSet("if elif else for while break continue return try except finally raise with as import from pass yield await async match case assert del global nonlocal"),
+    keyword: wordSet("def class lambda and or not in is None True False self cls"),
+    types: wordSet("int float str bool list dict set tuple bytes object complex frozenset"),
+  },
+  java: {
+    comment: C_COMMENT,
+    string: C_STRING,
+    control: wordSet("if else for while do switch case default break continue return try catch finally throw throws import package yield"),
+    keyword: wordSet("public private protected static final abstract class interface enum record extends implements new this super null true false instanceof var void int long short byte char boolean double float synchronized volatile transient native"),
+    types: wordSet(""),
+  },
+  cpp: {
+    comment: C_COMMENT,
+    string: C_STRING,
+    pre: String.raw`#[ \t]*[a-z]+`,
+    header: String.raw`(?<=#[ \t]*include[ \t]*)<[^>\n]*>`,
+    control: wordSet("if else for while do switch case default break continue return try catch throw goto"),
+    keyword: wordSet("int long short char bool double float void auto const constexpr static struct class union enum public private protected template typename using namespace new delete this nullptr true false unsigned signed sizeof inline virtual override operator friend typedef"),
+    types: wordSet("std vector string map unordered_map set unordered_set multiset pair queue stack deque priority_queue array bitset size_t int64_t uint64_t"),
+  },
+  javascript: {
+    comment: C_COMMENT,
+    string: C_STRING + "|`(?:\\\\.|[^`\\\\])*`",
+    control: wordSet("if else for while do switch case default break continue return try catch finally throw import export from as await yield"),
+    keyword: wordSet("function const let var class extends new this super null undefined true false typeof instanceof async static get set of in delete void"),
+    types: wordSet(""),
+  },
+  go: {
+    comment: C_COMMENT,
+    string: C_STRING + "|`[^`]*`",
+    control: wordSet("if else for switch case default break continue return go defer select goto fallthrough range import package"),
+    keyword: wordSet("func var const type struct interface map chan nil true false"),
+    types: wordSet("int int8 int16 int32 int64 uint uint8 uint16 uint32 uint64 float32 float64 string bool byte rune error any"),
+  },
+};
+
+// Class Tailwind viết đủ cả chuỗi để Tailwind tìm thấy khi build
+const TOKEN_CLASS = {
+  comment: "text-syn-comment",
+  string: "text-syn-string",
+  header: "text-syn-string",
+  pre: "text-syn-control",
+  decorator: "text-syn-function",
+  number: "text-syn-number",
+  control: "text-syn-control",
+  keyword: "text-syn-keyword",
+  type: "text-syn-type",
+  constant: "text-syn-constant",
+  function: "text-syn-function",
+  variable: "text-syn-variable",
+};
+const BRACKET_CLASS = ["text-bracket-1", "text-bracket-2", "text-bracket-3"];
+const CALL_AFTER = /[ \t]*\(/y;
+
+// Gộp các luật của 1 ngôn ngữ thành 1 regex; nhóm nào khớp thì đó là loại token
+function syntaxOf(lang) {
+  const rules = Object.hasOwn(SYNTAX, lang) ? SYNTAX[lang] : null;
+  if (rules && !rules.re) {
+    rules.re = new RegExp([
+      `(?<comment>${rules.comment})`,
+      `(?<string>${rules.string})`,
+      rules.header && `(?<header>${rules.header})`,
+      rules.pre && `(?<pre>${rules.pre})`,
+      String.raw`(?<decorator>@[A-Za-z_][\w.]*)`,
+      `(?<number>${NUMBER})`,
+      String.raw`(?<word>[A-Za-z_$][\w$]*)`,
+      String.raw`(?<open>[([{])`,
+      String.raw`(?<close>[)\]}])`,
+    ].filter(Boolean).join("|"), "g");
+  }
+  return rules;
+}
+
+function wordKind(rules, word, code, end) {
+  if (rules.control.has(word)) return "control";
+  if (rules.keyword.has(word)) return "keyword";
+  if (rules.types.has(word)) return "type";
+  if (/^[A-Z][A-Z\d_]+$/.test(word)) return "constant"; // MOD, INF
+  if (/^[A-Z]/.test(word)) return "type";               // tên class
+  CALL_AFTER.lastIndex = end;
+  return CALL_AFTER.test(code) ? "function" : "variable";
+}
+
+// Trả về HTML đã escape. textContent của kết quả đúng bằng code gốc, nên nút Copy lấy textContent là đủ.
+function highlight(code, lang) {
+  const rules = syntaxOf(lang);
+  if (!rules) return esc(code);
+  let html = "";
+  let last = 0;
+  let depth = 0; // độ sâu ngoặc, để tô 3 màu xoay vòng như VS Code
+  for (const m of code.matchAll(rules.re)) {
+    const [text] = m;
+    const kind = Object.keys(m.groups).find((k) => m.groups[k] !== undefined);
+    let cls;
+    if (kind === "word") cls = TOKEN_CLASS[wordKind(rules, text, code, m.index + text.length)];
+    else if (kind === "open") cls = BRACKET_CLASS[depth++ % 3];
+    else if (kind === "close") cls = BRACKET_CLASS[(depth = Math.max(depth - 1, 0)) % 3];
+    else cls = TOKEN_CLASS[kind];
+    html += `${esc(code.slice(last, m.index))}<span class="${cls}">${esc(text)}</span>`;
+    last = m.index + text.length;
+  }
+  return html + esc(code.slice(last));
 }
 
 const storage = {
@@ -171,8 +334,9 @@ function localize(value) {
   return value[state.lang] ?? value[DEFAULT_LANG] ?? Object.values(value)[0];
 }
 
-const formatDate = (iso) =>
-  new Date(iso).toLocaleDateString(LANGUAGES.find((l) => l.code === state.lang)?.locale);
+const locale = () => LANGUAGES.find((l) => l.code === state.lang)?.locale;
+const formatDate = (iso) => new Date(iso).toLocaleDateString(locale());
+const formatTime = (iso) => new Date(iso).toLocaleTimeString(locale(), { hour: "2-digit", minute: "2-digit" });
 
 // Lỗi kèm key dịch, để đổi ngôn ngữ thì thông báo lỗi cũng đổi theo
 function appError(key, ...args) {
@@ -272,9 +436,8 @@ function readFromFiles(files) {
 async function boot() {
   const isFile = location.protocol === "file:";
   try {
-    const content = await loadContent(readFromServer);
-    await openProgressFile();
-    showApp(content);
+    showApp(await loadContent(readFromServer));
+    startDrive();
   } catch (err) {
     const cached = storage.get(KEY_CONTENT_CACHE, null);
     if (isFile && cached) showApp(cached);
@@ -289,10 +452,12 @@ function showApp(content) {
   for (const phase of content.phases) {
     for (const item of phase.items) state.index.set(item.id, { item, phase });
   }
-  state.progress = syncWithFile(loadProgress(content.phases));
+  state.progress = loadProgress(content.phases);
   if (!state.expanded.size && content.phases.length) state.expanded.add(content.phases[0].id);
 
   $("btn-reload-data").hidden = location.protocol !== "file:";
+  // WebView của app Android không tải file về được; ở đó bản sao lưu là file trên Drive
+  $("btn-export").hidden = isNativeApp();
   $("loader").hidden = true;
   $("app").hidden = false;
   render();
@@ -313,7 +478,7 @@ function renderLoaderError() {
 }
 
 // =====================================================================
-// Tiến độ (lưu trong localStorage, và trong progress/progress.json khi chạy bằng start.sh)
+// Tiến độ (lưu trong localStorage, và đồng bộ qua Google Drive khi đã kết nối)
 //   items:  { [itemId]: { done, doneAt, notes, code, checks: { [checkId]: true }, reviews: [isoDate] } }
 //   solved: { [problemUrl]: isoDate }   1 bài xuất hiện ở nhiều mục vẫn tính chung
 // =====================================================================
@@ -346,10 +511,10 @@ function loadProgress(phases) {
 // Mọi thay đổi tiến độ (tick, giải bài, ghi chú, code, ôn tập, nhập, làm lại) đều đi qua đây
 function saveProgress() {
   storage.set(KEY_PROGRESS, state.progress);
-  fileSync.version++;
-  // Đánh dấu còn thay đổi chưa ghi ra file, để lần sau mở trang bản file cũ không đè mất
-  if (fileSync.enabled || storage.get(KEY_FILE_SYNC, null)) storage.set(KEY_FILE_SYNC, "pending");
-  queueFileSave();
+  drive.version++;
+  // Đánh dấu còn thay đổi chưa ghi lên Drive, để lần sau mở app bản Drive cũ không đè mất
+  storage.set(KEY_DRIVE_SYNC, { ...storage.get(KEY_DRIVE_SYNC, null), pending: true });
+  queueDriveSave();
 }
 
 const itemProgress = (id) => state.progress.items[id] || {};
@@ -400,7 +565,7 @@ function render(focusSelector) {
   renderSyncStatus();
 
   for (const btn of document.querySelectorAll("[data-filter]")) {
-    btn.classList.toggle("on", btn.dataset.filter === state.filter);
+    btn.setAttribute("aria-pressed", String(btn.dataset.filter === state.filter));
   }
   $("btn-expand").textContent = allExpanded() ? t("toolbar.collapse") : t("toolbar.expand");
 
@@ -408,7 +573,8 @@ function render(focusSelector) {
   if (focusSelector) $("phases").querySelector(focusSelector)?.focus();
 }
 
-function renderPhase(phase) {
+// Mỗi giai đoạn là 1 thư mục trong cây Explorer của VS Code: mũi tên, số thứ tự, các mục thụt vào có đường kẻ dọc
+function renderPhase(phase, index) {
   const total = phase.items.length;
   const doneCount = phase.items.filter(isDone).length;
   const pct = total ? Math.round((doneCount / total) * 100) : 0;
@@ -420,19 +586,23 @@ function renderPhase(phase) {
     const visible = phase.items.filter(FILTERS[state.filter]);
     body = visible.length
       ? visible.map(renderItem).join("")
-      : `<div class="empty">${esc(t(`filter.empty.${state.filter}`))}</div>`;
+      : `<div class="border-t border-line py-2.5 pr-3 pl-9.5 font-mono text-12 text-muted">${esc(t(`filter.empty.${state.filter}`))}</div>`;
   }
 
   return `
-    <div class="phase">
-      <button type="button" class="phase-head" data-phase="${esc(phase.id)}" aria-expanded="${isOpen}">
-        <span class="arrow" aria-hidden="true">▶</span>
-        <div class="phase-info">
-          <div class="phase-title">${esc(localize(phase.name))}</div>
-          <div class="phase-meta">${meta}</div>
-          <div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div>
+    <div class="mb-2 overflow-hidden rounded-md border border-line bg-card">
+      <button type="button" class="group/head flex w-full cursor-pointer items-center gap-2.5 px-3 py-2.5 text-left select-none hover:bg-soft focus-visible:-outline-offset-2"
+        data-phase="${esc(phase.id)}" aria-expanded="${isOpen}">
+        ${ICON_CHEVRON}
+        <span class="font-mono text-12 text-muted" aria-hidden="true">${String(index).padStart(2, "0")}</span>
+        <div class="min-w-0 flex-1">
+          <div class="text-15 font-semibold">${esc(localize(phase.name))}</div>
+          <div class="mt-0.5 mb-1.5 font-mono text-12 text-fg-2">${meta}</div>
+          <div class="h-1 overflow-hidden rounded-full bg-line-strong">
+            <div class="h-full rounded-full bg-ok-fill transition-[width] duration-200" style="width:${pct}%"></div>
+          </div>
         </div>
-        <span class="phase-pct">${pct}%</span>
+        <span class="min-w-11 text-right font-mono text-13 ${pct === 100 ? "text-ok" : "text-fg-2"}">${pct}%</span>
       </button>
       ${body}
     </div>`;
@@ -448,14 +618,18 @@ function renderItem(item) {
   if (p.reviews?.length) meta.push(t("item.reviews", p.reviews.length));
   if (p.notes || p.code) meta.push(t("item.hasNotes"));
 
+  // Tên mục bị gạch khi ô tick được chọn (group-has-checked), không cần thêm class "done".
+  // before: đường kẻ dọc nối các mục trong cùng thư mục (indent guide của VS Code)
   return `
-    <div class="item ${p.done ? "done" : ""}">
-      <input type="checkbox" data-done="${esc(item.id)}" ${p.done ? "checked" : ""} aria-label="${esc(t("item.markDone"))}">
-      <button type="button" class="item-open" data-open="${esc(item.id)}">
-        <span class="item-title">${fmt(localize(item.title))}</span>
+    <div class="group/item relative flex items-start gap-2.5 border-t border-line py-1.5 pr-3 pl-9.5 hover:bg-soft
+      before:absolute before:inset-y-0 before:left-4.75 before:w-px before:bg-line-strong before:content-['']">
+      <input type="checkbox" class="mt-1.25" data-done="${esc(item.id)}" ${p.done ? "checked" : ""} aria-label="${esc(t("item.markDone"))}">
+      <button type="button" class="group/open flex min-w-0 flex-1 cursor-pointer flex-wrap items-baseline gap-x-2 gap-y-0.5 rounded-sm py-0.5 text-left text-14"
+        data-open="${esc(item.id)}">
+        <span class="group-hover/open:text-accent group-has-checked/item:text-muted group-has-checked/item:line-through group-has-checked/item:*:text-muted">${fmt(localize(item.title))}</span>
         <span class="tag ${TYPE_CLASS[type]}">${esc(t(`type.${type}`))}</span>
-        ${needsReview(item) ? `<span class="tag tag-review">${esc(t("tag.review"))}</span>` : ""}
-        ${meta.length ? `<span class="item-meta">${esc(meta.join(" · "))}</span>` : ""}
+        ${needsReview(item) ? `<span class="tag bg-warn-bg text-warn">${esc(t("tag.review"))}</span>` : ""}
+        ${meta.length ? `<span class="basis-full font-mono text-12 text-muted">${esc(meta.join(" · "))}</span>` : ""}
       </button>
     </div>`;
 }
@@ -468,7 +642,9 @@ function renderStats() {
   const urls = new Set(items.flatMap((it) => (it.problems || []).map((p) => p.url)));
   const solved = [...urls].filter(isSolved).length;
 
-  $("stat-pct").textContent = `${items.length ? Math.round((doneCount / items.length) * 100) : 0}%`;
+  const pct = items.length ? Math.round((doneCount / items.length) * 100) : 0;
+  $("stat-pct").textContent = `${pct}%`;
+  $("stat-bar").style.width = `${pct}%`;
   $("stat-done").textContent = t("stats.items", doneCount, items.length);
   $("stat-current").textContent = current === -1 ? t("stats.allDone") : String(current);
   $("stat-solved").textContent = `${solved}/${urls.size}`;
@@ -506,30 +682,40 @@ function renderDetail(item, phase) {
     { id: "notes", label: esc(t("tab.notes")), body: renderNotesTab(item) },
   ];
 
+  // Tab giống tab file của VS Code: tab đang chọn có viền trên màu accent và nền liền với nội dung bên dưới.
+  // Ô trống cuối hàng tab nối tiếp đường kẻ dưới của các tab chưa chọn.
   return `
-    <header class="detail-head">
-      <div class="detail-heading">
-        <div class="detail-phase">
-          ${esc(localize(phase.name))} <span class="tag ${TYPE_CLASS[type]}">${esc(t(`type.${type}`))}</span>
+    <header class="flex items-start gap-3 px-5 pt-4 pb-3 max-sm:px-4">
+      <div class="min-w-0 flex-1">
+        <div class="flex flex-wrap items-center gap-1.5 font-mono text-12 text-fg-2">
+          <span>${esc(localize(phase.name))}</span>
+          <span class="text-muted" aria-hidden="true">›</span>
+          <span class="tag ${TYPE_CLASS[type]}">${esc(t(`type.${type}`))}</span>
         </div>
-        <h2 id="detail-title">${fmt(localize(item.title))}</h2>
+        <h2 id="detail-title" class="mt-1 text-19 leading-[1.35] font-semibold">${fmt(localize(item.title))}</h2>
       </div>
-      <button type="button" class="icon-btn" data-action="close" aria-label="${esc(t("detail.close"))}">✕</button>
+      <button type="button" class="grid size-7 shrink-0 cursor-pointer place-items-center rounded-sm text-fg-2 hover:bg-soft hover:text-fg"
+        data-action="close" aria-label="${esc(t("detail.close"))}">${ICON_CLOSE}</button>
     </header>
-    <div class="tabs" role="tablist">
+    <div class="flex overflow-x-auto border-t border-line bg-page" role="tablist">
       ${tabs.map((tab, i) => `
-        <button type="button" role="tab" data-tab="${tab.id}" aria-selected="${i === 0}">${tab.label}</button>`).join("")}
+        <button type="button" role="tab" data-tab="${tab.id}" aria-selected="${i === 0}"
+          class="flex cursor-pointer items-center gap-2 border-t-2 border-r border-b border-t-transparent border-r-line border-b-line px-4 py-2 text-13 whitespace-nowrap text-fg-2
+            hover:text-fg aria-selected:border-t-accent-strong aria-selected:border-b-transparent aria-selected:bg-card aria-selected:text-fg">
+          <span class="font-mono text-11 font-bold ${TAB_ICON[tab.id].iconClass}" aria-hidden="true">${TAB_ICON[tab.id].icon}</span>${tab.label}
+        </button>`).join("")}
+      <div class="flex-1 border-b border-line" aria-hidden="true"></div>
     </div>
-    <div class="detail-scroll">
+    <div id="detail-scroll" class="min-h-0 flex-1 overflow-y-auto px-5 pt-5 pb-7 max-sm:px-4">
       ${tabs.map((tab, i) => `
-        <section class="panel" role="tabpanel" data-panel="${tab.id}" ${i === 0 ? "" : "hidden"}>${tab.body}</section>`).join("")}
+        <section class="space-y-6" role="tabpanel" data-panel="${tab.id}" ${i === 0 ? "" : "hidden"}>${tab.body}</section>`).join("")}
     </div>
-    <footer class="detail-foot">
-      <label class="check">
+    <footer class="flex flex-wrap items-center gap-x-4 gap-y-2.5 border-t border-line bg-page px-5 py-2.5 max-sm:px-4">
+      <label class="flex cursor-pointer items-center gap-2 text-14">
         <input type="checkbox" data-done="${esc(item.id)}" ${isDone(item) ? "checked" : ""}> ${esc(t("foot.done"))}
       </label>
-      <span class="foot-info" id="foot-info"></span>
-      <button type="button" class="primary" id="btn-review" data-action="review"></button>
+      <span class="min-w-0 flex-1 font-mono text-12 text-fg-2" id="foot-info"></span>
+      <button type="button" class="btn btn-primary" id="btn-review" data-action="review"></button>
     </footer>`;
 }
 
@@ -543,53 +729,82 @@ function renderLearnTab(item) {
   const blocks = [
     item.description && block("block.description", paragraphs(localize(item.description))),
     keyPoints.length && block("block.keyPoints", bulletList(keyPoints)),
-    examples.length && block("block.examples", examples.map(renderExample).join("")),
+    examples.length && block("block.examples", `<div class="space-y-2">${examples.map(renderExample).join("")}</div>`),
     templates.length && block("block.template", renderTemplates(templates)),
     item.complexity && block("block.complexity", `<p>${fmt(localize(item.complexity))}</p>`),
     pitfalls.length && block("block.pitfalls", bulletList(pitfalls)),
-    resources.length && block("block.resources", `<ul class="resources">${resources.map(renderResource).join("")}</ul>`),
+    resources.length && block("block.resources", `<ul>${resources.map(renderResource).join("")}</ul>`),
   ].filter(Boolean);
   return blocks.join("") || emptyNote(t("learn.empty"));
 }
 
 function renderExample(ex) {
-  const row = (labelKey, value) =>
-    value ? `<div class="example-row"><span>${esc(t(labelKey))}</span><code>${esc(localize(value))}</code></div>` : "";
+  // Khung ví dụ như cửa sổ terminal: nhãn vào/ra màu từ khoá, giá trị màu chữ của editor
+  const row = (labelKey, value) => (value ? `
+    <div class="flex items-baseline gap-2 font-mono text-13 [&+&]:mt-0.5">
+      <span class="w-13 shrink-0 text-syn-keyword">${esc(t(labelKey))}</span>
+      <code class="bg-transparent p-0 whitespace-pre-wrap text-code-fg [font-size:inherit] [word-break:break-word]">${esc(localize(value))}</code>
+    </div>` : "");
   return `
-    <div class="example">
-      ${ex.title ? `<div class="example-title">${fmt(localize(ex.title))}</div>` : ""}
+    <div class="rounded-md border border-line bg-code px-3.5 py-2.5">
+      ${ex.title ? `<div class="mb-1 text-14 font-semibold">${fmt(localize(ex.title))}</div>` : ""}
       ${row("example.input", ex.input)}
       ${row("example.output", ex.output)}
-      ${ex.explain ? `<p>${fmt(localize(ex.explain))}</p>` : ""}
+      ${ex.explain ? `<p class="mt-1.5 text-13 text-fg-2">${fmt(localize(ex.explain))}</p>` : ""}
     </div>`;
 }
 
-// Nhiều ngôn ngữ code trong 1 khung, có nút chọn Python / Java...
+const codeFile = (lang) => (Object.hasOwn(CODE_FILES, lang)
+  ? CODE_FILES[lang]
+  : { name: `solution.${lang || "txt"}`, icon: "{}", iconClass: "text-fg-2" });
+
+// Nhiều ngôn ngữ code trong 1 khung, trình bày như editor của VS Code:
+// mỗi ngôn ngữ là 1 tab file (solution.py, Solution.java...), cột số dòng bên trái, code tô màu.
 function renderTemplates(templates) {
   const active = templates.some((tpl) => tpl.lang === state.codeLang) ? state.codeLang : templates[0].lang;
-  const langButtons = templates.map((tpl) => `
-    <button type="button" class="code-lang" data-code-lang="${esc(tpl.lang)}" aria-pressed="${tpl.lang === active}">
-      ${esc(CODE_LANG_LABEL[tpl.lang] || tpl.lang || "code")}
-    </button>`).join("");
-  const blocks = templates.map((tpl) => `
-    <pre data-code="${esc(tpl.lang)}" ${tpl.lang === active ? "" : "hidden"}><code>${esc(codeText(localize(tpl.code)))}</code></pre>`).join("");
+  const tabs = templates.map((tpl) => {
+    const file = codeFile(tpl.lang);
+    return `
+    <button type="button" data-code-lang="${esc(tpl.lang)}" aria-pressed="${tpl.lang === active}"
+      aria-label="${esc(CODE_LANG_LABEL[tpl.lang] || tpl.lang || "code")}"
+      class="flex cursor-pointer items-center gap-1.5 border-t-2 border-r border-t-transparent border-r-line bg-code-tab px-3 py-1.5 font-mono text-12 whitespace-nowrap text-fg-2
+        hover:text-fg aria-pressed:border-t-accent-strong aria-pressed:bg-code aria-pressed:text-fg">
+      <span class="text-11 font-bold ${file.iconClass}" aria-hidden="true">${esc(file.icon)}</span>${esc(file.name)}
+    </button>`;
+  }).join("");
+
+  // Cột số dòng là 1 <pre> riêng cùng cỡ chữ và line-height với code nên các dòng thẳng hàng;
+  // nó không nằm trong <pre> của code nên Copy không lấy số dòng, và không trôi khi cuộn ngang.
+  const panes = templates.map((tpl) => {
+    const code = codeText(localize(tpl.code));
+    const lineNumbers = code.split("\n").map((_, i) => i + 1).join("\n");
+    return `
+    <div class="flex bg-code font-mono text-13 leading-[1.6]" data-code="${esc(tpl.lang)}" ${tpl.lang === active ? "" : "hidden"}>
+      <pre class="shrink-0 py-3 pr-4 pl-4 text-right text-gutter select-none" aria-hidden="true">${lineNumbers}</pre>
+      <pre class="min-w-0 flex-1 overflow-x-auto py-3 pr-4 text-code-fg"><code
+        class="rounded-none bg-transparent p-0 text-code-fg [font-size:inherit]">${highlight(code, tpl.lang)}</code></pre>
+    </div>`;
+  }).join("");
 
   return `
-    <div class="code">
-      <div class="code-head">
-        <div class="code-langs">${langButtons}</div>
-        <button type="button" class="small" data-action="copy">${esc(t("copy"))}</button>
+    <div class="overflow-hidden rounded-md border border-line-strong" data-templates>
+      <div class="flex items-stretch bg-code-bar">
+        <div class="flex min-w-0 overflow-x-auto">${tabs}</div>
+        <button type="button" class="ml-auto flex shrink-0 cursor-pointer items-center gap-1.5 px-3 font-mono text-12 text-fg-2 hover:text-fg"
+          data-action="copy">${ICON_COPY}<span data-copy-label>${esc(t("copy"))}</span></button>
       </div>
-      ${blocks}
+      ${panes}
     </div>`;
 }
 
+const LINK_ROW = "flex flex-wrap items-center gap-x-2.5 gap-y-1 border-b border-line py-1.75";
+
 function renderResource(resource) {
-  const type = RESOURCE_TYPES.includes(resource.type) ? resource.type : "article";
+  const type = Object.hasOwn(RESOURCE_CLASS, resource.type) ? resource.type : "article";
   return `
-    <li>
-      <span class="res-type res-${type}">${esc(t(`res.${type}`))}</span>
-      <a href="${esc(safeUrl(resource.url))}" target="_blank" rel="noopener noreferrer">${esc(localize(resource.title))}</a>
+    <li class="${LINK_ROW}">
+      <span class="pill min-w-19 shrink-0 text-center ${RESOURCE_CLASS[type]}">${esc(t(`res.${type}`))}</span>
+      <a class="min-w-0 flex-1" href="${esc(safeUrl(resource.url))}" target="_blank" rel="noopener noreferrer">${esc(localize(resource.title))}</a>
     </li>`;
 }
 
@@ -598,57 +813,62 @@ function renderProblemsTab(item) {
   const lists = (item.resources || []).filter((r) => r.type === "practice");
 
   const groupHtml = [...groups].map(([source, problems]) => `
-    <div class="problem-group">
-      <h4>${esc(source)} <span class="group-count"></span></h4>
-      <ul class="problems">${problems.map(renderProblem).join("")}</ul>
+    <div data-group>
+      <h4 class="mb-0.5 font-mono text-13 font-semibold">${esc(source)} <span class="ml-1 text-12 font-normal text-syn-number" data-group-count></span></h4>
+      <ul>${problems.map(renderProblem).join("")}</ul>
     </div>`).join("");
 
   const blocks = [
-    groups.size && block("block.problems", groupHtml),
-    lists.length && block("block.moreLists", `<ul class="resources">${lists.map(renderResource).join("")}</ul>`),
+    groups.size && block("block.problems", `<div class="space-y-4">${groupHtml}</div>`),
+    lists.length && block("block.moreLists", `<ul>${lists.map(renderResource).join("")}</ul>`),
   ].filter(Boolean);
   return blocks.join("") || emptyNote(t("problems.empty"));
 }
 
+// Tên bài bị gạch khi ô tick được chọn (group-has-checked), không cần thêm class "solved"
 function renderProblem(problem) {
   const solved = isSolved(problem.url);
   const title = localize(problem.title);
   const level = problem.level
-    ? `<span class="level level-${esc(problem.level.toLowerCase())}">${esc(problem.level)}</span>`
+    ? `<span class="pill ${ownClass(LEVEL_CLASS, problem.level.toLowerCase())}">${esc(problem.level)}</span>`
     : "";
   return `
-    <li class="problem ${solved ? "solved" : ""}" data-url="${esc(problem.url)}">
+    <li class="group/problem ${LINK_ROW}" data-url="${esc(problem.url)}">
       <input type="checkbox" data-solved="${esc(problem.url)}" ${solved ? "checked" : ""}
         aria-label="${esc(t("problem.solvedLabel", title))}">
-      <a href="${esc(safeUrl(problem.url))}" target="_blank" rel="noopener noreferrer">${esc(title)}</a>
+      <a class="min-w-0 flex-1 group-has-checked/problem:text-muted group-has-checked/problem:line-through"
+        href="${esc(safeUrl(problem.url))}" target="_blank" rel="noopener noreferrer">${esc(title)}</a>
       ${level}
-      <button type="button" class="small help-toggle" data-action="help" aria-expanded="false">${esc(t("help.toggle"))}</button>
-      ${problem.note ? `<span class="problem-note">${fmt(localize(problem.note))}</span>` : ""}
+      <button type="button" class="btn btn-sm text-fg-2 aria-expanded:border-accent aria-expanded:text-accent"
+        data-action="help" aria-expanded="false">${esc(t("help.toggle"))}</button>
+      ${problem.note ? `<span class="basis-full pl-6.5 text-12 text-muted">${fmt(localize(problem.note))}</span>` : ""}
       ${renderHelp(problem)}
     </li>`;
 }
 
 // Khung "Cách giải" dưới mỗi bài: link lời giải + hỏi AI với câu hỏi soạn sẵn
 function renderHelp(problem) {
+  const label = "label";
   const links = solutionLinks(problem).map((link) => `
     <a href="${esc(safeUrl(link.url))}" target="_blank" rel="noopener noreferrer">${esc(link.label)}</a>`).join("");
   const modes = AI_MODES.map((mode) => `
     <button type="button" data-ai-mode="${mode}" aria-pressed="${mode === state.aiMode}">${esc(t(`help.mode.${mode}`))}</button>`).join("");
   const tools = Object.entries(AI_TOOLS).map(([id, tool]) => `
-    <button type="button" class="small" data-action="ask" data-tool="${id}">${esc(t("help.open", tool.name))}</button>`).join("");
+    <button type="button" class="btn btn-sm" data-action="ask" data-tool="${id}">${esc(t("help.open", tool.name))}</button>`).join("");
 
   return `
-    <div class="help" hidden>
-      <p class="help-tip">${esc(t("help.tip"))}</p>
-      <span class="help-label">${esc(t("help.read"))}</span>
-      <div class="help-links">${links}</div>
-      <span class="help-label">${esc(t("help.ask"))}</span>
-      <div class="help-ai">
-        <div class="switch" role="group" aria-label="${esc(t("help.modeLabel"))}">${modes}</div>
+    <div class="my-1 ml-6.5 grid basis-full grid-cols-[max-content_1fr] items-center gap-x-3.5 gap-y-2 rounded-md border border-line bg-page px-3 py-2.5 text-13
+      max-sm:ml-0 max-sm:grid-cols-1 max-sm:gap-1.5" data-help hidden>
+      <p class="col-span-full mb-2 text-12 text-fg-2">${esc(t("help.tip"))}</p>
+      <span class="${label}">${esc(t("help.read"))}</span>
+      <div class="flex flex-wrap gap-x-4 gap-y-0.5">${links}</div>
+      <span class="${label}">${esc(t("help.ask"))}</span>
+      <div class="flex flex-wrap items-center gap-1.5">
+        <div class="switch mr-1" role="group" aria-label="${esc(t("help.modeLabel"))}">${modes}</div>
         ${tools}
-        <button type="button" class="small" data-action="ask">${esc(t("help.copy"))}</button>
+        <button type="button" class="btn btn-sm" data-action="ask">${esc(t("help.copy"))}</button>
       </div>
-      <p class="help-status" aria-live="polite"></p>
+      <p class="col-span-full text-12 text-ok empty:hidden" data-help-status aria-live="polite"></p>
     </div>`;
 }
 
@@ -690,10 +910,10 @@ function aiPrompt(problem) {
 }
 
 function toggleHelp(li) {
-  const btn = li.querySelector(".help-toggle");
+  const btn = li.querySelector('[data-action="help"]');
   const open = btn.getAttribute("aria-expanded") !== "true";
   btn.setAttribute("aria-expanded", String(open));
-  li.querySelector(".help").hidden = !open;
+  li.querySelector("[data-help]").hidden = !open;
 }
 
 // Ghi nhớ để các bài khác, mục khác cũng dùng kiểu câu hỏi này
@@ -709,7 +929,7 @@ function setAiMode(mode) {
 // Copy câu hỏi trước rồi mới mở tab: mở tab trước thì trang mất focus và trình duyệt chặn copy.
 // Nút không có data-tool là nút "Copy câu hỏi".
 async function askAi(btn) {
-  const li = btn.closest(".problem");
+  const li = btn.closest("[data-url]");
   const problem = problemOf(li);
   if (!problem) return;
   const prompt = aiPrompt(problem);
@@ -726,33 +946,36 @@ async function askAi(btn) {
   const messages = tool
     ? [t("help.opened", tool.name), t(copied ? "help.pasteHint" : "help.copyFailed")]
     : [t(copied ? "help.copied" : "help.copyFailed")];
-  li.querySelector(".help-status").textContent = messages.join(" ");
+  li.querySelector("[data-help-status]").textContent = messages.join(" ");
 }
 
 function renderNotesTab(item) {
   const p = itemProgress(item.id);
   const checklist = state.content.codeReviewChecklist || [];
   const checks = checklist.map((c) => `
-    <label>
-      <input type="checkbox" data-check="${esc(c.id)}" ${p.checks?.[c.id] ? "checked" : ""}>
+    <label class="flex cursor-pointer items-start gap-2.5 py-1 text-14">
+      <input type="checkbox" class="mt-1" data-check="${esc(c.id)}" ${p.checks?.[c.id] ? "checked" : ""}>
       <span>${fmt(localize(c.text))}</span>
     </label>`).join("");
 
   return [
-    block("block.notes", `<textarea data-field="notes" rows="5"
+    block("block.notes", `<textarea class="field" data-field="notes" rows="5"
       placeholder="${esc(t("notes.placeholder"))}">${esc(p.notes || "")}</textarea>`),
-    block("block.code", `<textarea data-field="code" class="mono" rows="12" wrap="off" spellcheck="false"
+    block("block.code", `<textarea class="field font-mono text-13 leading-[1.6] text-code-fg tab-4" data-field="code" rows="12" wrap="off" spellcheck="false"
       placeholder="${esc(t("code.placeholder"))}">${esc(p.code || "")}</textarea>`),
-    checklist.length > 0 && block("block.checklist", `<div class="checklist">${checks}</div>`),
+    checklist.length > 0 && block("block.checklist", `<div>${checks}</div>`),
     block("block.history", '<div id="review-history"></div>'),
   ].filter(Boolean).join("");
 }
 
 function renderHistory(p) {
   const rows = [];
-  if (p.doneAt) rows.push(`<li>${esc(t("history.done", formatDate(p.doneAt)))}</li>`);
-  (p.reviews || []).forEach((iso, i) => rows.push(`<li>${esc(t("history.review", i + 1, formatDate(iso)))}</li>`));
-  return rows.length ? `<ul class="history">${rows.join("")}</ul>` : emptyNote(t("history.empty", REVIEW_AFTER_DAYS));
+  if (p.doneAt) rows.push(t("history.done", formatDate(p.doneAt)));
+  (p.reviews || []).forEach((iso, i) => rows.push(t("history.review", i + 1, formatDate(iso))));
+  return rows.length
+    ? `<ul>${rows.map((row) => `
+      <li class="flex items-center gap-2.5 py-0.5 font-mono text-13 before:size-1.5 before:shrink-0 before:rounded-full before:bg-ok-fill before:content-['']">${esc(row)}</li>`).join("")}</ul>`
+    : emptyNote(t("history.empty", REVIEW_AFTER_DAYS));
 }
 
 // Cập nhật các phần thay đổi theo tiến độ mà không vẽ lại cả dialog (giữ nguyên textarea đang gõ)
@@ -765,14 +988,14 @@ function refreshDetail() {
   const body = $("detail-body");
 
   $("problems-count").textContent = problems.length ? `${solvedCount(item)}/${problems.length}` : "";
-  for (const group of body.querySelectorAll(".problem-group")) {
+  for (const group of body.querySelectorAll("[data-group]")) {
     const boxes = [...group.querySelectorAll("[data-solved]")];
-    group.querySelector(".group-count").textContent = `${boxes.filter((b) => b.checked).length}/${boxes.length}`;
+    group.querySelector("[data-group-count]").textContent = `${boxes.filter((b) => b.checked).length}/${boxes.length}`;
   }
   $("review-history").innerHTML = renderHistory(p);
   $("foot-info").innerHTML = last
     ? esc(t("foot.lastStudied", timeAgo(last))) +
-      (needsReview(item) ? ` · <strong class="warn">${esc(t("foot.due"))}</strong>` : "")
+      (needsReview(item) ? ` · <strong class="text-warn">${esc(t("foot.due"))}</strong>` : "")
     : "";
   $("btn-review").disabled = reviewedToday;
   $("btn-review").textContent = reviewedToday ? t("foot.reviewed") : t("foot.review");
@@ -786,31 +1009,31 @@ function selectTab(tabId) {
   for (const panel of body.querySelectorAll("[data-panel]")) {
     panel.hidden = panel.dataset.panel !== tabId;
   }
-  body.querySelector(".detail-scroll").scrollTop = 0;
+  $("detail-scroll").scrollTop = 0;
 }
 
 // Chọn Python / Java; ghi nhớ để các mục khác mở ra cũng hiện ngôn ngữ đó
 function selectCodeLang(lang) {
   state.codeLang = lang;
   storage.set(KEY_CODE_LANG, lang);
-  for (const box of $("detail-body").querySelectorAll(".code")) {
-    if (!box.querySelector(`pre[data-code="${CSS.escape(lang)}"]`)) continue;
+  for (const box of $("detail-body").querySelectorAll("[data-templates]")) {
+    if (!box.querySelector(`[data-code="${CSS.escape(lang)}"]`)) continue;
     for (const btn of box.querySelectorAll("[data-code-lang]")) {
       btn.setAttribute("aria-pressed", String(btn.dataset.codeLang === lang));
     }
-    for (const pre of box.querySelectorAll("pre[data-code]")) pre.hidden = pre.dataset.code !== lang;
+    for (const pane of box.querySelectorAll("[data-code]")) pane.hidden = pane.dataset.code !== lang;
   }
 }
 
 async function copyCode(box) {
-  const btn = box.querySelector('[data-action="copy"]');
+  const label = box.querySelector("[data-copy-label]");
   try {
-    await navigator.clipboard.writeText(box.querySelector("pre:not([hidden])").textContent);
-    btn.textContent = t("copy.done");
+    await navigator.clipboard.writeText(box.querySelector("[data-code]:not([hidden]) code").textContent);
+    label.textContent = t("copy.done");
   } catch {
-    btn.textContent = t("copy.failed");
+    label.textContent = t("copy.failed");
   }
-  setTimeout(() => { btn.textContent = t("copy"); }, 1500);
+  setTimeout(() => { label.textContent = t("copy"); }, 1500);
 }
 
 function markReviewed(id) {
@@ -819,60 +1042,188 @@ function markReviewed(id) {
 }
 
 // =====================================================================
-// Lưu tiến độ ra file progress/progress.json (qua server.js, chạy bằng start.sh),
-// để đổi trình duyệt không mất dữ liệu. localStorage vẫn giữ 1 bản trong trình duyệt.
+// Đồng bộ Google Drive: tiến độ nằm trong file dsa-roadmap-progress.json ở My Drive,
+// cùng định dạng với file "Xuất tiến độ" nên tải về rồi "Nhập tiến độ" được.
+//   Máy tính (start.sh): server.js giữ đăng nhập Google, cấp access token qua api/google/*
+//   App Android: plugin GoogleDrive (mobile/android/app/src/main/java/.../GoogleDrivePlugin.java)
+//   Mở cách khác (Live Server, mở thẳng file): chỉ lưu trong trình duyệt
+// localStorage luôn giữ 1 bản trên máy, nên mất mạng hay chưa kết nối vẫn dùng bình thường.
 //
-// KEY_FILE_SYNC cho biết bản trong trình duyệt này so với file:
-//   (chưa có)  chưa từng ghi ra file  -> mở trang: gộp vào file, bên file thắng khi trùng
-//   "synced"   file đã có mọi thay đổi -> mở trang: lấy bản trong file
-//   "pending"  còn thay đổi chưa ghi   -> mở trang: gộp vào file, bên trình duyệt thắng khi trùng
+// KEY_DRIVE_SYNC = { fileId, version, pending }: bản trên máy so với file trên Drive
+//   chưa có fileId   chưa từng đồng bộ         -> gộp với file, bên Drive thắng khi trùng
+//   pending: false   giống bản Drive `version` -> Drive có bản mới hơn thì lấy luôn bản Drive
+//   pending: true    còn thay đổi chưa ghi      -> gộp với file, bên máy thắng khi trùng, rồi ghi
 // =====================================================================
-const fileSync = {
-  enabled: false,     // server có API lưu file
-  remote: null,       // tiến độ đọc từ file lúc mở trang, null nếu chưa có file
-  baseSavedAt: null,  // savedAt của bản file mà trang này đang dựa vào
-  error: null,        // lỗi gần nhất (appError), hiện ở cuối trang
-  version: 0,         // tăng mỗi lần tiến độ đổi
+const DRIVE_FILES = "https://www.googleapis.com/drive/v3/files";
+const DRIVE_UPLOAD = "https://www.googleapis.com/upload/drive/v3/files";
+// Thẻ gắn vào file để tìm lại được dù bạn đổi tên hay chuyển nó sang thư mục khác
+const DRIVE_TAG = { key: "dsaRoadmap", value: "progress" };
+const TOKEN_MARGIN_MS = 60 * 1000;
+
+const drive = {
+  auth: null,       // cách lấy token: serverAuth (máy tính) / androidAuth; null = không có Drive
+  status: "off",    // off | setup | login | syncing | synced | offline | error
+  error: null,      // lỗi khi status = error
+  syncedAt: null,   // lần đồng bộ xong gần nhất
+  token: null,      // { value, expiresAt }
+  version: 0,       // tăng mỗi lần tiến độ trên máy đổi
   timer: null,
-  saving: false,
-  again: false,       // có thay đổi mới trong lúc đang ghi
+  running: false,
+  again: false,     // có yêu cầu đồng bộ mới trong lúc đang chạy
 };
 
-async function openProgressFile() {
-  let res, body;
-  try {
-    res = await fetch(PROGRESS_API, { cache: "no-store" });
-    body = await res.json();
-  } catch {
-    return; // server khác (Live Server, http.server...) không có API: chỉ lưu trong trình duyệt
-  }
-  if (!res.ok) {
-    if (body?.error) fileSync.error = appError("sync.error", body.error);
-    return;
-  }
-  if (body !== null && !(isObject(body?.items) && isObject(body?.solved))) {
-    // File bị sửa tay sai định dạng: báo lỗi, không ghi đè
-    fileSync.error = appError("sync.error", `${PROGRESS_FILE}: ${t("error.notProgress")}`);
-    return;
-  }
-  fileSync.enabled = true;
-  fileSync.remote = body && { items: body.items, solved: body.solved };
-  fileSync.baseSavedAt = body?.savedAt ?? null;
+class NeedLogin extends Error {}
+class Offline extends Error {}
+
+const isNativeApp = () => Boolean(window.Capacitor?.isNativePlatform?.());
+
+// fetch() chỉ lỗi (TypeError) khi không gửi được request: mất mạng, server.js đã tắt...
+const request = (url, options) => fetch(url, options).catch(() => { throw new Offline(); });
+
+// Máy tính: server.js trả token và tự làm mới bằng refresh token đã lưu
+const serverAuth = {
+  async getToken() {
+    const res = await request(`${GOOGLE_API}/token`, { cache: "no-store" });
+    const body = await res.json().catch(() => ({}));
+    if (res.status === 401) throw new NeedLogin();
+    if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
+    return { value: body.accessToken, expiresAt: body.expiresAt };
+  },
+  async clearToken() {},
+  async login() {
+    location.href = `${GOOGLE_API}/login`; // xong bên Google thì server.js đưa về lại trang này
+  },
+};
+
+// Android: Google Play services cấp token; lần đầu hiện màn hình chọn tài khoản và cấp quyền
+function androidAuth(plugin) {
+  const getToken = async (interactive = false) => {
+    try {
+      const { accessToken } = await plugin.getAccessToken({ interactive });
+      // Play services không báo hạn của token: giữ ngắn, hết hạn sớm hơn thì Drive trả 401 và xin lại
+      return { value: accessToken, expiresAt: Date.now() + 10 * 60 * 1000 };
+    } catch (err) {
+      if (err.code === "NEED_CONSENT" || err.code === "CANCELLED") throw new NeedLogin();
+      throw err;
+    }
+  };
+  return {
+    getToken,
+    clearToken: (token) => plugin.clearToken({ token }).catch(() => {}),
+    async login() {
+      drive.token = await getToken(true);
+      await syncDrive();
+    },
+  };
 }
 
-function syncWithFile(local) {
-  if (!fileSync.enabled) return local;
-  const { remote } = fileSync;
-  const status = storage.get(KEY_FILE_SYNC, null);
-  if (remote && status === "synced") {
-    storage.set(KEY_PROGRESS, remote);
-    return remote;
+// null nếu cách mở app hiện tại không đồng bộ được
+async function detectDriveAuth() {
+  const plugin = isNativeApp() && window.Capacitor.Plugins?.GoogleDrive;
+  if (plugin) return { auth: androidAuth(plugin), configured: true };
+  if (location.protocol === "file:") return null;
+  try {
+    const res = await fetch(`${GOOGLE_API}/status`, { cache: "no-store" });
+    if (!res.ok) return null;
+    const { configured } = await res.json();
+    return { auth: serverAuth, configured };
+  } catch {
+    return null; // server khác (Live Server, http.server...) không có API này
   }
-  let progress = local;
-  if (remote) progress = status === "pending" ? mergeProgress(remote, local) : mergeProgress(local, remote);
-  storage.set(KEY_PROGRESS, progress);
-  queueFileSave();
-  return progress;
+}
+
+async function startDrive() {
+  const found = await detectDriveAuth();
+  if (!found) return;
+  if (!found.configured) {
+    setDriveStatus("setup");
+    return;
+  }
+  drive.auth = found.auth;
+  syncDrive();
+}
+
+async function accessToken() {
+  if (!drive.token || drive.token.expiresAt - TOKEN_MARGIN_MS < Date.now()) {
+    drive.token = await drive.auth.getToken();
+  }
+  return drive.token.value;
+}
+
+// Gọi Drive API kèm token. allow404: trả null thay vì báo lỗi khi file không còn
+async function driveFetch(url, options = {}, { allow404 = false, retry = true } = {}) {
+  const token = await accessToken();
+  const res = await request(url, { ...options, headers: { ...options.headers, Authorization: `Bearer ${token}` } });
+  if (res.status === 401 && retry) {
+    // Token hết hạn hoặc bị thu hồi: bỏ đi, xin token mới rồi thử lại 1 lần
+    drive.token = null;
+    await drive.auth.clearToken(token);
+    return driveFetch(url, options, { allow404, retry: false });
+  }
+  if (res.status === 404 && allow404) return null;
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.error?.message || `HTTP ${res.status}`);
+  }
+  return res;
+}
+
+const driveFileUrl = (id, params) => `${DRIVE_FILES}/${encodeURIComponent(id)}?${new URLSearchParams(params)}`;
+
+// File đã biết id: null nếu đã bị xoá hoặc nằm trong thùng rác
+async function getDriveFile(id) {
+  const res = await driveFetch(driveFileUrl(id, { fields: "id,version,trashed" }), {}, { allow404: true });
+  const file = res && (await res.json());
+  return file && !file.trashed ? file : null;
+}
+
+// Quyền drive.file chỉ thấy file do app tạo, nên tìm theo thẻ là đủ
+async function findDriveFile() {
+  const params = new URLSearchParams({
+    q: `appProperties has { key='${DRIVE_TAG.key}' and value='${DRIVE_TAG.value}' } and trashed = false`,
+    spaces: "drive",
+    orderBy: "modifiedTime desc",
+    fields: "files(id,version)",
+    pageSize: "1",
+  });
+  const res = await driveFetch(`${DRIVE_FILES}?${params}`);
+  return (await res.json()).files[0] || null;
+}
+
+async function downloadDriveFile(id) {
+  const res = await driveFetch(driveFileUrl(id, { alt: "media" }));
+  const data = await res.json().catch(() => null);
+  // File bị sửa tay sai định dạng: báo lỗi, không ghi đè
+  if (!isObject(data?.items) || !isObject(data?.solved)) throw appError("sync.badFile", DRIVE_FILE_NAME);
+  return { items: data.items, solved: data.solved };
+}
+
+const progressJson = (progress) => `${JSON.stringify({ savedAt: nowIso(), ...progress }, null, 2)}\n`;
+
+// Ghi đè file có sẵn, hoặc tạo file mới khi chưa có id. Trả về { id, version }
+async function writeDriveFile(id, progress) {
+  if (id) {
+    const res = await driveFetch(`${DRIVE_UPLOAD}/${encodeURIComponent(id)}?uploadType=media&fields=id,version`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: progressJson(progress),
+    });
+    return res.json();
+  }
+  // Tạo file: gửi thông tin file (tên, thẻ) và nội dung trong cùng 1 request
+  const boundary = `dsa-${Math.random().toString(36).slice(2)}`;
+  const metadata = { name: DRIVE_FILE_NAME, mimeType: "application/json", appProperties: { [DRIVE_TAG.key]: DRIVE_TAG.value } };
+  const body = [
+    `--${boundary}`, "Content-Type: application/json; charset=UTF-8", "", JSON.stringify(metadata),
+    `--${boundary}`, "Content-Type: application/json", "", progressJson(progress),
+    `--${boundary}--`, "",
+  ].join("\r\n");
+  const res = await driveFetch(`${DRIVE_UPLOAD}?uploadType=multipart&fields=id,version`, {
+    method: "POST",
+    headers: { "Content-Type": `multipart/related; boundary=${boundary}` },
+    body,
+  });
+  return res.json();
 }
 
 // Gộp 2 bản tiến độ: giữ mọi mục của cả hai, `winner` thắng khi cùng 1 trường của cùng 1 mục
@@ -882,65 +1233,113 @@ function mergeProgress(base, winner) {
   return { items, solved: { ...base.solved, ...winner.solved } };
 }
 
-function queueFileSave() {
-  if (!fileSync.enabled) return;
-  clearTimeout(fileSync.timer);
-  fileSync.timer = setTimeout(saveToFile, FILE_SAVE_DELAY_MS);
+const sameProgress = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
+// Bản lấy từ Drive: thay bản trên máy mà không tính là thay đổi mới
+function applyDriveProgress(progress) {
+  if (sameProgress(progress, state.progress)) return;
+  state.progress = progress;
+  storage.set(KEY_PROGRESS, progress);
+  render();
+  if (state.openId) refreshDetail();
 }
 
-// Mỗi lúc chỉ có 1 request ghi; thay đổi đến trong lúc đang ghi được gửi tiếp ngay sau đó
-async function saveToFile({ keepalive = false } = {}) {
-  clearTimeout(fileSync.timer);
-  fileSync.timer = null;
-  if (!fileSync.enabled) return;
-  if (fileSync.saving) {
-    fileSync.again = true;
+// Mỗi lúc chỉ 1 lượt đồng bộ; yêu cầu đến trong lúc đang chạy thì chạy thêm 1 lượt ngay sau đó
+async function syncDrive() {
+  clearTimeout(drive.timer);
+  drive.timer = null;
+  if (!drive.auth) return;
+  if (drive.running) {
+    drive.again = true;
     return;
   }
-
-  fileSync.saving = true;
-  const version = fileSync.version;
-  const savedAt = nowIso();
-  const body = JSON.stringify({ savedAt, baseSavedAt: fileSync.baseSavedAt, ...state.progress });
+  drive.running = true;
+  setDriveStatus("syncing");
   try {
-    const res = await fetch(PROGRESS_API, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body,
-      // keepalive cho request đi tiếp khi tab đã đóng, nhưng trình duyệt giới hạn ~64KB
-      keepalive: keepalive && new Blob([body]).size < 60000,
-    });
-    if (res.status === 409) {
-      // Trình duyệt khác đã ghi bản mới hơn: ngừng ghi để không đè mất bản đó
-      fileSync.enabled = false;
-      throw appError("sync.conflict");
+    const saved = storage.get(KEY_DRIVE_SYNC, null);
+    let file = (saved?.fileId && (await getDriveFile(saved.fileId))) || (await findDriveFile());
+    const known = file && file.id === saved?.fileId; // máy này đã từng đồng bộ với đúng file này
+    let mustWrite;
+
+    if (file && (!known || file.version !== saved.version)) {
+      // Drive có bản khác bản máy đang dựa vào: máy khác vừa ghi, hoặc lần đầu đồng bộ
+      const remote = await downloadDriveFile(file.id);
+      // Đọc lại cờ pending sau khi tải xong: có thể vừa có thay đổi trong lúc chờ
+      const pending = storage.get(KEY_DRIVE_SYNC, null)?.pending;
+      const merged = !known ? mergeProgress(state.progress, remote)
+        : pending ? mergeProgress(remote, state.progress)
+        : remote;
+      applyDriveProgress(merged);
+      mustWrite = !sameProgress(merged, remote);
+    } else {
+      mustWrite = !file || Boolean(storage.get(KEY_DRIVE_SYNC, null)?.pending);
     }
-    if (!res.ok) throw new Error((await res.json().catch(() => null))?.error || `HTTP ${res.status}`);
-    fileSync.baseSavedAt = savedAt;
-    if (version === fileSync.version) storage.set(KEY_FILE_SYNC, "synced");
-    setSyncError(null);
+
+    const version = drive.version;
+    if (mustWrite) file = await writeDriveFile(file?.id, state.progress);
+    // Có thay đổi trong lúc đang ghi thì vẫn còn pending; lượt sau (đã hẹn giờ) sẽ ghi tiếp
+    storage.set(KEY_DRIVE_SYNC, { fileId: file.id, version: file.version, pending: drive.version !== version });
+    drive.syncedAt = nowIso();
+    setDriveStatus("synced");
   } catch (err) {
-    setSyncError(err.i18n ? err : appError("sync.error", err.message));
+    if (err instanceof NeedLogin) {
+      drive.token = null;
+      setDriveStatus("login");
+    } else if (err instanceof Offline) {
+      setDriveStatus("offline");
+    } else {
+      setDriveStatus("error", err);
+    }
   } finally {
-    fileSync.saving = false;
-    if (fileSync.again) {
-      fileSync.again = false;
-      saveToFile();
+    drive.running = false;
+    if (drive.again) {
+      drive.again = false;
+      syncDrive();
     }
   }
 }
 
-function setSyncError(err) {
-  if (fileSync.error === err) return;
-  fileSync.error = err;
+function queueDriveSave() {
+  if (!drive.auth || drive.status === "login") return; // chờ người dùng bấm "Kết nối Google Drive"
+  clearTimeout(drive.timer);
+  drive.timer = setTimeout(syncDrive, DRIVE_SAVE_DELAY_MS);
+}
+
+function autoSyncDrive() {
+  if (drive.auth && drive.status !== "login") syncDrive();
+}
+
+async function connectDrive() {
+  if (drive.status !== "login") {
+    syncDrive();
+    return;
+  }
+  try {
+    await drive.auth.login();
+  } catch (err) {
+    if (!(err instanceof NeedLogin)) setDriveStatus("error", err);
+  }
+}
+
+function setDriveStatus(status, error = null) {
+  drive.status = status;
+  drive.error = error;
   if (state.content) renderSyncStatus();
 }
 
 function renderSyncStatus() {
+  const { status } = drive;
   const el = $("sync-status");
-  el.classList.toggle("warn", Boolean(fileSync.error));
-  if (fileSync.error) el.textContent = errorText(fileSync.error);
-  else el.textContent = fileSync.enabled ? t("sync.file", PROGRESS_FILE) : t("sync.browser");
+  el.toggleAttribute("data-warn", ["setup", "offline", "error"].includes(status));
+  el.dataset.status = status; // màu chấm trạng thái, xem #sync-status trong index.html
+  el.textContent =
+    status === "synced" ? t("sync.synced", formatTime(drive.syncedAt))
+    : status === "error" ? t("sync.error", errorText(drive.error))
+    : t(`sync.${status}`);
+
+  const btn = $("btn-drive");
+  btn.hidden = !["login", "offline", "error"].includes(status);
+  btn.textContent = t(status === "login" ? "sync.connect" : "sync.retry");
 }
 
 // =====================================================================
@@ -1035,10 +1434,13 @@ $("data-picker").addEventListener("change", async (e) => {
   }
 });
 
-// Đóng tab khi còn thay đổi đang chờ ghi ra file: gửi luôn, không đợi
-addEventListener("pagehide", () => {
-  if (fileSync.timer) saveToFile({ keepalive: true });
+$("btn-drive").addEventListener("click", connectDrive);
+
+// Quay lại app (vd. vừa học trên máy kia): lấy bản mới từ Drive. Rời app: ghi luôn thay đổi đang chờ
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" || drive.timer) autoSyncDrive();
 });
+addEventListener("online", autoSyncDrive);
 
 $("btn-reset").addEventListener("click", () => {
   if (!confirm(t("confirm.reset"))) return;
@@ -1078,19 +1480,16 @@ detail.addEventListener("click", (e) => {
   const actionEl = e.target.closest("[data-action]");
   const action = actionEl?.dataset.action;
   if (action === "close") detail.close();
-  if (action === "copy") copyCode(e.target.closest(".code"));
+  if (action === "copy") copyCode(e.target.closest("[data-templates]"));
   if (action === "review") markReviewed(state.openId);
-  if (action === "help") toggleHelp(e.target.closest(".problem"));
+  if (action === "help") toggleHelp(e.target.closest("[data-url]"));
   if (action === "ask") askAi(actionEl);
 });
 
 detail.addEventListener("change", (e) => {
   const { done, solved, check } = e.target.dataset;
   if (done) setDone(done, e.target.checked);
-  if (solved) {
-    setSolved(solved, e.target.checked);
-    e.target.closest(".problem").classList.toggle("solved", e.target.checked);
-  }
+  if (solved) setSolved(solved, e.target.checked);
   if (check) {
     updateItem(state.openId, { checks: { ...itemProgress(state.openId).checks, [check]: e.target.checked } });
   }
@@ -1105,7 +1504,7 @@ detail.addEventListener("input", (e) => {
 
 // Tab trong ô code chèn 4 dấu cách; Shift+Tab vẫn dùng để chuyển focus ra ngoài
 detail.addEventListener("keydown", (e) => {
-  if (e.key !== "Tab" || e.shiftKey || !e.target.matches("textarea.mono")) return;
+  if (e.key !== "Tab" || e.shiftKey || !e.target.matches('textarea[data-field="code"]')) return;
   e.preventDefault();
   e.target.setRangeText("    ", e.target.selectionStart, e.target.selectionEnd, "end");
   e.target.dispatchEvent(new Event("input", { bubbles: true }));

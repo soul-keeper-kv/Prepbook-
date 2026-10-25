@@ -1,0 +1,13 @@
+{
+  "name": "dsa-roadmap-web",
+  "private": true,
+  "description": "DSA study roadmap: the web app, plus the local server that runs it on the PC",
+  "scripts": {
+    "build:css": "tailwindcss -i index.css -o build/app.css --optimize",
+    "watch:css": "tailwindcss -i index.css -o build/app.css --optimize --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.3",
+    "tailwindcss": "4.3.3"
+  }
+}

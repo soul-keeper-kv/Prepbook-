@@ -81,7 +81,7 @@ Tìm được bài hướng dẫn hay cho 1 bài cụ thể thì thêm vào `gui
 
 Tick, ghi chú, code của bạn không nằm trong các file này.
 
-- Mở app bằng `start.sh` (server `server.js`): mỗi thay đổi được tự lưu vào `progress/progress.json` ở thư mục gốc project, nên đổi trình duyệt vẫn giữ nguyên tiến độ. Lần đầu mở ở một trình duyệt, tiến độ cũ trong trình duyệt đó được gộp vào file.
+- Mở app bằng `start.sh` hoặc app Android, rồi bấm "Kết nối Google Drive": mỗi thay đổi được tự lưu vào file `dsa-roadmap-progress.json` trong Google Drive của bạn, máy tính và điện thoại dùng chung. Lần đầu kết nối, tiến độ đang có trên máy được gộp vào file. Cách cài xem [README.md](../../README.md).
 - Mở cách khác (mở thẳng file, Live Server...): chỉ lưu trong trình duyệt (localStorage). Dòng chữ ở cuối trang cho biết đang lưu ở đâu.
 
-Dùng nút "Xuất tiến độ" để sao lưu ra file, "Nhập tiến độ" để khôi phục hoặc chuyển sang máy khác. File `progress/progress.json` cũng nhập lại được bằng nút này.
+Dùng nút "Xuất tiến độ" để sao lưu ra file, "Nhập tiến độ" để khôi phục hoặc chuyển sang máy khác. File trên Drive và file `progress/progress.json` cũ (bản trước khi có Drive) cũng nhập lại được bằng nút này.
