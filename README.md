@@ -4,11 +4,13 @@ Lộ trình học thuật toán, gồm 2 phần tách riêng:
 
 | Thư mục | Là gì | Hướng dẫn |
 | --- | --- | --- |
-| [web/](web/) | App web + server chạy trên máy tính (`start.sh`) | [web/README.md](web/README.md) |
-| [mobile/](mobile/) | App Android, đóng gói app web từ `web/` bằng Capacitor | [mobile/README.md](mobile/README.md) |
+| [web/](web/) | App React (Vite, TypeScript, Tailwind, shadcn/ui) + server chạy trên máy tính (`start.sh`) | [web/README.md](web/README.md) |
+| [mobile/](mobile/) | App Android, đóng gói bản build của `web/` bằng Capacitor | [mobile/README.md](mobile/README.md) |
 
-App Android không có bản code giao diện riêng: lúc build, nó copy `index.html`, `main.js`, `i18n.js`, CSS và `data/` từ `web/`.
+App Android không có bản code giao diện riêng: lúc build, nó copy `web/dist/` (code, CSS và nội dung `data/` đã gom lại).
 Sửa giao diện hay nội dung thì sửa trong `web/`, rồi build lại app.
+
+Không có backend hay database: nội dung nằm sẵn trong app, tiến độ nằm trong máy và trên Google Drive của bạn.
 
 Tiến độ (tick, ghi chú, code) của cả 2 bản nằm chung trong file `dsa-roadmap-progress.json` ở My Drive của bạn.
 Mỗi máy giữ thêm 1 bản trong máy, nên mất mạng vẫn học bình thường, có mạng lại thì tự đồng bộ.
@@ -37,5 +39,5 @@ Cần để app được phép ghi file vào Drive của bạn. Không cần th�
 - File trên Drive cùng định dạng với file "Xuất tiến độ": tải về rồi "Nhập tiến độ" được. Đổi tên hay chuyển thư mục vẫn chạy (app tìm file theo thẻ, không theo tên).
 - Xoá file trên Drive thì lần đồng bộ sau app tạo lại từ bản trong máy.
 
-Code đồng bộ nằm trong `web/main.js` (phần "Đồng bộ Google Drive"), dùng chung cho cả 2 bản.
-Chỉ khác cách lấy quyền Google: máy tính qua `web/server.js`, Android qua `mobile/android/.../GoogleDrivePlugin.java`.
+Code đồng bộ nằm trong `web/src/sync/` (thuật toán ở `engine.ts`, có test trong `engine.test.ts`), dùng chung cho cả 2 bản.
+Chỉ khác cách lấy quyền Google: máy tính qua `web/server/google-auth.ts`, Android qua `mobile/android/.../GoogleDrivePlugin.java`.

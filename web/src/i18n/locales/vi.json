@@ -1,0 +1,185 @@
+{
+  "app": {
+    "title": "DSA Roadmap"
+  },
+  "lang": {
+    "switch": "Ngôn ngữ"
+  },
+  "theme": {
+    "switch": "Giao diện",
+    "auto": "Tự động",
+    "light": "Sáng",
+    "dark": "Tối"
+  },
+  "stats": {
+    "progress": "Tiến độ",
+    "items": "{{done}}/{{total}} mục",
+    "current": "Giai đoạn hiện tại",
+    "allDone": "Xong",
+    "solved": "Bài đã giải",
+    "review": "Cần ôn lại"
+  },
+  "filter": {
+    "label": "Lọc mục",
+    "all": "Tất cả",
+    "todo": "Chưa xong",
+    "review": "Cần ôn",
+    "empty": {
+      "all": "Giai đoạn này chưa có mục nào.",
+      "todo": "Đã hoàn thành hết giai đoạn này.",
+      "review": "Không có mục nào cần ôn lại."
+    }
+  },
+  "toolbar": {
+    "expand": "Mở hết",
+    "collapse": "Thu gọn"
+  },
+  "type": {
+    "theory": "Lý thuyết",
+    "practice": "Luyện bài"
+  },
+  "tag": {
+    "review": "Cần ôn"
+  },
+  "item": {
+    "markDone": "Đánh dấu đã xong",
+    "problems": "{{solved}}/{{total}} bài",
+    "reviews_other": "ôn {{count}} lần",
+    "hasNotes": "có ghi chú"
+  },
+  "footer": {
+    "export": "Xuất tiến độ",
+    "import": "Nhập tiến độ",
+    "reset": "Làm lại từ đầu"
+  },
+  "sync": {
+    "off": "Tiến độ chỉ lưu trong trình duyệt này. Mở app bằng start.sh (hoặc app Android) để đồng bộ qua Google Drive.",
+    "setup": "Chưa bật đồng bộ Google Drive: thêm file google-oauth.json vào thư mục web theo README.md rồi tải lại trang. Tiến độ đang lưu trong trình duyệt này.",
+    "login": "Chưa kết nối Google Drive. Tiến độ đang lưu trên máy này; kết nối để dùng chung với máy khác.",
+    "syncing": "Đang đồng bộ với Google Drive…",
+    "synced": "Đã đồng bộ với Google Drive lúc {{time}}.",
+    "offline": "Không kết nối được Google Drive. Tiến độ vẫn lưu trên máy, có mạng lại sẽ tự đồng bộ.",
+    "error": "Chưa đồng bộ được với Google Drive: {{message}}. Tiến độ vẫn lưu trên máy này.",
+    "badFile": "file {{file}} trên Drive không đúng định dạng tiến độ (sửa lại, hoặc xoá đi để app tạo file mới)",
+    "connect": "Kết nối Google Drive",
+    "retry": "Đồng bộ lại"
+  },
+  "detail": {
+    "close": "Đóng"
+  },
+  "tab": {
+    "learn": "Kiến thức",
+    "problems": "Bài tập",
+    "notes": "Ghi chú & review"
+  },
+  "block": {
+    "description": "Mô tả",
+    "keyPoints": "Ý chính",
+    "examples": "Ví dụ",
+    "template": "Code mẫu",
+    "complexity": "Độ phức tạp",
+    "pitfalls": "Lỗi hay gặp",
+    "resources": "Tài liệu miễn phí",
+    "problems": "Bài luyện",
+    "moreLists": "Danh sách bài khác",
+    "notes": "Ghi chú",
+    "code": "Code của tôi",
+    "checklist": "Tự review code",
+    "history": "Lịch sử"
+  },
+  "example": {
+    "input": "Input",
+    "output": "Output"
+  },
+  "resource": {
+    "article": "Bài viết",
+    "video": "Video",
+    "course": "Khoá học",
+    "docs": "Docs",
+    "book": "Sách",
+    "visual": "Minh hoạ",
+    "practice": "Luyện tập"
+  },
+  "learn": {
+    "empty": "Mục này chưa có nội dung. Thêm vào file JSON của giai đoạn trong thư mục data."
+  },
+  "problems": {
+    "empty": "Mục này chưa có bài tập."
+  },
+  "problem": {
+    "solvedLabel": "Đã giải {{title}}"
+  },
+  "help": {
+    "toggle": "Cách giải",
+    "tip": "Tự nghĩ khoảng 20 phút trước. Bí thì hỏi AI ở chế độ “Chỉ gợi ý”, vẫn bí mới xem lời giải đầy đủ.",
+    "read": "Xem lời giải",
+    "editorial": "Lời giải chính thức",
+    "solutions": "Lời giải cộng đồng",
+    "discussions": "Thảo luận",
+    "web": "Tìm lời giải trên web",
+    "video": "Video giải thích",
+    "ask": "Hỏi AI",
+    "modeLabel": "Kiểu trả lời của AI",
+    "mode": {
+      "hint": "Chỉ gợi ý",
+      "explain": "Giải thích từng bước"
+    },
+    "open": "Mở {{name}}",
+    "copy": "Copy câu hỏi",
+    "opened": "Đã mở {{name}} ở tab mới.",
+    "pasteHint": "Câu hỏi đã được copy: nếu ô chat còn trống, dán vào (Ctrl+V) rồi Enter.",
+    "copied": "Đã copy câu hỏi. Dán (Ctrl+V) vào AI bạn hay dùng.",
+    "copyFailed": "Trình duyệt không cho copy câu hỏi."
+  },
+  "prompt": {
+    "hint": "Mình đang tự học thuật toán theo lộ trình, bài này nằm trong mục \"{{lesson}}\".\nMình đang làm bài \"{{title}}\" trên {{site}}: {{url}}\n\nMình là người mới và chưa biết cách giải. Hãy hướng dẫn như một người thầy, đừng đưa lời giải ngay:\n1. Nhắc lại đề bằng lời đơn giản, kèm 1 ví dụ nhỏ. Nếu không chắc đây là bài nào, hãy bảo mình dán đề vào, đừng đoán.\n2. Mỗi lần chỉ gợi ý 1 ý nhỏ rồi dừng lại chờ mình trả lời. Đi từ cách vét cạn tới cách tối ưu, và nói rõ bài dùng kỹ thuật nào.\n3. Chỉ viết code hoàn chỉnh ({{lang}}) khi mình yêu cầu.\n\nTrả lời bằng tiếng Việt.",
+    "explain": "Mình đang tự học thuật toán theo lộ trình, bài này nằm trong mục \"{{lesson}}\".\nGiải thích giúp mình bài \"{{title}}\" trên {{site}}: {{url}}\n\nMình là người mới, hãy giải thích từng bước:\n1. Đề bài hỏi gì, nói bằng lời đơn giản, kèm 1 ví dụ nhỏ. Nếu không chắc đây là bài nào, hãy bảo mình dán đề vào, đừng đoán.\n2. Cách vét cạn (brute force) và vì sao nó chưa đủ nhanh.\n3. Nhận xét quan trọng nhất dẫn tới cách tối ưu, và đó là kỹ thuật gì.\n4. Các bước của thuật toán, chạy tay trên ví dụ ở bước 1.\n5. Code {{lang}} có chú thích ngắn.\n6. Độ phức tạp time/space và các edge case dễ sai.\n\nTrả lời bằng tiếng Việt."
+  },
+  "notes": {
+    "placeholder": "Ý tưởng chính, chỗ bị kẹt, lỗi đã mắc, mẹo cần nhớ..."
+  },
+  "code": {
+    "placeholder": "Dán lời giải vào đây để tự review. Tab chèn 4 dấu cách."
+  },
+  "copy": {
+    "label": "Copy",
+    "done": "Đã copy",
+    "failed": "Không copy được"
+  },
+  "history": {
+    "done": "Hoàn thành: {{date}}",
+    "review": "Ôn lần {{n}}: {{date}}",
+    "empty": "Chưa có. Tick “Đã xong” khi học xong, rồi bấm “Đã ôn lại hôm nay” mỗi lần làm lại. Quá {{days}} ngày chưa ôn thì mục sẽ hiện nhãn “Cần ôn”."
+  },
+  "foot": {
+    "done": "Đã xong",
+    "lastStudied": "Học lần cuối: {{ago}}",
+    "due": "nên ôn lại",
+    "review": "Đã ôn lại hôm nay",
+    "reviewed": "Đã ôn hôm nay ✓"
+  },
+  "time": {
+    "today": "hôm nay",
+    "yesterday": "hôm qua",
+    "daysAgo_other": "{{count}} ngày trước"
+  },
+  "confirm": {
+    "cancel": "Huỷ",
+    "importTitle": "Nhập tiến độ từ file?",
+    "import": "Thay toàn bộ tiến độ hiện tại bằng dữ liệu trong file?",
+    "importAction": "Thay tiến độ",
+    "resetTitle": "Làm lại từ đầu?",
+    "reset": "Xoá toàn bộ tiến độ, ghi chú và code đã lưu? Nên bấm “Xuất tiến độ” để sao lưu trước.",
+    "resetAction": "Xoá hết"
+  },
+  "toast": {
+    "imported": "Đã nhập tiến độ từ file."
+  },
+  "error": {
+    "import": "Không nhập được: {{message}}",
+    "notProgress": "file không phải bản xuất tiến độ của app này",
+    "invalidJson": "{{file}} không phải JSON hợp lệ: {{message}}",
+    "contentTitle": "Dữ liệu trong thư mục data có lỗi",
+    "contentHint": "Sửa file JSON theo thông báo bên dưới. Đang chạy npm run dev thì lưu file là trang tự tải lại; chạy bằng start.sh thì chạy lại start.sh."
+  }
+}

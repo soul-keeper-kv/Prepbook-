@@ -1,23 +1,27 @@
 #!/usr/bin/env bash
-# Start the app: runs the local server (server.js) and opens it in the browser.
+# Start the app on the PC: build it, run the local server (server/serve.ts) and open the browser.
 # Keep this window open while using the app; Ctrl+C or closing it stops the server.
+# While editing code or data/, `npm run dev` is quicker: it reloads the page on every save.
 
 cd "$(dirname "$0")" || exit 1
 
-if ! command -v node >/dev/null 2>&1; then
-  echo "Node.js is required to run the app: https://nodejs.org" >&2
+fail() {
+  echo "$1" >&2
   read -r -p "Press Enter to close..."
   exit 1
+}
+
+command -v node >/dev/null 2>&1 || fail "Node.js 22.18 or newer is required: https://nodejs.org"
+# Node runs server/serve.ts directly; that needs type stripping (Node 22.18+)
+node -e 'const [a, b] = process.versions.node.split(".").map(Number); process.exit(a > 22 || (a === 22 && b >= 18) ? 0 : 1)' \
+  || fail "Node.js $(node -v) is too old: 22.18 or newer is required (https://nodejs.org)"
+
+if [ ! -d node_modules ]; then
+  echo "Installing dependencies (first run only)..."
+  npm ci --no-audit --no-fund || fail "npm ci failed."
 fi
 
-# The page loads build/app.css, which Tailwind builds from index.css plus the classes
-# used in index.html and main.js. After `npm install`, keep rebuilding it while the
-# app runs, so a new class shows up on page refresh. Without node_modules the app
-# uses the build/app.css already in the folder.
-if [ -x node_modules/.bin/tailwindcss ]; then
-  node_modules/.bin/tailwindcss -i index.css -o build/app.css --optimize --watch=always &
-  css_watcher=$!
-  trap 'kill "$css_watcher" 2>/dev/null' EXIT
-fi
+# Rebuild every time, so changes to the code or to data/ always show up
+npx vite build --logLevel warn || fail "Build failed (see the error above)."
 
-node server.js --open
+exec node server/serve.ts --open

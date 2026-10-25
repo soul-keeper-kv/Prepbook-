@@ -1,9 +1,9 @@
 {
   "name": "dsa-roadmap-mobile",
   "private": true,
-  "description": "Android app for the DSA roadmap: packs the web app from ../web with Capacitor",
+  "description": "Android app for the DSA roadmap: packs the built web app (../web/dist) with Capacitor",
   "scripts": {
-    "build:web": "npm --prefix ../web run build:css && node scripts/build-web.js",
+    "build:web": "npm --prefix ../web run build && node scripts/build-web.js",
     "android:sync": "npm run build:web && cap sync android",
     "android:build": "npm run android:sync && node scripts/build-android.js",
     "android:install": "npm run android:sync && node scripts/build-android.js --install"

@@ -2,24 +2,29 @@
   "version": "0.2.0",
   "configurations": [
     {
-      // Opens web/index.html straight from disk: no server, no Google Drive sync.
-      // The first time, the page asks you to pick the web/data folder.
-      "name": "Open index.html (no server)",
-      "type": "msedge",
+      // Vite dev server on http://localhost:3303: reloads on every save of src/ or data/.
+      // Google Drive sync works here too (same /api/google endpoints as the server).
+      "name": "Dev server (npm run dev)",
+      "type": "node-terminal",
       "request": "launch",
-      "file": "${workspaceFolder}/web/index.html"
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/web",
+      "serverReadyAction": {
+        "pattern": "Local:\\s+http://127\\.0\\.0\\.1:(\\d+)",
+        "uriFormat": "http://localhost:%s",
+        "action": "openExternally"
+      }
     },
     {
-      // Runs web/server.js on http://localhost:8080 (needed for Google Drive sync)
-      // and opens it in the default browser. The Stop button stops the server.
-      "name": "Run server (localhost:8080)",
-      "type": "node",
+      // Builds the app, then runs web/server/serve.ts on http://localhost:3303, like start.sh.
+      // The Stop button stops the server.
+      "name": "Build and run (localhost:3303)",
+      "type": "node-terminal",
       "request": "launch",
-      "program": "${workspaceFolder}/web/server.js",
+      "command": "npx vite build --logLevel warn && node server/serve.ts",
       "cwd": "${workspaceFolder}/web",
-      "console": "integratedTerminal",
       "serverReadyAction": {
-        // Also matches "Port 8080 is already in use", so the browser still opens
+        // Also matches "Port 3303 is already in use", so the browser still opens
         // when start.sh is already running the server.
         "pattern": "(?:App running at http://localhost:|Port )(\\d+)",
         "uriFormat": "http://localhost:%s",

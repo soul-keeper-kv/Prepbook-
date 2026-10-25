@@ -1,0 +1,7 @@
+node_modules/
+dist/
+coverage/
+package-lock.json
+# Content is hand-written JSON; keep its formatting as authored
+data/
+progress/

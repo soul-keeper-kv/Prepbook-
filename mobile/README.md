@@ -1,7 +1,7 @@
 # DSA Roadmap — app Android
 
 Đóng gói app web trong [../web](../web/README.md) thành file APK bằng Capacitor. Thư mục này không có code giao diện:
-lúc build, `scripts/build-web.js` copy app từ `web/` vào `www/`, rồi Capacitor đưa `www/` vào APK.
+lúc build, `npm run build:web` build app trong `web/` rồi `scripts/build-web.js` copy `web/dist/` vào `www/`; Capacitor đưa `www/` vào APK.
 
 ## Công cụ
 
@@ -42,7 +42,7 @@ Build trên máy khác thì khoá khác: thêm SHA-1 của máy đó vào client
 | File | Vai trò |
 | --- | --- |
 | `capacitor.config.json` | Tên app, package name, thư mục web (`www/`) |
-| `scripts/build-web.js` | Copy app từ `web/` vào `www/`. Danh sách file cần copy nằm ở đây |
+| `scripts/build-web.js` | Copy bản build `web/dist/` vào `www/` |
 | `scripts/build-android.js` | Build APK (và cài qua USB với `--install`) |
 | `android/` | Project Android do Capacitor tạo |
 | `android/app/src/main/java/dev/kienpt/dsaroadmap/GoogleDrivePlugin.java` | Lấy quyền Google Drive qua Google Play services, vì Google chặn đăng nhập trong WebView |

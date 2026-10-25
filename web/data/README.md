@@ -1,7 +1,11 @@
 # Dữ liệu của app
 
-App (`index.html`, `main.js`, `index.css`, `i18n.js`) chỉ là phần vỏ. Toàn bộ nội dung nằm trong thư mục này.
-Sửa JSON xong thì tải lại trang là thấy.
+App (`src/`) chỉ là phần vỏ. Toàn bộ nội dung nằm trong thư mục này.
+
+- Đang chạy `npm run dev`: lưu file JSON là trang tự cập nhật.
+- Chạy bằng `start.sh`: chạy lại `start.sh` (nó build lại mỗi lần).
+
+Lúc nạp, app kiểm tra từng file theo `src/content/schema.ts`. Sai định dạng (thiếu trường bắt buộc, gõ sai tên trường, URL không phải http(s), trùng `id`...) thì app hiện tên file và chỗ sai thay vì chạy với dữ liệu hỏng. `npm test` cũng kiểm tra toàn bộ thư mục này.
 
 ## Hai ngôn ngữ (vi / en)
 

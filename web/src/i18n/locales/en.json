@@ -1,0 +1,187 @@
+{
+  "app": {
+    "title": "DSA Roadmap"
+  },
+  "lang": {
+    "switch": "Language"
+  },
+  "theme": {
+    "switch": "Theme",
+    "auto": "Auto",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "stats": {
+    "progress": "Progress",
+    "items": "{{done}}/{{total}} items",
+    "current": "Current phase",
+    "allDone": "Done",
+    "solved": "Problems solved",
+    "review": "Due for review"
+  },
+  "filter": {
+    "label": "Filter items",
+    "all": "All",
+    "todo": "To do",
+    "review": "Due for review",
+    "empty": {
+      "all": "This phase has no items yet.",
+      "todo": "Everything in this phase is done.",
+      "review": "Nothing is due for review."
+    }
+  },
+  "toolbar": {
+    "expand": "Expand all",
+    "collapse": "Collapse all"
+  },
+  "type": {
+    "theory": "Theory",
+    "practice": "Practice"
+  },
+  "tag": {
+    "review": "Review due"
+  },
+  "item": {
+    "markDone": "Mark as done",
+    "problems": "{{solved}}/{{total}} problems",
+    "reviews_one": "reviewed once",
+    "reviews_other": "reviewed {{count}} times",
+    "hasNotes": "has notes"
+  },
+  "footer": {
+    "export": "Export progress",
+    "import": "Import progress",
+    "reset": "Start over"
+  },
+  "sync": {
+    "off": "Progress is saved in this browser only. Open the app with start.sh (or the Android app) to sync it through Google Drive.",
+    "setup": "Google Drive sync is not set up: add google-oauth.json to the web folder as described in README.md, then reload. Progress is kept in this browser for now.",
+    "login": "Google Drive is not connected. Progress is kept on this device; connect to share it with your other devices.",
+    "syncing": "Syncing with Google Drive…",
+    "synced": "Synced with Google Drive at {{time}}.",
+    "offline": "Couldn't reach Google Drive. Progress is still kept on this device and will sync when you're back online.",
+    "error": "Couldn't sync with Google Drive: {{message}}. Progress is still kept on this device.",
+    "badFile": "{{file}} on Drive is not a progress file (fix it, or delete it so the app creates a new one)",
+    "connect": "Connect Google Drive",
+    "retry": "Sync again"
+  },
+  "detail": {
+    "close": "Close"
+  },
+  "tab": {
+    "learn": "Learn",
+    "problems": "Problems",
+    "notes": "Notes & review"
+  },
+  "block": {
+    "description": "Description",
+    "keyPoints": "Key points",
+    "examples": "Examples",
+    "template": "Template code",
+    "complexity": "Complexity",
+    "pitfalls": "Common pitfalls",
+    "resources": "Free resources",
+    "problems": "Practice problems",
+    "moreLists": "More problem lists",
+    "notes": "Notes",
+    "code": "My code",
+    "checklist": "Self code review",
+    "history": "History"
+  },
+  "example": {
+    "input": "Input",
+    "output": "Output"
+  },
+  "resource": {
+    "article": "Article",
+    "video": "Video",
+    "course": "Course",
+    "docs": "Docs",
+    "book": "Book",
+    "visual": "Visual",
+    "practice": "Practice"
+  },
+  "learn": {
+    "empty": "No content yet. Add it to this phase's JSON file in the data folder."
+  },
+  "problems": {
+    "empty": "No problems for this item yet."
+  },
+  "problem": {
+    "solvedLabel": "Solved {{title}}"
+  },
+  "help": {
+    "toggle": "How to solve",
+    "tip": "Try on your own for about 20 minutes first. If stuck, ask the AI in “Hints only” mode; read a full solution only if you are still stuck.",
+    "read": "Read a solution",
+    "editorial": "Official editorial",
+    "solutions": "Community solutions",
+    "discussions": "Discussions",
+    "web": "Search the web",
+    "video": "Video walkthroughs",
+    "ask": "Ask AI",
+    "modeLabel": "AI answer style",
+    "mode": {
+      "hint": "Hints only",
+      "explain": "Step-by-step"
+    },
+    "open": "Open {{name}}",
+    "copy": "Copy prompt",
+    "opened": "Opened {{name}} in a new tab.",
+    "pasteHint": "The prompt is copied: if the chat box is empty, paste it (Ctrl+V) and press Enter.",
+    "copied": "Prompt copied. Paste it (Ctrl+V) into any AI chat.",
+    "copyFailed": "The browser blocked copying the prompt."
+  },
+  "prompt": {
+    "hint": "I'm teaching myself algorithms from a roadmap; this problem is in the section \"{{lesson}}\".\nI'm working on \"{{title}}\" on {{site}}: {{url}}\n\nI'm a beginner and don't know how to solve it yet. Coach me like a tutor; don't give me the solution right away:\n1. Restate the problem in simple words with one small example. If you're not sure which problem this is, ask me to paste the statement instead of guessing.\n2. Give me one small hint at a time, then stop and wait for my reply. Go from brute force to the optimal approach, and name the technique it uses.\n3. Only write full code ({{lang}}) when I ask for it.",
+    "explain": "I'm teaching myself algorithms from a roadmap; this problem is in the section \"{{lesson}}\".\nPlease explain \"{{title}}\" on {{site}}: {{url}}\n\nI'm a beginner, so walk me through it step by step:\n1. What the problem asks, in simple words, with one small example. If you're not sure which problem this is, ask me to paste the statement instead of guessing.\n2. The brute-force approach and why it is too slow.\n3. The key observation that leads to the optimal approach, and which technique that is.\n4. The algorithm step by step, traced by hand on the example from step 1.\n5. {{lang}} code with short comments.\n6. Time/space complexity and the edge cases that are easy to get wrong."
+  },
+  "notes": {
+    "placeholder": "Key idea, where you got stuck, mistakes, tricks to remember..."
+  },
+  "code": {
+    "placeholder": "Paste your solution here to review it. Tab inserts 4 spaces."
+  },
+  "copy": {
+    "label": "Copy",
+    "done": "Copied",
+    "failed": "Copy failed"
+  },
+  "history": {
+    "done": "Completed: {{date}}",
+    "review": "Review {{n}}: {{date}}",
+    "empty": "Nothing yet. Tick “Done” when you finish an item, then press “Mark reviewed today” each time you revisit it. After {{days}} days without a review, the item gets a “Review due” tag."
+  },
+  "foot": {
+    "done": "Done",
+    "lastStudied": "Last studied: {{ago}}",
+    "due": "due for review",
+    "review": "Mark reviewed today",
+    "reviewed": "Reviewed today ✓"
+  },
+  "time": {
+    "today": "today",
+    "yesterday": "yesterday",
+    "daysAgo_one": "{{count}} day ago",
+    "daysAgo_other": "{{count}} days ago"
+  },
+  "confirm": {
+    "cancel": "Cancel",
+    "importTitle": "Import progress from a file?",
+    "import": "Replace all current progress with the data in this file?",
+    "importAction": "Replace progress",
+    "resetTitle": "Start over?",
+    "reset": "Delete all progress, notes and saved code? Consider “Export progress” first as a backup.",
+    "resetAction": "Delete everything"
+  },
+  "toast": {
+    "imported": "Progress imported from the file."
+  },
+  "error": {
+    "import": "Couldn't import: {{message}}",
+    "notProgress": "this file is not a progress export from this app",
+    "invalidJson": "{{file}} is not valid JSON: {{message}}",
+    "contentTitle": "The data folder has an error",
+    "contentHint": "Fix the JSON file as described below. With npm run dev the page reloads when you save; with start.sh, run start.sh again."
+  }
+}

@@ -1,120 +1,24 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DSA Roadmap</title>
-  <!-- File do Tailwind build từ index.css, không sửa tay. Class Tailwind mới chỉ có hiệu lực sau khi build lại -->
-  <link rel="stylesheet" href="build/app.css">
-  <!-- Áp giao diện Sáng/Tối đã chọn trước khi vẽ trang để không bị nháy màu. Key giống KEY_THEME trong main.js -->
-  <script>
-    try {
-      const theme = JSON.parse(localStorage.getItem("dsa_theme"));
-      if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
-    } catch {}
-  </script>
-</head>
-<body>
-  <!-- Chữ giao diện nằm trong i18n.js (data-i18n = key), nội dung lộ trình nằm trong data/ -->
-  <main class="mx-auto max-w-190 px-4 pt-8 pb-16">
-    <div class="-mt-4 mb-6 flex flex-wrap items-center justify-end gap-2">
-      <!-- Dòng lệnh trang trí, giống dấu nhắc của terminal -->
-      <span class="mr-auto font-mono text-13 text-fg-2" aria-hidden="true">
-        <span class="text-ok-fill">❯</span> ~/<span class="text-fg">dsa-roadmap</span>
-      </span>
-      <div id="theme-switch" class="switch" role="group" data-i18n-aria="theme.switch">
-        <button type="button" data-set-theme="auto" data-i18n="theme.auto"></button>
-        <button type="button" data-set-theme="light" data-i18n="theme.light"></button>
-        <button type="button" data-set-theme="dark" data-i18n="theme.dark"></button>
-      </div>
-      <div id="lang-switch" class="switch" role="group" data-i18n-aria="lang.switch"></div>
-    </div>
-
-    <!-- Hiện khi không đọc được thư mục data (thường do mở thẳng file index.html) -->
-    <section id="loader" class="max-w-155" hidden>
-      <h1 class="mb-1 font-mono text-24 font-semibold" data-i18n="loader.title"></h1>
-      <p class="my-4" data-i18n-html="loader.intro"></p>
-      <ol class="mt-3 mb-5 list-decimal space-y-2 pl-5 marker:font-mono marker:text-syn-keyword">
-        <li data-i18n-html="loader.server"></li>
-        <li data-i18n-html="loader.picker"></li>
-      </ol>
-      <label class="btn btn-primary">
-        <span data-i18n="loader.pick"></span>
-        <input type="file" id="data-picker" webkitdirectory multiple hidden>
-      </label>
-      <p id="loader-error" class="my-4 rounded-sm border border-danger/40 bg-danger-bg px-3 py-2.5 font-mono text-13 whitespace-pre-wrap text-danger" hidden></p>
-    </section>
-
-    <div id="app" hidden>
-      <header class="mb-6">
-        <!-- after: con trỏ nhấp nháy như terminal -->
-        <h1 id="title" class="mb-1.5 font-mono text-24 leading-tight font-semibold
-          after:ml-1.5 after:inline-block after:h-[.95em] after:w-[.5em] after:translate-y-[.12em] after:animate-blink after:bg-accent after:content-['']
-          motion-reduce:after:animate-none"></h1>
-        <!-- Viết như 1 dòng comment trong code -->
-        <p id="subtitle" class="font-mono text-13 text-syn-comment before:content-['//_']"></p>
-      </header>
-
-      <section class="mb-5 grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3">
-        <div class="rounded-md border border-line bg-card px-3.5 py-3">
-          <div class="label" data-i18n="stats.progress"></div>
-          <div class="mt-1 font-mono text-24 leading-tight font-semibold text-syn-number" id="stat-pct">0%</div>
-          <div class="mt-2 h-1 overflow-hidden rounded-full bg-line-strong">
-            <div class="h-full rounded-full bg-ok-fill transition-[width] duration-300" id="stat-bar" style="width:0%"></div>
-          </div>
-          <div class="mt-1.5 font-mono text-12 text-fg-2" id="stat-done"></div>
-        </div>
-        <div class="rounded-md border border-line bg-card px-3.5 py-3">
-          <div class="label" data-i18n="stats.current"></div>
-          <div class="mt-1 font-mono text-24 leading-tight font-semibold text-syn-type" id="stat-current">0</div>
-        </div>
-        <div class="rounded-md border border-line bg-card px-3.5 py-3">
-          <div class="label" data-i18n="stats.solved"></div>
-          <div class="mt-1 font-mono text-24 leading-tight font-semibold text-syn-function" id="stat-solved">0</div>
-        </div>
-        <div class="rounded-md border border-line bg-card px-3.5 py-3">
-          <div class="label" data-i18n="stats.review"></div>
-          <div class="mt-1 font-mono text-24 leading-tight font-semibold text-warn" id="stat-review">0</div>
-        </div>
-      </section>
-
-      <nav class="mb-3 flex flex-wrap items-center gap-2">
-        <div class="switch" role="group" data-i18n-aria="filter.label">
-          <button type="button" data-filter="all" data-i18n="filter.all"></button>
-          <button type="button" data-filter="todo" data-i18n="filter.todo"></button>
-          <button type="button" data-filter="review" data-i18n="filter.review"></button>
-        </div>
-        <button type="button" class="btn btn-sm py-0.75" id="btn-expand"></button>
-        <span class="ml-auto inline-flex gap-1.5 text-12 max-sm:ml-0">
-          <span class="tag bg-accent-bg text-accent" data-i18n="type.theory"></span>
-          <span class="tag bg-ok-bg text-ok" data-i18n="type.practice"></span>
-        </span>
-      </nav>
-
-      <div id="phases"></div>
-
-      <footer class="mt-6 flex flex-wrap items-center gap-2 border-t border-line pt-4">
-        <!-- Chấm màu theo trạng thái đồng bộ (data-status, đặt trong renderSyncStatus của main.js) -->
-        <p id="sync-status" class="mb-1 flex basis-full items-center gap-2 font-mono text-12 text-fg-2
-          before:size-2 before:shrink-0 before:rounded-full before:bg-muted before:content-['']
-          data-[status=synced]:before:bg-ok-fill data-[status=syncing]:before:animate-pulse data-[status=syncing]:before:bg-accent
-          data-warn:text-warn data-warn:before:bg-warn"></p>
-        <!-- Kết nối / đồng bộ lại Google Drive; chữ trên nút đổi theo trạng thái (renderSyncStatus trong main.js) -->
-        <button type="button" class="btn btn-primary" id="btn-drive" hidden></button>
-        <button type="button" class="btn" id="btn-export" data-i18n="footer.export"></button>
-        <button type="button" class="btn" id="btn-import" data-i18n="footer.import"></button>
-        <button type="button" class="btn" id="btn-reload-data" data-i18n="footer.reloadData" hidden></button>
-        <button type="button" class="btn ml-auto hover:border-danger hover:text-danger" id="btn-reset" data-i18n="footer.reset"></button>
-        <input type="file" id="import-picker" accept=".json,application/json" hidden>
-      </footer>
-    </div>
-  </main>
-
-  <dialog id="detail" class="m-auto h-[min(820px,calc(100dvh-48px))] w-[min(860px,calc(100vw-32px))] max-h-none max-w-none overflow-hidden rounded-lg border border-line-strong bg-card text-fg shadow-[0_16px_48px_rgba(0,0,0,.35)] backdrop:bg-black/50 max-sm:m-0 max-sm:h-dvh max-sm:w-screen max-sm:rounded-none max-sm:border-0" aria-labelledby="detail-title">
-    <div id="detail-body" class="flex h-full flex-col"></div>
-  </dialog>
-
-  <script src="i18n.js"></script>
-  <script src="main.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>DSA Roadmap</title>
+    <!-- Apply the saved light/dark theme before the first paint, so the page does not flash.
+         Same key and values as src/lib/theme.ts. -->
+    <script>
+      try {
+        var theme = JSON.parse(localStorage.getItem("dsa_theme"))
+        var dark =
+          theme === "dark" ||
+          (theme !== "light" && matchMedia("(prefers-color-scheme: dark)").matches)
+        document.documentElement.classList.add(dark ? "dark" : "light")
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>

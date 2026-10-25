@@ -1,4 +1,7 @@
 node_modules/
+dist/
+coverage/
+*.tsbuildinfo
 
 # Google sign-in secrets: the OAuth client and the refresh token saved after signing in
 google-oauth.json
