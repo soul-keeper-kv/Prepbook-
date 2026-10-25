@@ -1,6 +1,7 @@
 {
   "app": {
-    "title": "DSA Roadmap"
+    "title": "Interview Prep",
+    "loading": "Loading…"
   },
   "lang": {
     "switch": "Language"
@@ -11,153 +12,543 @@
     "light": "Light",
     "dark": "Dark"
   },
-  "stats": {
-    "progress": "Progress",
-    "items": "{{done}}/{{total}} items",
-    "current": "Current phase",
-    "allDone": "Done",
-    "solved": "Problems solved",
-    "review": "Due for review"
+  "nav": {
+    "main": "Main navigation",
+    "breadcrumb": "Location",
+    "today": "Today",
+    "inbox": "Inbox",
+    "review": "Review",
+    "topics": "Topics",
+    "graph": "Graph",
+    "search": "Search",
+    "settings": "Settings"
   },
-  "filter": {
-    "label": "Filter items",
-    "all": "All",
-    "todo": "To do",
-    "review": "Due for review",
-    "empty": {
-      "all": "This phase has no items yet.",
-      "todo": "Everything in this phase is done.",
-      "review": "Nothing is due for review."
-    }
+  "tree": {
+    "title": "Topics and patterns",
+    "label": "Topics, phases and patterns. Drag and drop to reorder the roadmap.",
+    "due_one": "{{count}} item due for review",
+    "due_other": "{{count}} items due for review"
   },
-  "toolbar": {
-    "expand": "Expand all",
-    "collapse": "Collapse all"
+  "level": {
+    "0": "Not started",
+    "1": "Learning",
+    "2": "Got it",
+    "3": "Mastered",
+    "none": "No patterns yet"
   },
-  "type": {
-    "theory": "Theory",
-    "practice": "Practice"
+  "mastery": {
+    "practice": {
+      "0": "Not started: write a few lines of notes or add a first problem.",
+      "1": "Learning: solve {{alone}}/{{need}} problems on your own to reach “Got it”.",
+      "2": "Got it: {{alone}} problems solved on your own. Redo {{need}} of them alone in a review (at least {{gap}} days after the first try) to master it: {{reviewed}}/{{need}}.",
+      "3": "Mastered: {{reviewed}} problems redone alone in reviews, nothing overdue."
+    },
+    "theory": {
+      "0": "Not started: write notes, then tick “Done learning” when you are through.",
+      "1": "Learning: tick “Done learning” once you know the theory.",
+      "2": "Done learning. Get every Q&A card to “Solid” to master it.",
+      "3": "Mastered: every Q&A card is solid."
+    },
+    "dropped": "Dropped one level: a review is {{days}} days overdue. Catch up to get it back.",
+    "due_one": "{{count}} item due for review.",
+    "due_other": "{{count}} items due for review."
   },
-  "tag": {
-    "review": "Review due"
+  "outcome": {
+    "alone": "Solved alone",
+    "hint": "Needed a hint",
+    "solution": "Read the solution",
+    "todo": "Not tried"
   },
-  "item": {
-    "markDone": "Mark as done",
-    "problems": "{{solved}}/{{total}} problems",
-    "reviews_one": "reviewed once",
-    "reviews_other": "reviewed {{count}} times",
-    "hasNotes": "has notes"
+  "mistake": {
+    "pattern": "Did not recognise the pattern",
+    "boundary": "Boundary, off-by-one",
+    "edge": "Missed an edge case",
+    "complexity": "Wrong complexity, TLE",
+    "bug": "Bug in the implementation",
+    "api": "Forgot syntax or API"
   },
-  "footer": {
-    "export": "Export progress",
-    "import": "Import progress",
-    "reset": "Start over"
+  "grade": {
+    "forgot": "Forgot",
+    "fuzzy": "Fuzzy",
+    "solid": "Solid"
   },
-  "sync": {
-    "off": "Progress is saved in this browser only. Open the app with start.sh (or the Android app) to sync it through Google Drive.",
-    "setup": "Google Drive sync is not set up: add google-oauth.json to the web folder as described in README.md, then reload. Progress is kept in this browser for now.",
-    "login": "Google Drive is not connected. Progress is kept on this device; connect to share it with your other devices.",
-    "syncing": "Syncing with Google Drive…",
-    "synced": "Synced with Google Drive at {{time}}.",
-    "offline": "Couldn't reach Google Drive. Progress is still kept on this device and will sync when you're back online.",
-    "error": "Couldn't sync with Google Drive: {{message}}. Progress is still kept on this device.",
-    "badFile": "{{file}} on Drive is not a progress file (fix it, or delete it so the app creates a new one)",
-    "connect": "Connect Google Drive",
-    "retry": "Sync again"
+  "problemLevel": {
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard"
   },
-  "detail": {
-    "close": "Close"
-  },
-  "tab": {
-    "learn": "Learn",
-    "problems": "Problems",
-    "notes": "Notes & review"
-  },
-  "block": {
-    "description": "Description",
-    "keyPoints": "Key points",
-    "examples": "Examples",
-    "template": "Template code",
-    "complexity": "Complexity",
-    "pitfalls": "Common pitfalls",
-    "resources": "Free resources",
-    "problems": "Practice problems",
-    "moreLists": "More problem lists",
-    "notes": "Notes",
-    "code": "My code",
-    "checklist": "Self code review",
-    "history": "History"
-  },
-  "example": {
-    "input": "Input",
-    "output": "Output"
-  },
-  "resource": {
+  "resourceKind": {
     "article": "Article",
     "video": "Video",
     "course": "Course",
     "docs": "Docs",
     "book": "Book",
-    "visual": "Visual",
-    "practice": "Practice"
+    "other": "Other"
   },
-  "learn": {
-    "empty": "No content yet. Add it to this phase's JSON file in the data folder."
+  "topicKind": {
+    "dsa": "Algorithms (recognition, template, pitfalls)",
+    "concept": "Knowledge (what, how it works, when to use)",
+    "design": "System design (requirements, estimates, design, trade-offs)",
+    "story": "Behavioral (STAR stories)"
   },
-  "problems": {
-    "empty": "No problems for this item yet."
+  "topicColor": {
+    "blue": "Blue",
+    "orange": "Orange",
+    "teal": "Teal",
+    "purple": "Purple",
+    "green": "Green",
+    "pink": "Pink",
+    "gray": "Grey"
+  },
+  "section": {
+    "empty": "Nothing written yet.",
+    "recognition": {
+      "title": "Recognition",
+      "hint": "Signals in a problem statement that call for this pattern",
+      "placeholder": "- Asks about a contiguous subarray / substring\n- Longest / shortest one meeting a condition"
+    },
+    "idea": {
+      "title": "Idea",
+      "hint": "The core idea, in your own words",
+      "placeholder": "Two pointers both move right: right grows the window, left shrinks it when it breaks…"
+    },
+    "template": {
+      "title": "Template code",
+      "hint": "A skeleton you can rewrite without looking",
+      "placeholder": "```java\nint left = 0;\nfor (int right = 0; right < n; right++) {\n    // ...\n}\n```"
+    },
+    "pitfalls": {
+      "title": "Pitfalls I hit",
+      "hint": "Mistakes you made, with the problem's name",
+      "placeholder": "- Used if instead of while to shrink the window (Longest Repeating Character Replacement)"
+    },
+    "what": {
+      "title": "What it is",
+      "hint": "A short definition, like the opening answer in an interview",
+      "placeholder": "HashMap is a hash table: key -> bucket by hash…"
+    },
+    "how": {
+      "title": "How it works",
+      "hint": "What happens inside, with an example or code",
+      "placeholder": "- hash(key) & (n - 1) picks the bucket\n- Past load factor 0.75 it doubles"
+    },
+    "when": {
+      "title": "When to use it, trade-offs",
+      "hint": "When to pick it, when not to, compared with the alternatives",
+      "placeholder": "Use when… Avoid when… Compared with TreeMap…"
+    },
+    "requirements": {
+      "title": "Requirements",
+      "hint": "Functional and non-functional (latency, availability, consistency)",
+      "placeholder": "- Shorten a link, redirect\n- 100M links/day, 100x more reads than writes"
+    },
+    "estimates": {
+      "title": "Estimates",
+      "hint": "QPS, storage, bandwidth",
+      "placeholder": "Writes: 100M/day ≈ 1.2k QPS…"
+    },
+    "design": {
+      "title": "High-level design",
+      "hint": "The main blocks and how data flows",
+      "placeholder": "Client -> LB -> API -> cache -> DB…"
+    },
+    "deepDive": {
+      "title": "Deep dive",
+      "hint": "The hardest part: id generation, sharding, caching…",
+      "placeholder": "Short id: base62 of a counter…"
+    },
+    "tradeoffs": {
+      "title": "Trade-offs",
+      "hint": "What you chose, what you gave up, and why",
+      "placeholder": "Eventual consistency, because…"
+    },
+    "situation": {
+      "title": "Situation",
+      "hint": "Context: project, team, timing",
+      "placeholder": "A team of five, close to a release…"
+    },
+    "task": {
+      "title": "Task",
+      "hint": "Your job, the goal",
+      "placeholder": "I was responsible for…"
+    },
+    "action": {
+      "title": "Action",
+      "hint": "What you did, concretely",
+      "placeholder": "I…"
+    },
+    "result": {
+      "title": "Result",
+      "hint": "A measurable result, and the lesson",
+      "placeholder": "Cut the time by 40%…"
+    },
+    "questions": {
+      "title": "Answers these questions",
+      "hint": "Interview questions this story answers",
+      "placeholder": "- Tell me about a disagreement with a teammate\n- Tell me about a time you were wrong"
+    }
+  },
+  "edit": {
+    "rename": "Rename: {{name}}",
+    "edit": "Edit",
+    "editNamed": "Edit: {{name}}",
+    "write": "Write",
+    "done": "Done",
+    "save": "Save",
+    "markdownHint": "Markdown: - lists, **bold**, `code`, ```java for code blocks. Saved as you type.",
+    "moveUp": "Move up: {{name}}",
+    "moveDown": "Move down: {{name}}"
+  },
+  "picker": {
+    "filter": "Filter patterns…",
+    "none": "No pattern matches. Create patterns on a topic page first."
+  },
+  "today": {
+    "title_one": "Today: {{count}} task, about {{time}}",
+    "title_other": "Today: {{count}} tasks, about {{time}}",
+    "titleEmpty": "Nothing due today",
+    "start": "Start reviewing",
+    "streak": "Study streak",
+    "streakUnit": "days in a row",
+    "due": "Due today",
+    "overdue_one": "{{count}} task overdue",
+    "overdue_other": "{{count}} tasks overdue",
+    "solvedAlone": "Solved alone",
+    "solvedAloneUnit": "problems",
+    "week": "Last 7 days",
+    "weekUnit": "problems tried and cards reviewed",
+    "tasks": "Today's tasks",
+    "empty": "Nothing is due. Add problems to a pattern, or paste a link you just found into the Inbox.",
+    "cardsTask_one": "Review {{count}} Q&A card",
+    "cardsTask_other": "Review {{count}} Q&A cards",
+    "continueTask": "Keep going: {{name}}",
+    "inbox_one": "Inbox · {{count}}",
+    "inbox_other": "Inbox · {{count}}",
+    "openInbox": "Open inbox",
+    "activity": "Activity",
+    "activityLabel_one": "Study calendar for the last {{weeks}} weeks: {{count}} problem tried or card reviewed",
+    "activityLabel_other": "Study calendar for the last {{weeks}} weeks: {{count}} problems tried and cards reviewed",
+    "activitySummary_one": "{{count}} problem tried or card reviewed in {{weeks}} weeks",
+    "activitySummary_other": "{{count}} problems tried and cards reviewed in {{weeks}} weeks",
+    "topics": "Topics"
+  },
+  "topics": {
+    "intro": "Topics, phases and patterns. Drag a row to reorder the roadmap."
+  },
+  "topic": {
+    "name": "Topic name",
+    "new": "New topic",
+    "add": "Add topic",
+    "namePlaceholder": "For example: Computer networks",
+    "settings": "Topic settings",
+    "kind": "Kind of notes",
+    "kindHint": "The kind sets the sections of its pattern pages. Changing it deletes nothing: old notes stay, only hidden.",
+    "color": "Colour",
+    "delete": "Delete topic",
+    "deleteTitle": "Delete the topic “{{name}}”?",
+    "deleteText": "Also deletes its phases and patterns, and the problems, material and Q&A cards that are only in this topic.",
+    "deleteAction": "Delete topic",
+    "roadmap": "Roadmap",
+    "counts": "{{done}}/{{total}} patterns got · {{solved}} problems solved alone",
+    "next": "Next: {{name}}",
+    "allGotIt": "Every pattern got",
+    "noPatterns": "No patterns yet"
+  },
+  "phase": {
+    "name": "Phase name",
+    "none": "In no phase",
+    "add": "Add phase",
+    "namePlaceholder": "For example: Phase 2 · Data structures",
+    "progress": "{{done}}/{{total}} got",
+    "delete": "Delete phase {{name}}",
+    "deleteTitle": "Delete the phase “{{name}}”?",
+    "deleteText": "Its patterns stay, moved to “In no phase”.",
+    "deleteAction": "Delete phase"
+  },
+  "pattern": {
+    "name": "Pattern name",
+    "add": "Add pattern",
+    "namePlaceholder": "For example: Sliding Window",
+    "theory": "theory",
+    "theoryToggle": "Pure theory (no problems)",
+    "theoryDone": "Done learning the theory",
+    "due_one": "{{count}} due",
+    "due_other": "{{count}} due",
+    "problemCount_one": "{{count}} problem",
+    "problemCount_other": "{{count}} problems",
+    "delete": "Delete",
+    "deleteTitle": "Delete the pattern “{{name}}”?",
+    "deleteText": "Deletes its notes and Q&A cards, and the problems and material that are in no other pattern.",
+    "deleteAction": "Delete pattern",
+    "problems": "Problems done",
+    "problemsHint": "Problems you found and solved; log each attempt on the problem's page",
+    "resources": "Material read",
+    "resourcesHint": "Links, with what you took away",
+    "cards": "My interview questions",
+    "cardsHint": "Become review cards: answer aloud before revealing",
+    "requires": "Learn first",
+    "requiresEmpty": "Nothing to learn first.",
+    "related": "Related patterns",
+    "relatedEmpty": "Not linked to any pattern yet."
   },
   "problem": {
-    "solvedLabel": "Solved {{title}}"
+    "url": "Problem link",
+    "urlPlaceholder": "https://leetcode.com/problems/…",
+    "title": "Problem name",
+    "titlePlaceholder": "Name (empty: taken from the link)",
+    "level": "Level",
+    "add": "Add problem",
+    "added": "Problem added.",
+    "logNow": "Log attempt",
+    "none": "No problems yet. Find one that trains this pattern and paste its link here.",
+    "colProblem": "Problem",
+    "colLevel": "Level",
+    "colLast": "Last attempt",
+    "colRedo": "Redo",
+    "colActions": "Actions",
+    "inPatterns_one": "in {{count}} pattern",
+    "inPatterns_other": "in {{count}} patterns",
+    "unlink": "Remove {{name}} from the pattern",
+    "unlinkTitle": "Remove “{{name}}” from this pattern?",
+    "unlinkText": "It stays in its other patterns, with its attempts.",
+    "unlinkLastText": "This is its last pattern: the problem is deleted, with its attempts.",
+    "unlinkAction": "Remove",
+    "scheduleHint": "Redo after 1 day if you read the solution, after 3 days if you needed a hint; solved alone, the gap grows: 7, 14, 30, 60 days.",
+    "open": "Open problem",
+    "delete": "Delete problem",
+    "deleteTitle": "Delete the problem “{{name}}”?",
+    "deleteText": "Removes it from every pattern, with its attempts and notes.",
+    "deleteAction": "Delete problem",
+    "redo": "Redo: {{when}}",
+    "notTried": "Not tried yet",
+    "patterns": "Patterns:",
+    "editPatterns": "Edit patterns",
+    "notes": "Notes",
+    "notesPlaceholder": "What to remember about this problem, beyond any one attempt",
+    "notesEmpty": "No notes yet."
+  },
+  "attempt": {
+    "title": "Log this attempt",
+    "outcomeQuestion": "How did it go this time?",
+    "outcomeHint": {
+      "alone": "Looked at nothing",
+      "hint": "Read a hint or asked an AI",
+      "solution": "Had to read the solution"
+    },
+    "minutes": "Minutes",
+    "mistakes": "What went wrong",
+    "note": "Notes on this attempt",
+    "notePlaceholder": "Where you got stuck, which hint unlocked it, what to remember next time",
+    "code": "Code",
+    "lang": "Language",
+    "codePlaceholder": "Paste your solution. Tab inserts 4 spaces.",
+    "save": "Save attempt",
+    "pickOutcome": "Pick how it went first.",
+    "saved": "Saved. Redo: {{when}}.",
+    "history_one": "History · {{count}} attempt",
+    "history_other": "History · {{count}} attempts",
+    "none": "Not tried yet.",
+    "imported": "from the old app",
+    "importedOn": "Carried over from the old app, solved on {{date}}",
+    "noNote": "No notes.",
+    "noCode": "No code.",
+    "editCode": "Edit code",
+    "addCode": "Add code",
+    "delete": "Delete this attempt",
+    "deleteTitle": "Delete this attempt?",
+    "deleteText": "The review date and the pattern's level are worked out again without it.",
+    "deleteAction": "Delete"
+  },
+  "resource": {
+    "url": "Material link",
+    "urlPlaceholder": "https://…",
+    "title": "Name",
+    "titlePlaceholder": "Name (empty: taken from the link)",
+    "kindLabel": "Kind",
+    "add": "Add material",
+    "none": "No material yet.",
+    "unlink": "Remove {{name}} from the pattern",
+    "takeaway": "What I took away from {{name}}",
+    "takeawayPlaceholder": "1-2 lines you took away from it",
+    "takeawayEmpty": "No takeaway written yet."
+  },
+  "card": {
+    "question": "Question",
+    "questionPlaceholder": "For example: how does Sliding Window differ from Two Pointers?",
+    "answer": "Your answer",
+    "answerPlaceholder": "Answer as you would in the interview, briefly",
+    "add": "Add card",
+    "none": "No cards yet.",
+    "show": "Show the answer",
+    "hide": "Hide the answer",
+    "edit": "Edit card",
+    "delete": "Delete card",
+    "nextReview": "Next review: {{when}}",
+    "reviewed_one": "reviewed {{count}} time",
+    "reviewed_other": "reviewed {{count}} times"
+  },
+  "inbox": {
+    "intro": "Paste a link to a problem or some material you just found. File it under a pattern later, once read or solved.",
+    "url": "Link",
+    "urlPlaceholder": "Paste a link to a problem or material",
+    "title": "Name",
+    "titlePlaceholder": "Name (optional)",
+    "add": "Add to inbox",
+    "added": "Added to the inbox.",
+    "known": "Known problem: {{title}} · {{level}}",
+    "empty": "The inbox is empty.",
+    "asProblem": "As a problem",
+    "asResource": "As material",
+    "delete": "Delete {{name}}",
+    "patterns": "In patterns",
+    "pickPattern": "Pick at least one pattern.",
+    "save": "Save",
+    "filedProblem": "Filed as a problem.",
+    "filedResource": "Filed as material.",
+    "open": "Open"
+  },
+  "review": {
+    "intro": "Problems due to be redone and Q&A cards due for review, from every topic.",
+    "problems_one": "Problems to redo · {{count}}",
+    "problems_other": "Problems to redo · {{count}}",
+    "cards_one": "Q&A cards · {{count}}",
+    "cards_other": "Q&A cards · {{count}}",
+    "noProblems": "No problem is due.",
+    "noCards": "No card is due.",
+    "cardsDone_one": "Done! {{count}} card reviewed.",
+    "cardsDone_other": "Done! {{count}} cards reviewed.",
+    "lastTime": "last time",
+    "redo": "Redo",
+    "left_one": "{{count}} card left",
+    "left_other": "{{count}} cards left",
+    "reveal": "I answered: show my answer",
+    "noAnswer": "This card has no answer yet.",
+    "gradePrompt": "How far did you get just now?",
+    "nextIn_one": "back in {{count}} day",
+    "nextIn_other": "back in {{count}} days",
+    "rules": "Problems: read the solution, redo after 1 day; needed a hint, after 3 days; solved alone, the gap grows. More than 7 days overdue drops the pattern one level."
+  },
+  "due": {
+    "none": "not scheduled",
+    "today": "today",
+    "late_one": "{{count}} day late",
+    "late_other": "{{count}} days late",
+    "in_one": "in {{count}} day",
+    "in_other": "in {{count}} days"
+  },
+  "duration": {
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "hours_one": "{{count}} h",
+    "hours_other": "{{count}} h",
+    "hoursMinutes": "{{h}} h {{m}} min"
+  },
+  "suggest": {
+    "title": "Suggestions from the old DSA roadmap",
+    "roadmapIntro": "The old roadmap is only a suggestion now: Add turns an item into an (empty) pattern of yours, and its problems and material show on the pattern page for you to pick.",
+    "patternIntro": "Added to the pattern only when you click.",
+    "left_one": "{{count}} not added",
+    "left_other": "{{count}} not added",
+    "add": "Add",
+    "addNamed": "Add {{name}}",
+    "added": "Added"
+  },
+  "graph": {
+    "intro": "Each dot is a topic, a pattern or a problem. The more solid a pattern, the better you know it; arrows mean “learn first”. Click a dot to open it.",
+    "showProblems": "Show problems",
+    "label": "Graph of {{patterns}} patterns",
+    "legend": "Scroll to zoom, drag to move. The same as a list: the Topics page."
+  },
+  "search": {
+    "label": "Search the notes",
+    "placeholder": "Search patterns, problems, notes, material…",
+    "hint": "Searches the names and notes of every pattern, problem, attempt and material. Accents are optional.",
+    "none": "Nothing found.",
+    "kind": {
+      "topic": "topic",
+      "pattern": "pattern",
+      "problem": "problem",
+      "resource": "material"
+    }
+  },
+  "conflict": {
+    "title": "Notes edited on two devices",
+    "intro": "The same note was edited on two devices before they synced. The later edit is shown; the other one is kept here for you to pick back.",
+    "row": "{{field}} · version from {{date}}",
+    "show": "Show",
+    "hide": "Hide",
+    "restore": "Use this one",
+    "dismiss": "Dismiss",
+    "field": {
+      "note": "Attempt notes",
+      "code": "Attempt code",
+      "takeaway": "Takeaway",
+      "question": "Question",
+      "answer": "Answer",
+      "notes": "Notes"
+    }
+  },
+  "settings": {
+    "look": "Theme and language",
+    "langHint": "The language only changes the app's own text. Your notes stay as you wrote them.",
+    "sync": "Google Drive sync",
+    "data": "Data",
+    "dataHint": "Export to a JSON file as a backup. Imports an exported file, the file on Drive, and the old app's “Export progress” file.",
+    "export": "Export data",
+    "import": "Import data",
+    "reset": "Start over"
+  },
+  "sync": {
+    "off": "Saved in this browser only. Open the app with start.sh (or the Android app) to sync through Google Drive.",
+    "setup": "Google Drive sync is not set up: add google-oauth.json to the web folder as README.md explains, then reload. Your data is saved in this browser.",
+    "login": "Not connected to Google Drive. Your data is saved on this device; connect to share it with your other devices.",
+    "syncing": "Syncing with Google Drive…",
+    "synced": "Synced with Google Drive at {{time}}.",
+    "offline": "Cannot reach Google Drive. Your data is still saved on this device and syncs once back online.",
+    "error": "Could not sync with Google Drive: {{message}}. Your data is still saved on this device.",
+    "badFile": "{{file}} on Drive is not in the expected format (fix it, or delete it so the app creates a new one)",
+    "connect": "Connect Google Drive",
+    "retry": "Sync again",
+    "short": {
+      "off": "This device only",
+      "setup": "Sync not set up",
+      "login": "Drive not connected",
+      "syncing": "Syncing…",
+      "synced": "Synced {{time}}",
+      "offline": "Drive unreachable",
+      "error": "Sync error"
+    }
   },
   "help": {
-    "toggle": "How to solve",
-    "tip": "Try on your own for about 20 minutes first. If stuck, ask the AI in “Hints only” mode; read a full solution only if you are still stuck.",
+    "toggle": "Stuck? Get a hint",
+    "tip": "Think on your own for about 20 minutes first. Stuck: ask an AI in “Hints only” mode; still stuck: read the solution. Using this panel makes the attempt “Needed a hint” or “Read the solution”.",
     "read": "Read a solution",
     "editorial": "Official editorial",
     "solutions": "Community solutions",
-    "discussions": "Discussions",
+    "discussions": "Discussion",
     "web": "Search the web",
-    "video": "Video walkthroughs",
-    "ask": "Ask AI",
-    "modeLabel": "AI answer style",
+    "video": "Video explanation",
+    "ask": "Ask an AI",
+    "modeLabel": "How the AI answers",
     "mode": {
       "hint": "Hints only",
-      "explain": "Step-by-step"
+      "explain": "Step by step"
     },
     "open": "Open {{name}}",
     "copy": "Copy prompt",
     "opened": "Opened {{name}} in a new tab.",
-    "pasteHint": "The prompt is copied: if the chat box is empty, paste it (Ctrl+V) and press Enter.",
-    "copied": "Prompt copied. Paste it (Ctrl+V) into any AI chat.",
-    "copyFailed": "The browser blocked copying the prompt."
+    "pasteHint": "The prompt was copied: if the chat box is empty, paste it (Ctrl+V) and press Enter.",
+    "copied": "Prompt copied. Paste it (Ctrl+V) into the AI you use.",
+    "copyFailed": "The browser did not allow copying the prompt."
   },
   "prompt": {
-    "hint": "I'm teaching myself algorithms from a roadmap; this problem is in the section \"{{lesson}}\".\nI'm working on \"{{title}}\" on {{site}}: {{url}}\n\nI'm a beginner and don't know how to solve it yet. Coach me like a tutor; don't give me the solution right away:\n1. Restate the problem in simple words with one small example. If you're not sure which problem this is, ask me to paste the statement instead of guessing.\n2. Give me one small hint at a time, then stop and wait for my reply. Go from brute force to the optimal approach, and name the technique it uses.\n3. Only write full code ({{lang}}) when I ask for it.",
-    "explain": "I'm teaching myself algorithms from a roadmap; this problem is in the section \"{{lesson}}\".\nPlease explain \"{{title}}\" on {{site}}: {{url}}\n\nI'm a beginner, so walk me through it step by step:\n1. What the problem asks, in simple words, with one small example. If you're not sure which problem this is, ask me to paste the statement instead of guessing.\n2. The brute-force approach and why it is too slow.\n3. The key observation that leads to the optimal approach, and which technique that is.\n4. The algorithm step by step, traced by hand on the example from step 1.\n5. {{lang}} code with short comments.\n6. Time/space complexity and the edge cases that are easy to get wrong."
-  },
-  "notes": {
-    "placeholder": "Key idea, where you got stuck, mistakes, tricks to remember..."
-  },
-  "code": {
-    "placeholder": "Paste your solution here to review it. Tab inserts 4 spaces."
+    "hint": "I'm practising for interviews by pattern; this problem belongs to the pattern \"{{lesson}}\".\nI'm working on \"{{title}}\" on {{site}}: {{url}}\n\nGuide me like a teacher, without giving the solution away:\n1. Restate the problem in simple words, with one small example. If you are not sure which problem this is, ask me to paste the statement rather than guessing.\n2. Give one small hint at a time, then stop and wait for my answer. Go from brute force to the optimal approach.\n3. Only write complete code ({{lang}}) when I ask for it.",
+    "explain": "I'm practising for interviews by pattern; this problem belongs to the pattern \"{{lesson}}\".\nPlease explain \"{{title}}\" on {{site}}: {{url}}\n\nExplain it step by step:\n1. What the problem asks, in simple words, with one small example. If you are not sure which problem this is, ask me to paste the statement rather than guessing.\n2. The brute-force approach and why it is too slow.\n3. The key observation that leads to the optimal approach, and why it is this pattern.\n4. The algorithm's steps, traced by hand on the example from step 1.\n5. {{lang}} code with short comments.\n6. Time/space complexity and the edge cases that are easy to get wrong."
   },
   "copy": {
     "label": "Copy",
     "done": "Copied",
     "failed": "Copy failed"
-  },
-  "history": {
-    "done": "Completed: {{date}}",
-    "review": "Review {{n}}: {{date}}",
-    "empty": "Nothing yet. Tick “Done” when you finish an item, then press “Mark reviewed today” each time you revisit it. After {{days}} days without a review, the item gets a “Review due” tag."
-  },
-  "foot": {
-    "done": "Done",
-    "lastStudied": "Last studied: {{ago}}",
-    "due": "due for review",
-    "review": "Mark reviewed today",
-    "reviewed": "Reviewed today ✓"
   },
   "time": {
     "today": "today",
@@ -165,23 +556,28 @@
     "daysAgo_one": "{{count}} day ago",
     "daysAgo_other": "{{count}} days ago"
   },
+  "notFound": {
+    "title": "This page does not exist",
+    "back": "Back to Today"
+  },
   "confirm": {
     "cancel": "Cancel",
-    "importTitle": "Import progress from a file?",
-    "import": "Replace all current progress with the data in this file?",
-    "importAction": "Replace progress",
+    "importTitle": "Import data from the file?",
+    "import": "Replace all current data with the file's? Anything not in the file is deleted, on every synced device too.",
+    "importOld": "This file is progress from the old app. Its ticked items, notes, code and solved problems are added as patterns and problems; current data is kept.",
+    "importAction": "Import",
     "resetTitle": "Start over?",
-    "reset": "Delete all progress, notes and saved code? Consider “Export progress” first as a backup.",
+    "reset": "Delete every pattern, problem, note, material and Q&A card, on every synced device too? Use “Export data” first to keep a backup.",
     "resetAction": "Delete everything"
   },
   "toast": {
-    "imported": "Progress imported from the file."
+    "imported": "Data imported from the file."
   },
   "error": {
-    "import": "Couldn't import: {{message}}",
-    "notProgress": "this file is not a progress export from this app",
+    "import": "Could not import: {{message}}",
+    "notNotebook": "the file is not an export of this app",
     "invalidJson": "{{file}} is not valid JSON: {{message}}",
-    "contentTitle": "The data folder has an error",
-    "contentHint": "Fix the JSON file as described below. With npm run dev the page reloads when you save; with start.sh, run start.sh again."
+    "contentTitle": "The files in the data folder have errors",
+    "contentHint": "Fix the JSON file as the message below says. Under npm run dev the page reloads when you save; with start.sh, run start.sh again."
   }
 }

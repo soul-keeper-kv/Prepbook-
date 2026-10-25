@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest"
 import { AppError } from "@/lib/errors"
+import { emptyNotebook } from "@/notebook/schema"
 import { createDriveStore, Offline, type DriveAuth } from "@/sync/drive-store"
 
 const json = (body: unknown, status = 200) =>
@@ -47,7 +48,7 @@ describe("createDriveStore", () => {
     await expect(store.getFile("f1")).resolves.toBeNull()
   })
 
-  it("refuses a downloaded file that is not progress", async () => {
+  it("refuses a downloaded file that is not a notebook", async () => {
     const store = createDriveStore(
       fakeAuth(),
       vi.fn<typeof fetch>().mockResolvedValue(json({ hello: 1 }))
@@ -59,12 +60,12 @@ describe("createDriveStore", () => {
   it("creates a tagged file with one multipart request", async () => {
     const fetchFn = vi.fn<typeof fetch>().mockResolvedValue(json({ id: "new", version: "1" }))
     const store = createDriveStore(fakeAuth(), fetchFn)
-    await expect(store.write(undefined, { items: {}, solved: {} })).resolves.toEqual({
+    await expect(store.write(undefined, emptyNotebook())).resolves.toEqual({
       id: "new",
       version: "1",
     })
     const [url, init] = fetchFn.mock.calls[0] ?? []
     expect(String(url)).toContain("uploadType=multipart")
-    expect(String(init?.body)).toContain('"appProperties":{"dsaRoadmap":"progress"}')
+    expect(String(init?.body)).toContain('"appProperties":{"prepNotebook":"notebook"}')
   })
 })

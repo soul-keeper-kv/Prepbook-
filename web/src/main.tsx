@@ -1,20 +1,21 @@
 import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 import "@/index.css"
-import "@/i18n"
+import { currentLang } from "@/i18n"
 import { App } from "@/app"
 import { ContentErrorScreen } from "@/components/layout/content-error"
 import { ContentProvider } from "@/content/context"
 import { loadContent } from "@/content/load"
+import { startClock, tick } from "@/lib/clock"
 import { initTheme } from "@/lib/theme"
-import { loadSavedProgress } from "@/progress/legacy"
-import { progressActions } from "@/progress/store"
-import { uiActions } from "@/state/ui"
+import { loadSavedNotebook } from "@/notebook/load"
+import { notebookActions, onLocalNotebookChange } from "@/notebook/store"
 import { startDriveSync } from "@/sync"
 
 initTheme()
 
 const root = createRoot(document.getElementById("root")!)
+// The old roadmap in data/: suggestions, and the source the old progress is carried over from
 const result = loadContent()
 
 if (!result.ok) {
@@ -25,8 +26,10 @@ if (!result.ok) {
   )
 } else {
   const { content } = result
-  progressActions.init(loadSavedProgress(content.phases))
-  uiActions.setExpanded(content.phases.slice(0, 1).map((p) => p.id))
+  notebookActions.init(loadSavedNotebook(content, currentLang()))
+  startClock()
+  // A change made just now shows up in due dates without waiting for the next minute
+  onLocalNotebookChange(tick)
   void startDriveSync()
 
   root.render(

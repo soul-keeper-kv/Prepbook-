@@ -1,10 +1,11 @@
 import type { Phase } from "@/content/schema"
-import { emptyProgress, nowIso } from "@/progress/logic"
-import { ProgressSchema, type Progress } from "@/progress/schema"
+import { nowIso } from "@/lib/dates"
 import { KEYS, storage } from "@/lib/storage"
+import { ProgressSchema, type Progress } from "@/progress/schema"
 
-// Reads the saved progress at startup. Copies saved by versions before v3 only held ticks:
-// v2 by item id, v1 by "phaseIndex-itemIndex". They are converted once and saved as v3.
+// Progress the old roadmap app saved in this browser, read once to carry it into the
+// notebook (see notebook/load.ts). Copies saved before v3 only held ticks: v2 by item id,
+// v1 by "phaseIndex-itemIndex". They are converted here; nothing is written back.
 export function loadSavedProgress(phases: Phase[]): Progress {
   const saved = ProgressSchema.safeParse(storage.get(KEYS.progress))
   if (saved.success) return saved.data
@@ -23,8 +24,7 @@ export function loadSavedProgress(phases: Phase[]): Progress {
     }
   }
 
-  const progress = emptyProgress()
+  const progress: Progress = { items: {}, solved: {} }
   for (const id of doneIds) progress.items[id] = { done: true, doneAt: nowIso() }
-  if (doneIds.length) storage.set(KEYS.progress, progress)
   return progress
 }

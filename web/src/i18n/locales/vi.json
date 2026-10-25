@@ -1,6 +1,7 @@
 {
   "app": {
-    "title": "DSA Roadmap"
+    "title": "Interview Prep",
+    "loading": "Đang tải…"
   },
   "lang": {
     "switch": "Ngôn ngữ"
@@ -11,107 +12,493 @@
     "light": "Sáng",
     "dark": "Tối"
   },
-  "stats": {
-    "progress": "Tiến độ",
-    "items": "{{done}}/{{total}} mục",
-    "current": "Giai đoạn hiện tại",
-    "allDone": "Xong",
-    "solved": "Bài đã giải",
-    "review": "Cần ôn lại"
+  "nav": {
+    "main": "Điều hướng chính",
+    "breadcrumb": "Vị trí",
+    "today": "Hôm nay",
+    "inbox": "Hộp thu",
+    "review": "Ôn lại",
+    "topics": "Chủ đề",
+    "graph": "Graph",
+    "search": "Tìm",
+    "settings": "Cài đặt"
   },
-  "filter": {
-    "label": "Lọc mục",
-    "all": "Tất cả",
-    "todo": "Chưa xong",
-    "review": "Cần ôn",
-    "empty": {
-      "all": "Giai đoạn này chưa có mục nào.",
-      "todo": "Đã hoàn thành hết giai đoạn này.",
-      "review": "Không có mục nào cần ôn lại."
-    }
+  "tree": {
+    "title": "Chủ đề và pattern",
+    "label": "Chủ đề, giai đoạn và pattern. Kéo thả để sắp xếp lộ trình.",
+    "due_other": "{{count}} mục đến hạn ôn"
   },
-  "toolbar": {
-    "expand": "Mở hết",
-    "collapse": "Thu gọn"
+  "level": {
+    "0": "Chưa học",
+    "1": "Đang học",
+    "2": "Nắm được",
+    "3": "Thành thạo",
+    "none": "Chưa có pattern"
   },
-  "type": {
-    "theory": "Lý thuyết",
-    "practice": "Luyện bài"
+  "mastery": {
+    "practice": {
+      "0": "Chưa bắt đầu: viết vài dòng ghi chú hoặc thêm bài đầu tiên.",
+      "1": "Đang học: tự làm được {{alone}}/{{need}} bài để lên “Nắm được”.",
+      "2": "Nắm được: tự làm được {{alone}} bài. Tự làm lại được {{need}} bài khi ôn (cách lần đầu từ {{gap}} ngày) để thành thạo: {{reviewed}}/{{need}}.",
+      "3": "Thành thạo: {{reviewed}} bài tự làm lại được khi ôn, không có gì trễ hạn."
+    },
+    "theory": {
+      "0": "Chưa bắt đầu: viết ghi chú, rồi tick “Đã học xong” khi xong.",
+      "1": "Đang học: tick “Đã học xong” khi đã nắm phần lý thuyết.",
+      "2": "Đã học xong. Ôn mọi thẻ hỏi đáp tới mức “Nhớ chắc” để thành thạo.",
+      "3": "Thành thạo: mọi thẻ hỏi đáp đều đã nhớ chắc."
+    },
+    "dropped": "Tụt 1 mức vì có mục quá hạn ôn {{days}} ngày. Ôn xong là lên lại.",
+    "due_other": "{{count}} mục đến hạn ôn."
   },
-  "tag": {
-    "review": "Cần ôn"
+  "outcome": {
+    "alone": "Tự làm được",
+    "hint": "Cần gợi ý",
+    "solution": "Xem lời giải",
+    "todo": "Chưa làm"
   },
-  "item": {
-    "markDone": "Đánh dấu đã xong",
-    "problems": "{{solved}}/{{total}} bài",
-    "reviews_other": "ôn {{count}} lần",
-    "hasNotes": "có ghi chú"
+  "mistake": {
+    "pattern": "Không nhận ra pattern",
+    "boundary": "Sai biên, lệch 1 (off-by-one)",
+    "edge": "Quên edge case",
+    "complexity": "Sai độ phức tạp, bị TLE",
+    "bug": "Lỗi khi cài đặt",
+    "api": "Quên cú pháp, API"
   },
-  "footer": {
-    "export": "Xuất tiến độ",
-    "import": "Nhập tiến độ",
-    "reset": "Làm lại từ đầu"
+  "grade": {
+    "forgot": "Quên",
+    "fuzzy": "Nhớ mập mờ",
+    "solid": "Nhớ chắc"
   },
-  "sync": {
-    "off": "Tiến độ chỉ lưu trong trình duyệt này. Mở app bằng start.sh (hoặc app Android) để đồng bộ qua Google Drive.",
-    "setup": "Chưa bật đồng bộ Google Drive: thêm file google-oauth.json vào thư mục web theo README.md rồi tải lại trang. Tiến độ đang lưu trong trình duyệt này.",
-    "login": "Chưa kết nối Google Drive. Tiến độ đang lưu trên máy này; kết nối để dùng chung với máy khác.",
-    "syncing": "Đang đồng bộ với Google Drive…",
-    "synced": "Đã đồng bộ với Google Drive lúc {{time}}.",
-    "offline": "Không kết nối được Google Drive. Tiến độ vẫn lưu trên máy, có mạng lại sẽ tự đồng bộ.",
-    "error": "Chưa đồng bộ được với Google Drive: {{message}}. Tiến độ vẫn lưu trên máy này.",
-    "badFile": "file {{file}} trên Drive không đúng định dạng tiến độ (sửa lại, hoặc xoá đi để app tạo file mới)",
-    "connect": "Kết nối Google Drive",
-    "retry": "Đồng bộ lại"
+  "problemLevel": {
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard"
   },
-  "detail": {
-    "close": "Đóng"
-  },
-  "tab": {
-    "learn": "Kiến thức",
-    "problems": "Bài tập",
-    "notes": "Ghi chú & review"
-  },
-  "block": {
-    "description": "Mô tả",
-    "keyPoints": "Ý chính",
-    "examples": "Ví dụ",
-    "template": "Code mẫu",
-    "complexity": "Độ phức tạp",
-    "pitfalls": "Lỗi hay gặp",
-    "resources": "Tài liệu miễn phí",
-    "problems": "Bài luyện",
-    "moreLists": "Danh sách bài khác",
-    "notes": "Ghi chú",
-    "code": "Code của tôi",
-    "checklist": "Tự review code",
-    "history": "Lịch sử"
-  },
-  "example": {
-    "input": "Input",
-    "output": "Output"
-  },
-  "resource": {
+  "resourceKind": {
     "article": "Bài viết",
     "video": "Video",
     "course": "Khoá học",
     "docs": "Docs",
     "book": "Sách",
-    "visual": "Minh hoạ",
-    "practice": "Luyện tập"
+    "other": "Khác"
   },
-  "learn": {
-    "empty": "Mục này chưa có nội dung. Thêm vào file JSON của giai đoạn trong thư mục data."
+  "topicKind": {
+    "dsa": "Thuật toán (nhận diện, template, bẫy)",
+    "concept": "Kiến thức (là gì, hoạt động ra sao, khi nào dùng)",
+    "design": "System design (yêu cầu, ước lượng, thiết kế, đánh đổi)",
+    "story": "Hành vi (câu chuyện STAR)"
   },
-  "problems": {
-    "empty": "Mục này chưa có bài tập."
+  "topicColor": {
+    "blue": "Xanh dương",
+    "orange": "Cam",
+    "teal": "Xanh ngọc",
+    "purple": "Tím",
+    "green": "Xanh lá",
+    "pink": "Hồng",
+    "gray": "Xám"
+  },
+  "section": {
+    "empty": "Chưa viết gì.",
+    "recognition": {
+      "title": "Nhận diện",
+      "hint": "Dấu hiệu trong đề cho biết nên dùng pattern này",
+      "placeholder": "- Đề hỏi về đoạn con / chuỗi con liên tiếp\n- Tìm dài nhất / ngắn nhất thoả điều kiện"
+    },
+    "idea": {
+      "title": "Ý tưởng",
+      "hint": "Ý chính, viết bằng lời của bạn",
+      "placeholder": "Hai con trỏ cùng chạy sang phải: phải mở rộng, trái co lại khi cửa sổ sai…"
+    },
+    "template": {
+      "title": "Template code",
+      "hint": "Khung code tự viết lại được không cần nhìn",
+      "placeholder": "```java\nint left = 0;\nfor (int right = 0; right < n; right++) {\n    // ...\n}\n```"
+    },
+    "pitfalls": {
+      "title": "Bẫy đã dính",
+      "hint": "Lỗi bạn đã mắc, kèm tên bài",
+      "placeholder": "- Dùng if thay vì while khi co cửa sổ (Longest Repeating Character Replacement)"
+    },
+    "what": {
+      "title": "Là gì",
+      "hint": "Định nghĩa ngắn, như trả lời câu mở đầu của phỏng vấn",
+      "placeholder": "HashMap là bảng băm: key -> bucket theo hash…"
+    },
+    "how": {
+      "title": "Hoạt động ra sao",
+      "hint": "Bên trong chạy thế nào, kèm ví dụ hoặc code",
+      "placeholder": "- hash(key) & (n - 1) chọn bucket\n- Quá load factor 0.75 thì resize gấp đôi"
+    },
+    "when": {
+      "title": "Khi nào dùng, đánh đổi",
+      "hint": "Chọn nó khi nào, không chọn khi nào, so với lựa chọn khác",
+      "placeholder": "Dùng khi… Tránh khi… So với TreeMap…"
+    },
+    "requirements": {
+      "title": "Yêu cầu",
+      "hint": "Chức năng và phi chức năng (độ trễ, sẵn sàng, nhất quán)",
+      "placeholder": "- Rút gọn link, chuyển hướng\n- 100M link/ngày, đọc nhiều hơn ghi 100 lần"
+    },
+    "estimates": {
+      "title": "Ước lượng",
+      "hint": "QPS, dung lượng, băng thông",
+      "placeholder": "Ghi: 100M/ngày ≈ 1.2k QPS…"
+    },
+    "design": {
+      "title": "Thiết kế tổng quan",
+      "hint": "Các khối chính và luồng dữ liệu",
+      "placeholder": "Client -> LB -> API -> cache -> DB…"
+    },
+    "deepDive": {
+      "title": "Đi sâu",
+      "hint": "Phần khó nhất: sinh id, sharding, cache…",
+      "placeholder": "Sinh short id: base62 của counter…"
+    },
+    "tradeoffs": {
+      "title": "Đánh đổi",
+      "hint": "Đã chọn gì, bỏ gì, vì sao",
+      "placeholder": "Chọn eventual consistency vì…"
+    },
+    "situation": {
+      "title": "Situation",
+      "hint": "Bối cảnh: dự án, đội, thời điểm",
+      "placeholder": "Đội 5 người, sắp release…"
+    },
+    "task": {
+      "title": "Task",
+      "hint": "Việc của bạn, mục tiêu",
+      "placeholder": "Tôi chịu trách nhiệm…"
+    },
+    "action": {
+      "title": "Action",
+      "hint": "Bạn đã làm gì, cụ thể",
+      "placeholder": "Tôi đã…"
+    },
+    "result": {
+      "title": "Result",
+      "hint": "Kết quả đo được, bài học",
+      "placeholder": "Giảm 40% thời gian…"
+    },
+    "questions": {
+      "title": "Dùng cho câu hỏi",
+      "hint": "Những câu hỏi phỏng vấn câu chuyện này trả lời được",
+      "placeholder": "- Kể về một lần bất đồng với đồng nghiệp\n- Kể về một lần bạn sai"
+    }
+  },
+  "edit": {
+    "rename": "Đổi tên: {{name}}",
+    "edit": "Sửa",
+    "editNamed": "Sửa: {{name}}",
+    "write": "Viết",
+    "done": "Xong",
+    "save": "Lưu",
+    "markdownHint": "Markdown: - danh sách, **đậm**, `code`, ```java cho khối code. Tự lưu khi gõ.",
+    "moveUp": "Đưa lên: {{name}}",
+    "moveDown": "Đưa xuống: {{name}}"
+  },
+  "picker": {
+    "filter": "Lọc pattern…",
+    "none": "Không có pattern nào khớp. Tạo pattern ở trang chủ đề trước."
+  },
+  "today": {
+    "title_other": "Hôm nay: {{count}} việc, khoảng {{time}}",
+    "titleEmpty": "Hôm nay chưa có gì đến hạn",
+    "start": "Bắt đầu ôn",
+    "streak": "Chuỗi ngày học",
+    "streakUnit": "ngày liên tiếp",
+    "due": "Cần ôn hôm nay",
+    "overdue_other": "{{count}} việc quá hạn",
+    "solvedAlone": "Đã tự làm được",
+    "solvedAloneUnit": "bài",
+    "week": "7 ngày qua",
+    "weekUnit": "lần làm bài và ôn thẻ",
+    "tasks": "Việc hôm nay",
+    "empty": "Không có gì đến hạn. Thêm bài vào một pattern, hoặc dán link vừa tìm được vào Hộp thu.",
+    "cardsTask_other": "Ôn {{count}} thẻ hỏi đáp",
+    "continueTask": "Học tiếp: {{name}}",
+    "inbox_other": "Hộp thu · {{count}}",
+    "openInbox": "Mở hộp thu",
+    "activity": "Hoạt động",
+    "activityLabel_other": "Lịch học {{weeks}} tuần qua: {{count}} lần làm bài và ôn thẻ",
+    "activitySummary_other": "{{count}} lần làm bài và ôn thẻ trong {{weeks}} tuần",
+    "topics": "Chủ đề"
+  },
+  "topics": {
+    "intro": "Chủ đề, giai đoạn và pattern. Kéo thả một dòng để sắp lại lộ trình."
+  },
+  "topic": {
+    "name": "Tên chủ đề",
+    "new": "Chủ đề mới",
+    "add": "Thêm chủ đề",
+    "namePlaceholder": "Ví dụ: Mạng máy tính",
+    "settings": "Cài đặt chủ đề",
+    "kind": "Kiểu ghi chú",
+    "kindHint": "Kiểu ghi chú quyết định các mục trên trang pattern. Đổi kiểu không xoá gì: ghi chú cũ vẫn còn, chỉ ẩn đi.",
+    "color": "Màu",
+    "delete": "Xoá chủ đề",
+    "deleteTitle": "Xoá chủ đề “{{name}}”?",
+    "deleteText": "Xoá cả các giai đoạn, pattern, bài tập, tài liệu và thẻ hỏi đáp chỉ nằm trong chủ đề này.",
+    "deleteAction": "Xoá chủ đề",
+    "roadmap": "Lộ trình",
+    "counts": "{{done}}/{{total}} pattern đã nắm · {{solved}} bài tự làm được",
+    "next": "Tiếp: {{name}}",
+    "allGotIt": "Đã nắm mọi pattern",
+    "noPatterns": "Chưa có pattern"
+  },
+  "phase": {
+    "name": "Tên giai đoạn",
+    "none": "Chưa xếp giai đoạn",
+    "add": "Thêm giai đoạn",
+    "namePlaceholder": "Ví dụ: Giai đoạn 2 · Cấu trúc dữ liệu",
+    "progress": "{{done}}/{{total}} đã nắm",
+    "delete": "Xoá giai đoạn {{name}}",
+    "deleteTitle": "Xoá giai đoạn “{{name}}”?",
+    "deleteText": "Các pattern trong giai đoạn này vẫn còn, chuyển xuống mục “Chưa xếp giai đoạn”.",
+    "deleteAction": "Xoá giai đoạn"
+  },
+  "pattern": {
+    "name": "Tên pattern",
+    "add": "Thêm pattern",
+    "namePlaceholder": "Ví dụ: Sliding Window",
+    "theory": "lý thuyết",
+    "theoryToggle": "Lý thuyết thuần (không có bài tập)",
+    "theoryDone": "Đã học xong phần lý thuyết",
+    "due_other": "{{count}} đến hạn",
+    "problemCount_other": "{{count}} bài",
+    "delete": "Xoá",
+    "deleteTitle": "Xoá pattern “{{name}}”?",
+    "deleteText": "Xoá ghi chú, thẻ hỏi đáp của pattern này, và các bài tập, tài liệu không nằm trong pattern nào khác.",
+    "deleteAction": "Xoá pattern",
+    "problems": "Bài đã làm",
+    "problemsHint": "Bài bạn tự tìm và làm; mỗi lần làm ghi lại ở trang của bài",
+    "resources": "Tài liệu đã đọc",
+    "resourcesHint": "Link kèm điều bạn rút ra",
+    "cards": "Câu hỏi phỏng vấn tự soạn",
+    "cardsHint": "Thành thẻ để ôn: tự trả lời thành tiếng rồi mới mở đáp án",
+    "requires": "Học trước",
+    "requiresEmpty": "Không cần học pattern nào trước.",
+    "related": "Pattern liên quan",
+    "relatedEmpty": "Chưa nối với pattern nào."
   },
   "problem": {
-    "solvedLabel": "Đã giải {{title}}"
+    "url": "Link bài",
+    "urlPlaceholder": "https://leetcode.com/problems/…",
+    "title": "Tên bài",
+    "titlePlaceholder": "Tên bài (để trống thì lấy theo link)",
+    "level": "Mức",
+    "add": "Thêm bài",
+    "added": "Đã thêm bài.",
+    "logNow": "Ghi lần làm",
+    "none": "Chưa có bài nào. Tìm một bài luyện pattern này rồi dán link vào đây.",
+    "colProblem": "Bài",
+    "colLevel": "Mức",
+    "colLast": "Lần gần nhất",
+    "colRedo": "Làm lại",
+    "colActions": "Thao tác",
+    "inPatterns_other": "trong {{count}} pattern",
+    "unlink": "Bỏ {{name}} khỏi pattern",
+    "unlinkTitle": "Bỏ “{{name}}” khỏi pattern này?",
+    "unlinkText": "Bài vẫn còn trong các pattern khác, cùng lịch sử làm bài.",
+    "unlinkLastText": "Đây là pattern cuối cùng của bài: bài sẽ bị xoá cùng lịch sử làm bài.",
+    "unlinkAction": "Bỏ ra",
+    "scheduleHint": "Làm lại sau 1 ngày nếu xem lời giải, sau 3 ngày nếu cần gợi ý, tự làm được thì giãn dần 7, 14, 30, 60 ngày.",
+    "open": "Mở đề",
+    "delete": "Xoá bài",
+    "deleteTitle": "Xoá bài “{{name}}”?",
+    "deleteText": "Xoá bài khỏi mọi pattern, cùng lịch sử làm bài và ghi chú.",
+    "deleteAction": "Xoá bài",
+    "redo": "Làm lại: {{when}}",
+    "notTried": "Chưa làm lần nào",
+    "patterns": "Pattern:",
+    "editPatterns": "Sửa pattern",
+    "notes": "Ghi chú chung",
+    "notesPlaceholder": "Điều cần nhớ về bài này, không gắn với một lần làm",
+    "notesEmpty": "Chưa có ghi chú chung."
+  },
+  "attempt": {
+    "title": "Ghi lần làm này",
+    "outcomeQuestion": "Lần này làm thế nào?",
+    "outcomeHint": {
+      "alone": "Không xem gì",
+      "hint": "Xem gợi ý hoặc hỏi AI",
+      "solution": "Phải đọc lời giải"
+    },
+    "minutes": "Số phút",
+    "mistakes": "Sai ở đâu",
+    "note": "Ghi chú lần này",
+    "notePlaceholder": "Kẹt ở đâu, gợi ý nào giúp mở ra, lần sau cần nhớ gì",
+    "code": "Code",
+    "lang": "Ngôn ngữ",
+    "codePlaceholder": "Dán lời giải của bạn. Tab chèn 4 dấu cách.",
+    "save": "Lưu lần làm",
+    "pickOutcome": "Chọn lần này làm thế nào trước đã.",
+    "saved": "Đã lưu. Làm lại: {{when}}.",
+    "history_other": "Lịch sử · {{count}} lần",
+    "none": "Chưa làm lần nào.",
+    "imported": "từ bản cũ",
+    "importedOn": "Mang sang từ bản cũ, giải ngày {{date}}",
+    "noNote": "Không có ghi chú.",
+    "noCode": "Không có code.",
+    "editCode": "Sửa code",
+    "addCode": "Thêm code",
+    "delete": "Xoá lần làm này",
+    "deleteTitle": "Xoá lần làm này?",
+    "deleteText": "Lịch ôn và mức của pattern sẽ tính lại không có lần này.",
+    "deleteAction": "Xoá"
+  },
+  "resource": {
+    "url": "Link tài liệu",
+    "urlPlaceholder": "https://…",
+    "title": "Tên tài liệu",
+    "titlePlaceholder": "Tên (để trống thì lấy theo link)",
+    "kindLabel": "Loại",
+    "add": "Thêm tài liệu",
+    "none": "Chưa có tài liệu nào.",
+    "unlink": "Bỏ {{name}} khỏi pattern",
+    "takeaway": "Điều rút ra từ {{name}}",
+    "takeawayPlaceholder": "1-2 dòng bạn rút ra từ tài liệu này",
+    "takeawayEmpty": "Chưa ghi điều rút ra."
+  },
+  "card": {
+    "question": "Câu hỏi",
+    "questionPlaceholder": "Ví dụ: Sliding Window khác Two Pointers ở đâu?",
+    "answer": "Câu trả lời của bạn",
+    "answerPlaceholder": "Trả lời như đang phỏng vấn, ngắn gọn",
+    "add": "Thêm thẻ",
+    "none": "Chưa có thẻ nào.",
+    "show": "Hiện câu trả lời",
+    "hide": "Ẩn câu trả lời",
+    "edit": "Sửa thẻ",
+    "delete": "Xoá thẻ",
+    "nextReview": "Ôn lần tới: {{when}}",
+    "reviewed_other": "đã ôn {{count}} lần"
+  },
+  "inbox": {
+    "intro": "Dán link bài hoặc tài liệu vừa tìm được. Xếp vào pattern sau, khi đã đọc hoặc làm.",
+    "url": "Link",
+    "urlPlaceholder": "Dán link bài hoặc tài liệu",
+    "title": "Tên",
+    "titlePlaceholder": "Tên (không bắt buộc)",
+    "add": "Thêm vào hộp thu",
+    "added": "Đã thêm vào hộp thu.",
+    "known": "Đã biết bài này: {{title}} · {{level}}",
+    "empty": "Hộp thu trống.",
+    "asProblem": "Thành bài tập",
+    "asResource": "Thành tài liệu",
+    "delete": "Xoá {{name}}",
+    "patterns": "Thuộc pattern",
+    "pickPattern": "Chọn ít nhất 1 pattern.",
+    "save": "Lưu",
+    "filedProblem": "Đã xếp thành bài tập.",
+    "filedResource": "Đã xếp thành tài liệu.",
+    "open": "Mở"
+  },
+  "review": {
+    "intro": "Bài đến hạn làm lại và thẻ hỏi đáp đến hạn ôn, từ mọi chủ đề.",
+    "problems_other": "Bài làm lại · {{count}}",
+    "cards_other": "Thẻ hỏi đáp · {{count}}",
+    "noProblems": "Không có bài nào đến hạn.",
+    "noCards": "Không có thẻ nào đến hạn.",
+    "cardsDone_other": "Xong! Đã ôn {{count}} thẻ.",
+    "lastTime": "lần trước",
+    "redo": "Làm lại",
+    "left_other": "còn {{count}} thẻ",
+    "reveal": "Đã trả lời xong, xem câu trả lời của tôi",
+    "noAnswer": "Thẻ này chưa có câu trả lời.",
+    "gradePrompt": "Lúc nãy bạn trả lời được tới đâu?",
+    "nextIn_other": "ôn lại sau {{count}} ngày",
+    "rules": "Bài: xem lời giải thì làm lại sau 1 ngày, cần gợi ý sau 3 ngày, tự làm được thì giãn dần. Quá hạn hơn 7 ngày làm pattern tụt 1 mức."
+  },
+  "due": {
+    "none": "chưa lên lịch",
+    "today": "hôm nay",
+    "late_other": "quá hạn {{count}} ngày",
+    "in_other": "sau {{count}} ngày"
+  },
+  "duration": {
+    "minutes_other": "{{count}} phút",
+    "hours_other": "{{count}} giờ",
+    "hoursMinutes": "{{h}} giờ {{m}} phút"
+  },
+  "suggest": {
+    "title": "Gợi ý từ lộ trình DSA cũ",
+    "roadmapIntro": "Lộ trình cũ chỉ còn là gợi ý: bấm Thêm thì mục đó thành pattern (trống) của bạn, bài và tài liệu của nó hiện ở trang pattern để bạn chọn.",
+    "patternIntro": "Chỉ thêm vào pattern khi bạn bấm.",
+    "left_other": "{{count}} chưa thêm",
+    "add": "Thêm",
+    "addNamed": "Thêm {{name}}",
+    "added": "Đã thêm"
+  },
+  "graph": {
+    "intro": "Mỗi chấm là một chủ đề, pattern hoặc bài. Pattern càng đậm càng nắm chắc; mũi tên là “học trước”. Bấm một chấm để mở.",
+    "showProblems": "Hiện bài tập",
+    "label": "Graph của {{patterns}} pattern",
+    "legend": "Cuộn để phóng to, kéo để di chuyển. Dạng danh sách có ở trang Chủ đề."
+  },
+  "search": {
+    "label": "Tìm trong ghi chú",
+    "placeholder": "Tìm pattern, bài, ghi chú, tài liệu…",
+    "hint": "Tìm trong tên và ghi chú của mọi pattern, bài, lần làm và tài liệu. Gõ không dấu cũng được.",
+    "none": "Không tìm thấy gì.",
+    "kind": {
+      "topic": "chủ đề",
+      "pattern": "pattern",
+      "problem": "bài",
+      "resource": "tài liệu"
+    }
+  },
+  "conflict": {
+    "title": "Có ghi chú bị sửa ở 2 máy",
+    "intro": "Cùng một ghi chú được sửa ở 2 máy trước khi kịp đồng bộ. Bản sửa sau đang hiện; bản kia giữ ở đây để bạn chọn lại.",
+    "row": "{{field}} · bản lúc {{date}}",
+    "show": "Xem",
+    "hide": "Ẩn",
+    "restore": "Dùng bản này",
+    "dismiss": "Bỏ qua",
+    "field": {
+      "note": "Ghi chú lần làm",
+      "code": "Code lần làm",
+      "takeaway": "Điều rút ra",
+      "question": "Câu hỏi",
+      "answer": "Câu trả lời",
+      "notes": "Ghi chú chung"
+    }
+  },
+  "settings": {
+    "look": "Giao diện và ngôn ngữ",
+    "langHint": "Ngôn ngữ chỉ đổi chữ của app. Ghi chú của bạn giữ nguyên như đã viết.",
+    "sync": "Đồng bộ Google Drive",
+    "data": "Dữ liệu",
+    "dataHint": "Xuất ra file JSON để sao lưu. Nhập được file đã xuất, file trên Drive, và file “Xuất tiến độ” của bản cũ.",
+    "export": "Xuất dữ liệu",
+    "import": "Nhập dữ liệu",
+    "reset": "Làm lại từ đầu"
+  },
+  "sync": {
+    "off": "Dữ liệu chỉ lưu trong trình duyệt này. Mở app bằng start.sh (hoặc app Android) để đồng bộ qua Google Drive.",
+    "setup": "Chưa bật đồng bộ Google Drive: thêm file google-oauth.json vào thư mục web theo README.md rồi tải lại trang. Dữ liệu đang lưu trong trình duyệt này.",
+    "login": "Chưa kết nối Google Drive. Dữ liệu đang lưu trên máy này; kết nối để dùng chung với máy khác.",
+    "syncing": "Đang đồng bộ với Google Drive…",
+    "synced": "Đã đồng bộ với Google Drive lúc {{time}}.",
+    "offline": "Không kết nối được Google Drive. Dữ liệu vẫn lưu trên máy, có mạng lại sẽ tự đồng bộ.",
+    "error": "Chưa đồng bộ được với Google Drive: {{message}}. Dữ liệu vẫn lưu trên máy này.",
+    "badFile": "file {{file}} trên Drive không đúng định dạng (sửa lại, hoặc xoá đi để app tạo file mới)",
+    "connect": "Kết nối Google Drive",
+    "retry": "Đồng bộ lại",
+    "short": {
+      "off": "Chỉ lưu trên máy",
+      "setup": "Chưa bật đồng bộ",
+      "login": "Chưa kết nối Drive",
+      "syncing": "Đang đồng bộ…",
+      "synced": "Đã đồng bộ {{time}}",
+      "offline": "Mất kết nối Drive",
+      "error": "Lỗi đồng bộ"
+    }
   },
   "help": {
-    "toggle": "Cách giải",
-    "tip": "Tự nghĩ khoảng 20 phút trước. Bí thì hỏi AI ở chế độ “Chỉ gợi ý”, vẫn bí mới xem lời giải đầy đủ.",
+    "toggle": "Bí? Xem gợi ý",
+    "tip": "Tự nghĩ khoảng 20 phút trước. Bí thì hỏi AI ở chế độ “Chỉ gợi ý”, vẫn bí mới xem lời giải. Dùng tới phần này thì lần làm là “Cần gợi ý” hoặc “Xem lời giải”.",
     "read": "Xem lời giải",
     "editorial": "Lời giải chính thức",
     "solutions": "Lời giải cộng đồng",
@@ -132,52 +519,39 @@
     "copyFailed": "Trình duyệt không cho copy câu hỏi."
   },
   "prompt": {
-    "hint": "Mình đang tự học thuật toán theo lộ trình, bài này nằm trong mục \"{{lesson}}\".\nMình đang làm bài \"{{title}}\" trên {{site}}: {{url}}\n\nMình là người mới và chưa biết cách giải. Hãy hướng dẫn như một người thầy, đừng đưa lời giải ngay:\n1. Nhắc lại đề bằng lời đơn giản, kèm 1 ví dụ nhỏ. Nếu không chắc đây là bài nào, hãy bảo mình dán đề vào, đừng đoán.\n2. Mỗi lần chỉ gợi ý 1 ý nhỏ rồi dừng lại chờ mình trả lời. Đi từ cách vét cạn tới cách tối ưu, và nói rõ bài dùng kỹ thuật nào.\n3. Chỉ viết code hoàn chỉnh ({{lang}}) khi mình yêu cầu.\n\nTrả lời bằng tiếng Việt.",
-    "explain": "Mình đang tự học thuật toán theo lộ trình, bài này nằm trong mục \"{{lesson}}\".\nGiải thích giúp mình bài \"{{title}}\" trên {{site}}: {{url}}\n\nMình là người mới, hãy giải thích từng bước:\n1. Đề bài hỏi gì, nói bằng lời đơn giản, kèm 1 ví dụ nhỏ. Nếu không chắc đây là bài nào, hãy bảo mình dán đề vào, đừng đoán.\n2. Cách vét cạn (brute force) và vì sao nó chưa đủ nhanh.\n3. Nhận xét quan trọng nhất dẫn tới cách tối ưu, và đó là kỹ thuật gì.\n4. Các bước của thuật toán, chạy tay trên ví dụ ở bước 1.\n5. Code {{lang}} có chú thích ngắn.\n6. Độ phức tạp time/space và các edge case dễ sai.\n\nTrả lời bằng tiếng Việt."
-  },
-  "notes": {
-    "placeholder": "Ý tưởng chính, chỗ bị kẹt, lỗi đã mắc, mẹo cần nhớ..."
-  },
-  "code": {
-    "placeholder": "Dán lời giải vào đây để tự review. Tab chèn 4 dấu cách."
+    "hint": "Mình đang tự luyện phỏng vấn theo pattern, bài này thuộc pattern \"{{lesson}}\".\nMình đang làm bài \"{{title}}\" trên {{site}}: {{url}}\n\nHãy hướng dẫn như một người thầy, đừng đưa lời giải ngay:\n1. Nhắc lại đề bằng lời đơn giản, kèm 1 ví dụ nhỏ. Nếu không chắc đây là bài nào, hãy bảo mình dán đề vào, đừng đoán.\n2. Mỗi lần chỉ gợi ý 1 ý nhỏ rồi dừng lại chờ mình trả lời. Đi từ cách vét cạn tới cách tối ưu.\n3. Chỉ viết code hoàn chỉnh ({{lang}}) khi mình yêu cầu.\n\nTrả lời bằng tiếng Việt.",
+    "explain": "Mình đang tự luyện phỏng vấn theo pattern, bài này thuộc pattern \"{{lesson}}\".\nGiải thích giúp mình bài \"{{title}}\" trên {{site}}: {{url}}\n\nHãy giải thích từng bước:\n1. Đề bài hỏi gì, nói bằng lời đơn giản, kèm 1 ví dụ nhỏ. Nếu không chắc đây là bài nào, hãy bảo mình dán đề vào, đừng đoán.\n2. Cách vét cạn (brute force) và vì sao nó chưa đủ nhanh.\n3. Nhận xét quan trọng nhất dẫn tới cách tối ưu, và vì sao nó là pattern này.\n4. Các bước của thuật toán, chạy tay trên ví dụ ở bước 1.\n5. Code {{lang}} có chú thích ngắn.\n6. Độ phức tạp time/space và các edge case dễ sai.\n\nTrả lời bằng tiếng Việt."
   },
   "copy": {
     "label": "Copy",
     "done": "Đã copy",
     "failed": "Không copy được"
   },
-  "history": {
-    "done": "Hoàn thành: {{date}}",
-    "review": "Ôn lần {{n}}: {{date}}",
-    "empty": "Chưa có. Tick “Đã xong” khi học xong, rồi bấm “Đã ôn lại hôm nay” mỗi lần làm lại. Quá {{days}} ngày chưa ôn thì mục sẽ hiện nhãn “Cần ôn”."
-  },
-  "foot": {
-    "done": "Đã xong",
-    "lastStudied": "Học lần cuối: {{ago}}",
-    "due": "nên ôn lại",
-    "review": "Đã ôn lại hôm nay",
-    "reviewed": "Đã ôn hôm nay ✓"
-  },
   "time": {
     "today": "hôm nay",
     "yesterday": "hôm qua",
     "daysAgo_other": "{{count}} ngày trước"
   },
+  "notFound": {
+    "title": "Không tìm thấy trang này",
+    "back": "Về trang Hôm nay"
+  },
   "confirm": {
     "cancel": "Huỷ",
-    "importTitle": "Nhập tiến độ từ file?",
-    "import": "Thay toàn bộ tiến độ hiện tại bằng dữ liệu trong file?",
-    "importAction": "Thay tiến độ",
+    "importTitle": "Nhập dữ liệu từ file?",
+    "import": "Thay toàn bộ dữ liệu hiện tại bằng dữ liệu trong file? Thứ gì không có trong file sẽ bị xoá, ở cả các máy đồng bộ.",
+    "importOld": "File này là tiến độ của bản cũ. Các mục đã tick, ghi chú, code và bài đã giải sẽ được thêm vào thành pattern và bài tập; dữ liệu hiện tại giữ nguyên.",
+    "importAction": "Nhập",
     "resetTitle": "Làm lại từ đầu?",
-    "reset": "Xoá toàn bộ tiến độ, ghi chú và code đã lưu? Nên bấm “Xuất tiến độ” để sao lưu trước.",
+    "reset": "Xoá toàn bộ pattern, bài tập, ghi chú, tài liệu và thẻ hỏi đáp, ở cả các máy đồng bộ? Nên bấm “Xuất dữ liệu” để sao lưu trước.",
     "resetAction": "Xoá hết"
   },
   "toast": {
-    "imported": "Đã nhập tiến độ từ file."
+    "imported": "Đã nhập dữ liệu từ file."
   },
   "error": {
     "import": "Không nhập được: {{message}}",
-    "notProgress": "file không phải bản xuất tiến độ của app này",
+    "notNotebook": "file không phải bản xuất của app này",
     "invalidJson": "{{file}} không phải JSON hợp lệ: {{message}}",
     "contentTitle": "Dữ liệu trong thư mục data có lỗi",
     "contentHint": "Sửa file JSON theo thông báo bên dưới. Đang chạy npm run dev thì lưu file là trang tự tải lại; chạy bằng start.sh thì chạy lại start.sh."

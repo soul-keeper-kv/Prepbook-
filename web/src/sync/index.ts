@@ -1,10 +1,11 @@
 import { create } from "zustand"
 import { KEYS, storage } from "@/lib/storage"
-import { onLocalProgressChange, progressActions } from "@/progress/store"
+import { parseNotebook } from "@/notebook/schema"
+import { notebookActions, onLocalNotebookChange } from "@/notebook/store"
 import { detectAuth } from "@/sync/auth"
 import { DriveSync, type SyncRecord, type SyncState } from "@/sync/engine"
 
-// The one DriveSync instance, wired to the progress store and to the page lifecycle.
+// The one DriveSync instance, wired to the notebook store and to the page lifecycle.
 
 export const useSyncStore = create<SyncState>()(() => ({
   status: "off",
@@ -13,14 +14,16 @@ export const useSyncStore = create<SyncState>()(() => ({
 }))
 
 export const driveSync = new DriveSync({
-  readRecord: () => (storage.get(KEYS.driveSync) as SyncRecord | null) ?? null,
-  writeRecord: (record) => storage.set(KEYS.driveSync, record),
-  getProgress: progressActions.get,
-  applyRemote: progressActions.applyRemote,
+  readRecord: () => (storage.get(KEYS.notebookSync) as SyncRecord | null) ?? null,
+  writeRecord: (record) => storage.set(KEYS.notebookSync, record),
+  readBase: () => parseNotebook(storage.get(KEYS.notebookBase)),
+  writeBase: (doc) => storage.set(KEYS.notebookBase, doc),
+  getDoc: notebookActions.get,
+  applyRemote: notebookActions.applyRemote,
   onState: (state) => useSyncStore.setState(state),
 })
 
-onLocalProgressChange(() => driveSync.notifyLocalChange())
+onLocalNotebookChange(() => driveSync.notifyLocalChange())
 
 /** Call once at startup */
 export async function startDriveSync() {

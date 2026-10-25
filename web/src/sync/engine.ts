@@ -1,5 +1,6 @@
-import { mergeProgress, nowIso, sameProgress } from "@/progress/logic"
-import type { Progress } from "@/progress/schema"
+import { nowIso } from "@/lib/dates"
+import { mergeNotebooks, sameNotebook } from "@/notebook/merge"
+import type { Notebook } from "@/notebook/schema"
 import {
   NeedLogin,
   Offline,
@@ -8,13 +9,16 @@ import {
   type DriveStore,
 } from "@/sync/drive-store"
 
-// Keeps the progress on this device and the file on Google Drive in step.
+// Keeps the notebook on this device and the file on Google Drive in step.
 // localStorage always holds a full copy, so the app works offline or before connecting.
 //
-// The sync record (localStorage dsa_drive_sync) = { fileId, version, pending }:
-//   no fileId          never synced with this file -> merge with it, Drive wins on conflicts
+// The sync record (localStorage prep_drive_sync) = { fileId, version, pending }:
+//   no fileId          never synced with this file -> merge with it (no base: every
+//                                                     difference counts as a conflict)
 //   pending: false     same as Drive `version`     -> Drive has newer? take Drive's copy as is
-//   pending: true      changes not uploaded yet    -> merge, this device wins, then upload
+//   pending: true      changes not uploaded yet    -> three-way merge against the base, upload
+// The base (prep_drive_base) is the copy last seen on Drive: with it, a field changed on one
+// side only is never mistaken for a conflict (see notebook/merge.ts).
 
 export type SyncStatus = "off" | "setup" | "login" | "syncing" | "synced" | "offline" | "error"
 
@@ -33,9 +37,11 @@ export interface SyncRecord {
 export interface SyncDeps {
   readRecord(): SyncRecord | null
   writeRecord(record: SyncRecord): void
-  getProgress(): Progress
+  readBase(): Notebook | null
+  writeBase(doc: Notebook): void
+  getDoc(): Notebook
   /** Replace the local copy without counting it as a new local change */
-  applyRemote(progress: Progress): void
+  applyRemote(doc: Notebook): void
   onState(state: SyncState): void
   createStore?: (auth: DriveAuth) => DriveStore
 }
@@ -127,6 +133,7 @@ export class DriveSync {
       const saved = this.deps.readRecord()
       let file = (saved?.fileId && (await store.getFile(saved.fileId))) || (await store.findFile())
       const known = Boolean(file) && file?.id === saved?.fileId // synced with this very file before
+      let onDrive: Notebook | null = null
       let mustWrite: boolean
 
       if (file && (!known || file.version !== saved?.version)) {
@@ -135,20 +142,24 @@ export class DriveSync {
         const remote = await store.download(file.id)
         // Read the flag again after the download: a change may have come in meanwhile
         const pending = this.deps.readRecord()?.pending
-        const local = this.deps.getProgress()
-        const merged = !known
-          ? mergeProgress(local, remote)
-          : pending
-            ? mergeProgress(remote, local)
+        const merged =
+          !known || pending
+            ? mergeNotebooks(known ? this.deps.readBase() : null, this.deps.getDoc(), remote)
             : remote
         this.deps.applyRemote(merged)
-        mustWrite = !sameProgress(merged, remote)
+        onDrive = remote
+        mustWrite = !sameNotebook(merged, remote)
       } else {
         mustWrite = !file || Boolean(this.deps.readRecord()?.pending)
       }
 
       const version = this.version
-      if (mustWrite || !file) file = await store.write(file?.id, this.deps.getProgress())
+      if (mustWrite || !file) {
+        const doc = this.deps.getDoc()
+        file = await store.write(file?.id, doc)
+        onDrive = doc
+      }
+      if (onDrive) this.deps.writeBase(onDrive)
       // A change made during the upload keeps `pending`; the save it scheduled uploads it
       this.deps.writeRecord({
         fileId: file.id,

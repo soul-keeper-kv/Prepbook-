@@ -24,6 +24,8 @@ Element.prototype.scrollIntoView ??= () => {}
 Element.prototype.hasPointerCapture ??= () => false
 Element.prototype.releasePointerCapture ??= () => {}
 Element.prototype.scrollTo ??= () => {}
+// jsdom has window.scrollTo, but only to log "Not implemented"
+window.scrollTo = () => {}
 
 afterEach(() => {
   cleanup()

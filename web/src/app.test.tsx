@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from "@testing-library/react"
+import { act, render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { beforeEach, describe, expect, it } from "vitest"
 import "@/i18n"
@@ -6,16 +6,13 @@ import i18n from "@/i18n"
 import { App } from "@/app"
 import { ContentProvider } from "@/content/context"
 import { buildContent, dataFiles } from "@/content/load"
-import { localize } from "@/content/localize"
 import { KEYS, storage } from "@/lib/storage"
-import { emptyProgress } from "@/progress/logic"
-import { progressActions } from "@/progress/store"
-import { uiActions, useUiStore } from "@/state/ui"
+import { liveValues } from "@/notebook/logic"
+import { withDefaultTopics } from "@/notebook/migrate"
+import { emptyNotebook, type Notebook } from "@/notebook/schema"
+import { notebookActions } from "@/notebook/store"
 
 const content = buildContent(dataFiles)
-const firstPhase = content.phases[0]!
-const firstItem = firstPhase.items[0]!
-const itemTitle = localize(firstItem.title, "vi").replace(/`|\*\*/g, "")
 
 function renderApp() {
   return render(
@@ -25,97 +22,100 @@ function renderApp() {
   )
 }
 
+async function go(hash: string) {
+  await act(async () => {
+    window.location.hash = hash
+    window.dispatchEvent(new HashChangeEvent("hashchange"))
+  })
+}
+
+const saved = () => storage.get(KEYS.notebook) as Notebook
+
 beforeEach(async () => {
   await i18n.changeLanguage("vi")
-  progressActions.init(emptyProgress())
-  useUiStore.setState({ filter: "all", openId: null })
-  uiActions.setExpanded([firstPhase.id])
+  notebookActions.init(withDefaultTopics(emptyNotebook(), "vi"))
+  window.location.hash = ""
 })
 
 describe("App", () => {
-  it("shows the roadmap title and the first phase open", () => {
+  it("opens on Today with the default topics", () => {
     renderApp()
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      localize(content.title, "vi")
+      "Hôm nay chưa có gì đến hạn"
     )
-    expect(screen.getByText(itemTitle)).toBeInTheDocument()
+    expect(screen.getAllByText("System Design").length).toBeGreaterThan(0)
   })
 
-  it("ticking an item saves progress and updates the stats", async () => {
+  it("builds a roadmap: a phase, a pattern, notes, a problem and an attempt", async () => {
     const user = userEvent.setup()
     renderApp()
-    const [firstCheckbox] = screen.getAllByRole("checkbox", { name: "Đánh dấu đã xong" })
-    await user.click(firstCheckbox!)
+    await go("#/topic/t_dsa")
+    expect(await screen.findByRole("heading", { level: 1 })).toHaveTextContent("DSA")
 
-    const saved = storage.get(KEYS.progress) as { items: Record<string, { done?: boolean }> }
-    expect(saved.items[firstItem.id]?.done).toBe(true)
-    expect(screen.getAllByText(`1/${content.items.size} mục`).length).toBeGreaterThan(0)
-  })
+    await user.type(screen.getByRole("textbox", { name: "Thêm giai đoạn" }), "Giai đoạn 1{Enter}")
+    const addPattern = await screen.findAllByRole("textbox", { name: "Thêm pattern" })
+    await user.type(addPattern[0]!, "Sliding Window{Enter}")
+    const link = await screen.findByRole("link", { name: "Sliding Window" })
 
-  it("opens an item, switches tabs and saves notes as you type", async () => {
-    const user = userEvent.setup()
-    renderApp()
-    await user.click(screen.getByText(itemTitle))
+    // The pattern page: write the first section
+    await user.click(link)
+    await waitFor(() => expect(window.location.hash).toMatch(/^#\/pattern\//))
+    await act(async () => window.dispatchEvent(new HashChangeEvent("hashchange")))
+    await screen.findByRole("heading", { level: 1, name: /Sliding Window/ })
+    await user.click(screen.getByRole("button", { name: "Sửa: Nhận diện" }))
+    await user.type(screen.getByRole("textbox", { name: "Nhận diện" }), "đoạn con liên tiếp")
+    const pattern = liveValues(saved().patterns).find((p) => p.name === "Sliding Window")!
+    expect(pattern.sections.recognition).toBe("đoạn con liên tiếp")
 
-    const dialog = await screen.findByRole("dialog")
-    expect(within(dialog).getByRole("tab", { name: /Kiến thức/ })).toHaveAttribute(
-      "aria-selected",
-      "true"
+    // Add a problem by its link
+    await user.type(
+      screen.getByRole("textbox", { name: "Link bài" }),
+      "https://leetcode.com/problems/longest-substring-without-repeating-characters/"
     )
+    await user.click(screen.getByRole("button", { name: "Thêm bài" }))
+    const problem = liveValues(saved().problems)[0]!
+    expect(problem.title).toBe("Longest Substring Without Repeating Characters") // known from data/
 
-    await user.click(within(dialog).getByRole("tab", { name: /Ghi chú/ }))
-    await user.type(within(dialog).getByPlaceholderText(/Ý tưởng chính/), "two pointers")
-
-    const saved = storage.get(KEYS.progress) as { items: Record<string, { notes?: string }> }
-    expect(saved.items[firstItem.id]?.notes).toBe("two pointers")
+    // Log an attempt on the problem's page
+    await go(`#/problem/${problem.id}`)
+    await screen.findByRole("heading", { level: 1, name: /Longest Substring/ })
+    await user.click(screen.getByRole("radio", { name: /Cần gợi ý/ }))
+    await user.type(screen.getByRole("spinbutton", { name: "Số phút" }), "35")
+    await user.click(screen.getByRole("button", { name: "Lưu lần làm" }))
+    const attempts = liveValues(saved().attempts)
+    expect(attempts).toHaveLength(1)
+    expect(attempts[0]).toMatchObject({ outcome: "hint", minutes: 35 })
+    expect(screen.getByText("Làm lại: sau 3 ngày")).toBeInTheDocument()
   })
 
-  it("switches the interface language", async () => {
+  it("collects a link in the inbox and files it as a problem", async () => {
+    const user = userEvent.setup()
+    const pattern = notebookActions.addPattern("t_dsa", null, "Graphs")
+    renderApp()
+    await go("#/inbox")
+    await screen.findByRole("heading", { level: 1, name: "Hộp thu" })
+    const main = screen.getByRole("main")
+    await user.type(
+      within(main).getByRole("textbox", { name: "Link" }),
+      "https://leetcode.com/problems/number-of-islands/"
+    )
+    await user.click(within(main).getByRole("button", { name: "Thêm vào hộp thu" }))
+    expect(liveValues(saved().inbox)).toHaveLength(1)
+
+    await user.click(await within(main).findByRole("button", { name: "Thành bài tập" }))
+    await user.click(within(main).getByRole("checkbox", { name: "Graphs" }))
+    await user.click(within(main).getByRole("button", { name: "Lưu" }))
+    const doc = saved()
+    expect(liveValues(doc.inbox)).toHaveLength(0)
+    expect(liveValues(doc.problems)[0]?.patternIds).toEqual([pattern])
+  })
+
+  it("switches the app to English from the settings", async () => {
     const user = userEvent.setup()
     renderApp()
-    await user.click(screen.getByRole("radio", { name: "EN" }))
-    expect(screen.getByRole("button", { name: "Export progress" })).toBeInTheDocument()
+    await go("#/settings")
+    await user.click(await screen.findByRole("radio", { name: "EN" }))
+    expect(await screen.findByRole("heading", { level: 1, name: "Settings" })).toBeInTheDocument()
     expect(storage.get(KEYS.lang)).toBe("en")
-  })
-
-  it("collapses and expands every phase", async () => {
-    const user = userEvent.setup()
-    renderApp()
-    await user.click(screen.getByRole("button", { name: "Mở hết" }))
-    expect(useUiStore.getState().expanded).toHaveLength(content.phases.length)
-    await user.click(screen.getByRole("button", { name: "Thu gọn" }))
-    expect(screen.queryByText(itemTitle)).not.toBeInTheDocument()
-  })
-})
-
-describe("item dialog", () => {
-  it("opens on the Learn tab every time, even for the same item", async () => {
-    const user = userEvent.setup()
-    renderApp()
-    await user.click(screen.getByText(itemTitle))
-    let dialog = await screen.findByRole("dialog")
-    await user.click(within(dialog).getByRole("tab", { name: /Ghi chú/ }))
-    await user.keyboard("{Escape}")
-    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument())
-
-    await user.click(screen.getByText(itemTitle))
-    dialog = await screen.findByRole("dialog")
-    expect(within(dialog).getByRole("tab", { name: /Kiến thức/ })).toHaveAttribute(
-      "aria-selected",
-      "true"
-    )
-  })
-})
-
-describe("keyboard focus", () => {
-  it("returns focus to the item row after the dialog closes", async () => {
-    const user = userEvent.setup()
-    renderApp()
-    const opener = screen.getByText(itemTitle).closest("button")!
-    await user.click(opener)
-    await screen.findByRole("dialog")
-    await user.keyboard("{Escape}")
-    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument())
-    expect(document.activeElement).toBe(opener)
   })
 })

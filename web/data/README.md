@@ -1,6 +1,13 @@
-# Dữ liệu của app
+# Lộ trình DSA cũ (gợi ý)
 
-App (`src/`) chỉ là phần vỏ. Toàn bộ nội dung nằm trong thư mục này.
+Nội dung ở đây không còn là nội dung chính của app: những gì bạn học nằm trong notebook (`src/notebook/`) do bạn tự viết. Thư mục này giờ chỉ dùng để:
+
+- gợi ý giai đoạn và mục ở trang chủ đề DSA: bấm **Thêm** thì mục đó thành một pattern trống của bạn;
+- gợi ý bài và tài liệu ở trang pattern tạo từ một mục (chỉ thêm khi bạn bấm);
+- nhận ra link bài bạn dán vào (Hộp thu, ô thêm bài): lấy sẵn tên và mức;
+- chuyển tiến độ của bản cũ (lần đầu mở bản mới, hoặc nút **Nhập dữ liệu**) thành pattern và bài tập.
+
+Các trường `description`, `keyPoints`, `examples`, `template`, `complexity`, `pitfalls` và `codeReviewChecklist` vẫn được kiểm tra nhưng app không hiện nữa.
 
 - Đang chạy `npm run dev`: lưu file JSON là trang tự cập nhật.
 - Chạy bằng `start.sh`: chạy lại `start.sh` (nó build lại mỗi lần).
@@ -14,22 +21,19 @@ Mọi trường chữ đều viết được theo 2 cách:
 - Chuỗi thường: hiện giống nhau ở mọi ngôn ngữ, ví dụ `"title": "Two Sum"`.
 - Theo ngôn ngữ: `"title": { "vi": "Dạng bài Stack", "en": "Stack problems" }`. Thiếu `en` thì app dùng `vi`.
 
-Cách thứ hai dùng được cả cho mảng (`keyPoints`, `pitfalls`) và code (`template[].code`).
-Chữ trên nút và nhãn của app (không phải nội dung) nằm trong `i18n.js`.
+Khi một gợi ý được thêm vào notebook, tên được chép theo ngôn ngữ đang chọn lúc đó; sau đó là chữ của bạn, không đổi theo ngôn ngữ nữa.
+Chữ trên nút và nhãn của app nằm trong `src/i18n/locales/`.
 
 ## manifest.json
 
 ```json
 {
-  "title": { "vi": "Tiêu đề trang", "en": "Page title" },
-  "subtitle": { "vi": "Dòng mô tả", "en": "Subtitle" },
-  "phases": ["phase-0-nen-tang.json", "phase-1-co-ban.json"],
-  "codeReviewChecklist": [{ "id": "edge", "text": { "vi": "Đã xét edge case", "en": "Edge cases covered" } }]
+  "title": { "vi": "Tiêu đề", "en": "Title" },
+  "phases": ["phase-0-nen-tang.json", "phase-1-co-ban.json"]
 }
 ```
 
-- `phases`: danh sách file giai đoạn, theo đúng thứ tự hiển thị. Thêm giai đoạn mới = tạo file mới rồi thêm tên file vào đây.
-- `codeReviewChecklist`: các ô tự review ở tab "Ghi chú & review" của mọi mục.
+- `phases`: danh sách file giai đoạn, theo thứ tự gợi ý.
 
 ## File giai đoạn
 
@@ -42,50 +46,30 @@ Chữ trên nút và nhãn của app (không phải nội dung) nằm trong `i18
 }
 ```
 
-Mỗi mục trong `items`. Chỉ `id`, `type`, `title` là bắt buộc; trường nào có thì hiện, không có thì thôi:
+Các trường của mỗi mục trong `items` mà app còn dùng:
 
 | Trường | Ý nghĩa |
 |---|---|
-| `id` | Khoá lưu tiến độ, không trùng với mục khác. **Đặt 1 lần rồi đừng đổi**, đổi là mất tick và ghi chú của mục đó |
-| `type` | `"theory"` (Lý thuyết) hoặc `"practice"` (Luyện bài) |
-| `title` | Tên mục |
-| `description` | Mô tả. Xuống 2 dòng (`\n\n`) để tách đoạn |
-| `keyPoints` | Danh sách ý chính |
-| `examples` | `[{ "title", "input", "output", "explain" }]` |
-| `template` | Code mẫu, mỗi ngôn ngữ 1 phần tử: `[{ "lang": "python", "code": ["dòng 1", "dòng 2"] }, { "lang": "java", "code": [...] }]`. Hiện thành các tab Python / Java |
-| `complexity` | Độ phức tạp |
-| `pitfalls` | Danh sách lỗi hay gặp |
-| `problems` | Bài cần giải, có ô tick: `[{ "title", "url", "level", "note", "guides" }]`. App tự gom theo trang (LeetCode, HackerRank, CSES...). `level`: `Easy` / `Medium` / `Hard` (HackerRank có thêm `Advanced`). `guides` (không bắt buộc): link hướng dẫn riêng cho bài, `[{ "title", "url" }]`, xem phần "Cách giải" bên dưới |
-| `resources` | Tài liệu: `[{ "type", "title", "url" }]` |
+| `id` | **Đặt 1 lần rồi đừng đổi**: pattern tạo từ mục này nhận ra mục qua `id` (để gợi ý bài, và để 2 máy cùng thêm 1 mục thì ra 1 pattern) |
+| `title` | Tên mục, thành tên pattern khi được thêm |
+| `problems` | Bài gợi ý: `[{ "title", "url", "level", "note", "guides" }]`. `level`: `Easy` / `Medium` / `Hard`. Mục không có bài nào thành pattern "lý thuyết thuần" |
+| `resources` | Tài liệu gợi ý: `[{ "type", "title", "url" }]`. `type`: `article`, `video`, `course`, `docs`, `book`, `visual`, `practice` |
 
-`type` của `resources`:
+Cùng 1 link bài xuất hiện ở nhiều mục vẫn là 1 bài trong notebook (khớp theo link, bỏ qua `www.`, dấu `/` cuối và phần sau tên bài của LeetCode).
 
-- `article`, `video`, `course`, `docs`, `book`, `visual`: hiện ở tab "Kiến thức", phần "Tài liệu miễn phí".
-- `practice` (danh sách bài theo tag, study plan, contest...): hiện ở tab "Bài tập", phần "Danh sách bài khác".
+## Gợi ý khi bí
 
-Trong text có thể viết `` `code` `` và `**chữ đậm**`.
+Trang của mỗi bài có phần **Bí? Xem gợi ý**, app tự tạo từ link của bài: link lời giải (LeetCode, HackerRank, AtCoder; trang khác thì tìm Google), video trên YouTube, và câu hỏi soạn sẵn để mở Claude hoặc ChatGPT. Nội dung câu hỏi nằm trong `src/i18n/locales/` (key `prompt.hint`, `prompt.explain`).
 
-Bài tập được tính theo `url`: cùng 1 bài xuất hiện ở nhiều mục thì tick ở đâu cũng tính chung.
-
-### Cách giải
-
-Mỗi bài ở tab "Bài tập" có nút "Cách giải". Không cần thêm gì vào data, app tự tạo từ `url` của bài:
-
-- Link lời giải: LeetCode (editorial, solutions), HackerRank (editorial, discussions), AtCoder (editorial). Trang khác (CSES...) thì là link tìm Google. Cuối cùng là link tìm video trên YouTube.
-- Hỏi AI: copy sẵn câu hỏi (tên bài, link, mục đang học, ngôn ngữ code đang chọn) rồi mở Claude hoặc ChatGPT. Có 2 kiểu: "Chỉ gợi ý" và "Giải thích từng bước". Nội dung câu hỏi nằm trong `i18n.js` (key `prompt.hint`, `prompt.explain`).
-
-Tìm được bài hướng dẫn hay cho 1 bài cụ thể thì thêm vào `guides`, link đó hiện đầu tiên:
+`guides` của một bài (không bắt buộc) là link hướng dẫn riêng, hiện đầu tiên:
 
 ```json
 { "title": "Two Sum", "url": "https://leetcode.com/problems/two-sum/", "level": "Easy",
   "guides": [{ "title": { "vi": "Giải thích bằng hash map", "en": "Hash map walkthrough" }, "url": "https://..." }] }
 ```
 
-## Tiến độ
+Bài bạn tự thêm cũng có các link này khi link của nó trùng một bài ở đây.
 
-Tick, ghi chú, code của bạn không nằm trong các file này.
+## Dữ liệu của bạn
 
-- Mở app bằng `start.sh` hoặc app Android, rồi bấm "Kết nối Google Drive": mỗi thay đổi được tự lưu vào file `dsa-roadmap-progress.json` trong Google Drive của bạn, máy tính và điện thoại dùng chung. Lần đầu kết nối, tiến độ đang có trên máy được gộp vào file. Cách cài xem [README.md](../../README.md).
-- Mở cách khác (mở thẳng file, Live Server...): chỉ lưu trong trình duyệt (localStorage). Dòng chữ ở cuối trang cho biết đang lưu ở đâu.
-
-Dùng nút "Xuất tiến độ" để sao lưu ra file, "Nhập tiến độ" để khôi phục hoặc chuyển sang máy khác. File trên Drive và file `progress/progress.json` cũ (bản trước khi có Drive) cũng nhập lại được bằng nút này.
+Pattern, bài, lần làm, ghi chú và thẻ của bạn không nằm trong các file này: chúng ở trong trình duyệt và trong file `interview-prep-notebook.json` trên Google Drive. Cách đồng bộ xem [README.md](../../README.md).

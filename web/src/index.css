@@ -56,6 +56,15 @@
   --syn-comment: #008000;
   --syn-function: #795e26;
   --syn-type: #267f99;
+
+  /* Topic colours: an 8px dot next to a topic name, and the graph view. Text-safe on --card. */
+  --topic-blue: #005fb8;
+  --topic-orange: #b4520a;
+  --topic-teal: #0f766e;
+  --topic-purple: #7c3aed;
+  --topic-green: #2f7d32;
+  --topic-pink: #be185d;
+  --topic-gray: #616161;
 }
 
 .dark {
@@ -105,6 +114,14 @@
   --syn-comment: #6a9955;
   --syn-function: #dcdcaa;
   --syn-type: #4ec9b0;
+
+  --topic-blue: #4daafc;
+  --topic-orange: #f0a35e;
+  --topic-teal: #4ec9b0;
+  --topic-purple: #c586c0;
+  --topic-green: #73c991;
+  --topic-pink: #f38ba8;
+  --topic-gray: #9d9d9d;
 }
 
 @theme inline {
@@ -153,6 +170,14 @@
   --color-syn-comment: var(--syn-comment);
   --color-syn-function: var(--syn-function);
   --color-syn-type: var(--syn-type);
+
+  --color-topic-blue: var(--topic-blue);
+  --color-topic-orange: var(--topic-orange);
+  --color-topic-teal: var(--topic-teal);
+  --color-topic-purple: var(--topic-purple);
+  --color-topic-green: var(--topic-green);
+  --color-topic-pink: var(--topic-pink);
+  --color-topic-gray: var(--topic-gray);
 
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);

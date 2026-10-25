@@ -1,16 +1,19 @@
 import { z } from "zod"
+import { nowIso } from "@/lib/dates"
 import { AppError } from "@/lib/errors"
-import { nowIso } from "@/progress/logic"
-import { ProgressSchema, type Progress } from "@/progress/schema"
+import { parseNotebook, type Notebook } from "@/notebook/schema"
 
-// The progress file on Google Drive, through the Drive REST API v3.
+// The notebook file on Google Drive, through the Drive REST API v3.
 // The app only has the drive.file scope: it sees the files it created and nothing else.
+//
+// Not the file of the old roadmap app (dsa-roadmap-progress.json): an old copy of the app
+// still installed somewhere keeps writing that one, and would drop the notebook from it.
 
 const DRIVE_FILES = "https://www.googleapis.com/drive/v3/files"
 const DRIVE_UPLOAD = "https://www.googleapis.com/upload/drive/v3/files"
-export const DRIVE_FILE_NAME = "dsa-roadmap-progress.json"
+export const DRIVE_FILE_NAME = "interview-prep-notebook.json"
 // Tag on the file, so it is found again after being renamed or moved to another folder
-const DRIVE_TAG = { key: "dsaRoadmap", value: "progress" }
+const DRIVE_TAG = { key: "prepNotebook", value: "notebook" }
 const TOKEN_MARGIN_MS = 60 * 1000 // fetch a new token a little before the old one expires
 
 /** The user has to sign in (again) before the app can reach Drive */
@@ -42,16 +45,16 @@ export type DriveFile = z.infer<typeof DriveFileSchema>
 export interface DriveStore {
   /** The file with this id; null when it was deleted or is in the trash */
   getFile(id: string): Promise<DriveFile | null>
-  /** The newest progress file the app created */
+  /** The newest notebook file the app created */
   findFile(): Promise<DriveFile | null>
-  download(id: string): Promise<Progress>
+  download(id: string): Promise<Notebook>
   /** Overwrites the file, or creates it when there is no id yet */
-  write(id: string | undefined, progress: Progress): Promise<DriveFile>
+  write(id: string | undefined, doc: Notebook): Promise<DriveFile>
   setToken(token: Token | null): void
 }
 
-const progressJson = (progress: Progress) =>
-  `${JSON.stringify({ savedAt: nowIso(), ...progress }, null, 2)}\n`
+// Not indented: the notebook grows with every note, and Drive stores it as sent
+const notebookJson = (doc: Notebook) => `${JSON.stringify({ savedAt: nowIso(), ...doc })}\n`
 
 export function createDriveStore(auth: DriveAuth, fetchFn: typeof fetch = fetch): DriveStore {
   let token: Token | null = null
@@ -127,26 +130,26 @@ export function createDriveStore(auth: DriveAuth, fetchFn: typeof fetch = fetch)
 
     async download(id) {
       const res = await driveFetch(fileUrl(id, { alt: "media" }))
-      const result = ProgressSchema.safeParse(await res!.json().catch(() => null))
+      const doc = parseNotebook(await res!.json().catch(() => null))
       // Edited by hand into something else: report it rather than overwrite it
-      if (!result.success) throw new AppError("sync.badFile", { file: DRIVE_FILE_NAME })
-      return result.data
+      if (!doc) throw new AppError("sync.badFile", { file: DRIVE_FILE_NAME })
+      return doc
     },
 
-    async write(id, progress) {
+    async write(id, doc) {
       if (id) {
         const res = await driveFetch(
           `${DRIVE_UPLOAD}/${encodeURIComponent(id)}?uploadType=media&fields=id,version`,
           {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
-            body: progressJson(progress),
+            body: notebookJson(doc),
           }
         )
         return DriveFileSchema.parse(await res!.json())
       }
       // New file: metadata (name, tag) and content in one multipart request
-      const boundary = `dsa-${Math.random().toString(36).slice(2)}`
+      const boundary = `prep-${Math.random().toString(36).slice(2)}`
       const metadata = {
         name: DRIVE_FILE_NAME,
         mimeType: "application/json",
@@ -160,7 +163,7 @@ export function createDriveStore(auth: DriveAuth, fetchFn: typeof fetch = fetch)
         `--${boundary}`,
         "Content-Type: application/json",
         "",
-        progressJson(progress),
+        notebookJson(doc),
         `--${boundary}--`,
         "",
       ].join("\r\n")
