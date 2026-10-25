@@ -1,0 +1,4 @@
+node_modules/
+
+# Web app copied from ../web for packing into the APK (npm run build:web)
+www/
