@@ -62,8 +62,9 @@ Pattern → Resources, note sections, Q&A cards
   A review more than 7 days overdue drops the pattern one level.
 - **Attempt outcome** has 3 values: solved alone / needed a hint / read the solution.
   Redo after 1 day (solution), 3 days (hint), growing gaps (alone).
-- The old roadmap in `web/data/` is a **suggestion source only**: shown in a "Suggestions
-  from the old DSA roadmap" box, added to a pattern only when the user clicks.
+- The modules in `web/data/` (one folder per module, each bound to a topic) are a
+  **suggestion source only**: shown in a "Suggestions: <module title>" box on that topic's
+  page, added to a pattern only when the user clicks.
 
 ## Screens
 

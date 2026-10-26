@@ -20,6 +20,8 @@ import { Tag } from "@/components/tag"
 import { Button } from "@/components/ui/button"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { useContent } from "@/content/context"
+import { modulesOf, type Module } from "@/content/load"
+import { localize } from "@/content/localize"
 import { cn } from "@/lib/utils"
 import { useLang, useNotebook } from "@/notebook/hooks"
 import {
@@ -32,8 +34,7 @@ import {
 } from "@/notebook/logic"
 import { TOPIC_COLORS, TOPIC_KINDS, type Pattern, type Phase, type Topic } from "@/notebook/schema"
 import { notebookActions } from "@/notebook/store"
-import { patternIdFor, roadmapSuggestions, type SuggestedItem } from "@/notebook/suggestions"
-import { DSA_TOPIC_ID } from "@/notebook/templates"
+import { moduleSuggestions, patternIdFor, type SuggestedItem } from "@/notebook/suggestions"
 import { href, navigate } from "@/state/router"
 
 function MoveButtons({
@@ -293,13 +294,13 @@ function TopicSettings({ topic }: { topic: Topic }) {
   )
 }
 
-/** The old DSA roadmap, offered phase by phase: an item becomes a pattern only when added */
-function Suggestions() {
+/** A module of data/, offered phase by phase: an item becomes a pattern only when added */
+function Suggestions({ module }: { module: Module }) {
   const { t } = useTranslation()
   const content = useContent()
   const nb = useNotebook()
   const lang = useLang()
-  const phases = roadmapSuggestions(content, nb, lang)
+  const phases = moduleSuggestions(module, nb, lang)
   const notAdded = (items: SuggestedItem[]) => items.filter((i) => !i.added).map((i) => i.itemId)
   const allLeft = notAdded(phases.flatMap((p) => p.items))
 
@@ -314,7 +315,7 @@ function Suggestions() {
 
   return (
     <Panel
-      title={t("suggest.title")}
+      title={t("suggest.title", { name: localize(module.title, lang) })}
       actions={
         allLeft.length > 0 && (
           <Button size="xs" onClick={() => addAll(allLeft)}>
@@ -396,6 +397,7 @@ export function TopicPage({ id }: { id: string }) {
   const nb = useNotebook()
   const [showSettings, setShowSettings] = useState(false)
   const now = useNow()
+  const content = useContent()
   const topic = getLive(nb.topics, id)
   if (!topic) {
     return (
@@ -406,6 +408,7 @@ export function TopicPage({ id }: { id: string }) {
       </PageHeader>
     )
   }
+  const modules = modulesOf(content, topic.id)
   const status = topicStatus(nb, topic.id, now)
   const phases = phasesOf(nb, topic.id)
   const loose = patternsOf(nb, topic.id, null)
@@ -481,9 +484,11 @@ export function TopicPage({ id }: { id: string }) {
             />
           </div>
         </section>
-        {topic.id === DSA_TOPIC_ID && (
-          <aside className="min-w-0 flex-[1_1_300px]">
-            <Suggestions />
+        {modules.length > 0 && (
+          <aside className="flex min-w-0 flex-[1_1_300px] flex-col gap-4">
+            {modules.map((module) => (
+              <Suggestions key={module.id} module={module} />
+            ))}
           </aside>
         )}
       </div>

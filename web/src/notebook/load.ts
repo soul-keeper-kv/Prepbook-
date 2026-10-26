@@ -3,7 +3,7 @@ import type { Lang } from "@/i18n/languages"
 import { KEYS, storage } from "@/lib/storage"
 import { migrateProgress, withDefaultTopics } from "@/notebook/migrate"
 import { emptyNotebook, parseNotebook, type Notebook } from "@/notebook/schema"
-import { loadSavedProgress } from "@/progress/legacy"
+import { legacyModule, loadSavedProgress } from "@/progress/legacy"
 
 const savedCodeLang = () => {
   const value = storage.get(KEYS.codeLang)
@@ -22,7 +22,7 @@ export function loadSavedNotebook(content: Content, lang: Lang): Notebook {
   const fresh = withDefaultTopics(emptyNotebook(), lang)
   const notebook = migrateProgress(
     fresh,
-    loadSavedProgress(content.phases),
+    loadSavedProgress(legacyModule(content)?.phases ?? []),
     content,
     lang,
     savedCodeLang()

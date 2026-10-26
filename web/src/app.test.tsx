@@ -5,7 +5,7 @@ import "@/i18n"
 import i18n from "@/i18n"
 import { App } from "@/app"
 import { ContentProvider } from "@/content/context"
-import { buildContent, dataFiles } from "@/content/load"
+import { buildContent, dataFiles, modulesOf } from "@/content/load"
 import { localize } from "@/content/localize"
 import { KEYS, storage } from "@/lib/storage"
 import { liveValues } from "@/notebook/logic"
@@ -283,7 +283,7 @@ describe("App", () => {
     renderApp()
     await go("#/topic/t_dsa")
     await screen.findByRole("heading", { level: 1 })
-    const firstPhase = content.phases[0]!
+    const firstPhase = modulesOf(content, "t_dsa")[0]!.phases[0]!
     const phaseName = localize(firstPhase.name, "vi")
     await user.click(screen.getByRole("button", { name: (name) => name.startsWith(phaseName) }))
     await user.click(screen.getByRole("button", { name: /^Thêm cả giai đoạn/ }))

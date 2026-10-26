@@ -41,21 +41,21 @@ Tiến độ của bản cũ (lộ trình DSA có tick): lần đầu mở bản
 
 ## Thư mục
 
-| Đường dẫn               | Vai trò                                                                                                                                                                                   |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data/`                 | Lộ trình DSA cũ, giờ chỉ dùng làm gợi ý, xem [data/README.md](data/README.md). Kiểm tra theo `src/content/schema.ts`                                                                      |
-| `src/notebook/`         | Dữ liệu người dùng viết: định dạng (`schema.ts`), thao tác (`store.ts`), tính lịch ôn và mức (`logic.ts`), gộp 2 bản (`merge.ts`), chuyển tiến độ cũ (`migrate.ts`), gợi ý từ lộ trình cũ |
-| `src/content/`          | Nạp lộ trình cũ trong `data/`, link lời giải, câu hỏi gửi AI                                                                                                                              |
-| `src/progress/`         | Định dạng tiến độ của bản cũ, chỉ đọc 1 lần để chuyển sang notebook                                                                                                                       |
-| `src/sync/`             | Đồng bộ Google Drive                                                                                                                                                                      |
-| `src/pages/`            | Các trang: Hôm nay, Hộp thu, Ôn lại, Chủ đề, Pattern, Bài, Graph, Tìm, Cài đặt                                                                                                            |
-| `src/components/`       | Khung app (`shell/`), phần dùng chung (`common/`), phần của trang pattern và trang bài                                                                                                    |
-| `src/components/ui/`    | Component của shadcn/ui (đã chỉnh lại cho giống VS Code)                                                                                                                                  |
-| `src/state/router.ts`   | Địa chỉ trang theo hash (`#/pattern/<id>`): chạy được trên server tĩnh và trong app Android                                                                                               |
-| `src/i18n/locales/`     | Chữ giao diện tiếng Việt / tiếng Anh. Thêm key thì thêm ở cả 2 file (có test kiểm tra)                                                                                                    |
-| `src/index.css`         | Bảng màu VS Code (Light+ / Dark+), cỡ chữ, style gốc                                                                                                                                      |
-| `server/serve.ts`       | Server cục bộ: phục vụ `dist/` và giữ đăng nhập Google. Node chạy thẳng file `.ts`                                                                                                        |
-| `server/google-auth.ts` | Đăng nhập Google (`/api/google/*`), dùng chung cho `serve.ts` và `npm run dev`                                                                                                            |
+| Đường dẫn               | Vai trò                                                                                                                                                                               |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data/`                 | Gợi ý theo module, mỗi module một thư mục gắn với một chủ đề (hiện có `dsa/`). Quy tắc đặt tên xem [data/README.md](data/README.md)                                                   |
+| `src/notebook/`         | Dữ liệu người dùng viết: định dạng (`schema.ts`), thao tác (`store.ts`), tính lịch ôn và mức (`logic.ts`), gộp 2 bản (`merge.ts`), chuyển tiến độ cũ (`migrate.ts`), gợi ý từ `data/` |
+| `src/content/`          | Nạp và kiểm tra các module trong `data/`, link lời giải, câu hỏi gửi AI                                                                                                               |
+| `src/progress/`         | Định dạng tiến độ của bản cũ, chỉ đọc 1 lần để chuyển sang notebook                                                                                                                   |
+| `src/sync/`             | Đồng bộ Google Drive                                                                                                                                                                  |
+| `src/pages/`            | Các trang: Hôm nay, Hộp thu, Ôn lại, Chủ đề, Pattern, Bài, Graph, Tìm, Cài đặt                                                                                                        |
+| `src/components/`       | Khung app (`shell/`), phần dùng chung (`common/`), phần của trang pattern và trang bài                                                                                                |
+| `src/components/ui/`    | Component của shadcn/ui (đã chỉnh lại cho giống VS Code)                                                                                                                              |
+| `src/state/router.ts`   | Địa chỉ trang theo hash (`#/pattern/<id>`): chạy được trên server tĩnh và trong app Android                                                                                           |
+| `src/i18n/locales/`     | Chữ giao diện tiếng Việt / tiếng Anh. Thêm key thì thêm ở cả 2 file (có test kiểm tra)                                                                                                |
+| `src/index.css`         | Bảng màu VS Code (Light+ / Dark+), cỡ chữ, style gốc                                                                                                                                  |
+| `server/serve.ts`       | Server cục bộ: phục vụ `dist/` và giữ đăng nhập Google. Node chạy thẳng file `.ts`                                                                                                    |
+| `server/google-auth.ts` | Đăng nhập Google (`/api/google/*`), dùng chung cho `serve.ts` và `npm run dev`                                                                                                        |
 
 Quy tắc giao diện (màu, chữ, bố cục, i18n, accessibility) nằm ở skill [prep-ui](../.claude/skills/prep-ui/SKILL.md).
 

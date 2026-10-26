@@ -8,8 +8,8 @@ import { useContent } from "@/content/context"
 import { useLocalize } from "@/content/localize"
 import { AI_MODES, AI_TOOLS, solutionLinks, sourceOf } from "@/content/problems"
 import { cn } from "@/lib/utils"
-import { normalizeUrl } from "@/notebook/ids"
 import type { Problem } from "@/notebook/schema"
+import { findSuggestedProblem } from "@/notebook/suggestions"
 import { uiActions, useUiStore } from "@/state/ui"
 
 /**
@@ -22,11 +22,8 @@ export function ProblemHelp({ problem, patternNames }: { problem: Problem; patte
   const codeLang = useUiStore((s) => s.codeLang)
   const content = useContent()
   const localize = useLocalize()
-  // The old roadmap may list guides written for this very problem: they come first
-  const key = normalizeUrl(problem.url)
-  const guides = content.phases
-    .flatMap((phase) => phase.items.flatMap((item) => item.problems ?? []))
-    .find((p) => normalizeUrl(p.url) === key)?.guides
+  // data/ may list guides written for this very problem: they come first
+  const guides = findSuggestedProblem(content, problem.url)?.problem.guides
   const links = solutionLinks(
     { url: problem.url, title: problem.title, level: problem.level, guides },
     problem.title,

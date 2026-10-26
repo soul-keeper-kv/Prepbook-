@@ -1,8 +1,7 @@
 import type { ReactNode } from "react"
-import type { ItemType, ResourceType } from "@/content/schema"
 import { cn } from "@/lib/utils"
 
-// Small labels: "tag" is square (Theory / Practice / Review due), "pill" is round
+// Small labels: "tag" is square (Theory / Review due), "pill" is round
 // (resource type, difficulty). Class names are written out in full so Tailwind finds them.
 const TONES = {
   link: "bg-info-bg text-link",
@@ -14,18 +13,6 @@ const TONES = {
 } as const
 
 export type Tone = keyof typeof TONES
-
-export const ITEM_TYPE_TONE: Record<ItemType, Tone> = { theory: "link", practice: "ok" }
-
-export const RESOURCE_TONE: Record<ResourceType, Tone> = {
-  article: "link",
-  video: "danger",
-  course: "purple",
-  docs: "neutral",
-  book: "warn",
-  visual: "ok",
-  practice: "ok",
-}
 
 const LEVEL_TONE: Record<string, Tone> = {
   easy: "ok",

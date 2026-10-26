@@ -1,0 +1,89 @@
+{
+  "id": "p0",
+  "name": { "vi": "Giai đoạn 0 · Nền tảng ngôn ngữ", "en": "Phase 0 · Language fundamentals" },
+  "items": [
+    {
+      "id": "p0-lang",
+      "title": { "vi": "Chọn 1 ngôn ngữ (C++ / Python / Java) và đi đến cùng", "en": "Pick one language (C++ / Python / Java) and stick with it" },
+      "resources": [
+        { "type": "course", "title": "CS50x (Harvard)", "url": "https://cs50.harvard.edu/x/" },
+        { "type": "docs", "title": "Python docs: The Python Tutorial", "url": "https://docs.python.org/3/tutorial/" },
+        { "type": "docs", "title": "dev.java: Learn Java", "url": "https://dev.java/learn/" }
+      ]
+    },
+    {
+      "id": "p0-basics",
+      "title": { "vi": "Biến, vòng lặp, hàm, mảng, chuỗi, nhập xuất nhanh", "en": "Variables, loops, functions, arrays, strings, fast I/O" },
+      "problems": [
+        { "title": "Reverse String", "url": "https://leetcode.com/problems/reverse-string/", "level": "Easy" },
+        { "title": "Fizz Buzz", "url": "https://leetcode.com/problems/fizz-buzz/", "level": "Easy" },
+        { "title": "Running Sum of 1d Array", "url": "https://leetcode.com/problems/running-sum-of-1d-array/", "level": "Easy" },
+        { "title": "Richest Customer Wealth", "url": "https://leetcode.com/problems/richest-customer-wealth/", "level": "Easy" },
+        { "title": "Palindrome Number", "url": "https://leetcode.com/problems/palindrome-number/", "level": "Easy" },
+        { "title": "Solve Me First", "url": "https://www.hackerrank.com/challenges/solve-me-first/problem", "level": "Easy" },
+        { "title": "Simple Array Sum", "url": "https://www.hackerrank.com/challenges/simple-array-sum/problem", "level": "Easy" },
+        { "title": "A Very Big Sum", "url": "https://www.hackerrank.com/challenges/a-very-big-sum/problem", "level": "Easy" },
+        { "title": "Diagonal Difference", "url": "https://www.hackerrank.com/challenges/diagonal-difference/problem", "level": "Easy" },
+        { "title": "Staircase", "url": "https://www.hackerrank.com/challenges/staircase/problem", "level": "Easy" },
+        { "title": "Time Conversion", "url": "https://www.hackerrank.com/challenges/time-conversion/problem", "level": "Easy" },
+        { "title": "Alternating Characters", "url": "https://www.hackerrank.com/challenges/alternating-characters/problem", "level": "Easy" },
+        { "title": "Funny String", "url": "https://www.hackerrank.com/challenges/funny-string/problem", "level": "Easy" }
+      ],
+      "resources": [
+        { "type": "article", "title": "USACO Guide: Input & Output", "url": "https://usaco.guide/general/input-output" },
+        { "type": "article", "title": "USACO Guide: Fast Input & Output", "url": "https://usaco.guide/general/fast-io" }
+      ]
+    },
+    {
+      "id": "p0-stdlib",
+      "title": { "vi": "Thư viện chuẩn: vector/map/set/sort hoặc list/dict/set", "en": "Standard library: vector/map/set/sort or list/dict/set" },
+      "problems": [
+        { "title": "Contains Duplicate", "url": "https://leetcode.com/problems/contains-duplicate/", "level": "Easy" },
+        { "title": "Valid Anagram", "url": "https://leetcode.com/problems/valid-anagram/", "level": "Easy" },
+        { "title": "Intersection of Two Arrays", "url": "https://leetcode.com/problems/intersection-of-two-arrays/", "level": "Easy" },
+        { "title": "First Unique Character in a String", "url": "https://leetcode.com/problems/first-unique-character-in-a-string/", "level": "Easy" },
+        { "title": "collections.Counter()", "url": "https://www.hackerrank.com/challenges/collections-counter/problem", "level": "Easy" },
+        { "title": "DefaultDict Tutorial", "url": "https://www.hackerrank.com/challenges/defaultdict-tutorial/problem", "level": "Easy" },
+        { "title": "Collections.deque()", "url": "https://www.hackerrank.com/challenges/py-collections-deque/problem", "level": "Easy" },
+        { "title": "Java Hashset", "url": "https://www.hackerrank.com/challenges/java-hashset/problem", "level": "Easy" },
+        { "title": "Java Stack", "url": "https://www.hackerrank.com/challenges/java-stack/problem", "level": "Medium" },
+        { "title": "Java Dequeue", "url": "https://www.hackerrank.com/challenges/java-dequeue/problem", "level": "Medium" },
+        { "title": "Java Priority Queue", "url": "https://www.hackerrank.com/challenges/java-priority-queue/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "docs", "title": "Python docs: collections", "url": "https://docs.python.org/3/library/collections.html" },
+        { "type": "docs", "title": "Oracle: Java Collections tutorial", "url": "https://docs.oracle.com/javase/tutorial/collections/" },
+        { "type": "article", "title": "Python Wiki: TimeComplexity", "url": "https://wiki.python.org/moin/TimeComplexity" }
+      ]
+    },
+    {
+      "id": "p0-easy",
+      "title": { "vi": "30–50 bài nhập môn: Codeforces 800 hoặc LeetCode Easy", "en": "30–50 warm-up problems: Codeforces 800 or LeetCode Easy" },
+      "problems": [
+        { "title": "Two Sum", "url": "https://leetcode.com/problems/two-sum/", "level": "Easy" },
+        { "title": "Best Time to Buy and Sell Stock", "url": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/", "level": "Easy" },
+        { "title": "Merge Sorted Array", "url": "https://leetcode.com/problems/merge-sorted-array/", "level": "Easy" },
+        { "title": "Remove Duplicates from Sorted Array", "url": "https://leetcode.com/problems/remove-duplicates-from-sorted-array/", "level": "Easy" },
+        { "title": "Majority Element", "url": "https://leetcode.com/problems/majority-element/", "level": "Easy" },
+        { "title": "Move Zeroes", "url": "https://leetcode.com/problems/move-zeroes/", "level": "Easy" },
+        { "title": "Compare the Triplets", "url": "https://www.hackerrank.com/challenges/compare-the-triplets/problem", "level": "Easy" },
+        { "title": "Plus Minus", "url": "https://www.hackerrank.com/challenges/plus-minus/problem", "level": "Easy" },
+        { "title": "Mini-Max Sum", "url": "https://www.hackerrank.com/challenges/mini-max-sum/problem", "level": "Easy" },
+        { "title": "Birthday Cake Candles", "url": "https://www.hackerrank.com/challenges/birthday-cake-candles/problem", "level": "Easy" },
+        { "title": "Arrays - DS", "url": "https://www.hackerrank.com/challenges/arrays-ds/problem", "level": "Easy" },
+        { "title": "Left Rotation", "url": "https://www.hackerrank.com/challenges/array-left-rotation/problem", "level": "Easy" },
+        { "title": "Missing Numbers", "url": "https://www.hackerrank.com/challenges/missing-numbers/problem", "level": "Easy" },
+        { "title": "Gemstones", "url": "https://www.hackerrank.com/challenges/gem-stones/problem", "level": "Easy" }
+      ],
+      "resources": [
+        { "type": "article", "title": "Tech Interview Handbook: Coding interview techniques", "url": "https://www.techinterviewhandbook.org/coding-interview-techniques/" },
+        { "type": "practice", "title": "LeetCode study plan: LeetCode 75", "url": "https://leetcode.com/studyplan/leetcode-75/" },
+        { "type": "practice", "title": "LeetCode study plan: Top Interview 150", "url": "https://leetcode.com/studyplan/top-interview-150/" },
+        { "type": "practice", "title": "Grind 75", "url": "https://www.techinterviewhandbook.org/grind75/" },
+        { "type": "practice", "title": "HackerRank Interview Preparation Kit", "url": "https://www.hackerrank.com/interview/interview-preparation-kit" },
+        { "type": "practice", "title": { "vi": "Danh sách LeetCode Easy", "en": "LeetCode Easy problem list" }, "url": "https://leetcode.com/problemset/?difficulty=EASY" },
+        { "type": "practice", "title": "Codeforces rating 800", "url": "https://codeforces.com/problemset?order=BY_RATING_ASC&tags=800-800" }
+      ]
+    }
+  ]
+}

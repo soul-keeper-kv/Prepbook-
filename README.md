@@ -7,7 +7,7 @@ Bạn tự tìm tài liệu và bài, tự làm, rồi ghi lại trong app: **T�
 - **Trang pattern**: các mục ghi chú theo kiểu chủ đề (DSA: nhận diện, ý tưởng, template, bẫy), bài đã làm, tài liệu đã đọc, câu hỏi phỏng vấn tự soạn.
 - **Mỗi lần làm bài** được ghi lại (tự làm / cần gợi ý / xem lời giải, số phút, sai ở đâu, code). Lịch làm lại và mức của pattern (Chưa học → Đang học → Nắm được → Thành thạo) tính từ đó, không tick tay.
 - **Hộp thu** giữ link vừa tìm được; **Ôn lại** gom bài và thẻ hỏi đáp đến hạn; **Graph** vẽ các pattern và bài như Obsidian.
-- Lộ trình DSA cũ trong `web/data/` giờ chỉ là **gợi ý**: bấm Thêm thì mới thành pattern của bạn.
+- `web/data/` chứa **gợi ý** theo module, mỗi module gắn với một chủ đề (hiện có lộ trình DSA cũ): bấm Thêm thì mới thành pattern của bạn.
 
 Gồm 2 phần tách riêng:
 

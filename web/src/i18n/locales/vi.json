@@ -448,8 +448,8 @@
     "hoursMinutes": "{{h}} giờ {{m}} phút"
   },
   "suggest": {
-    "title": "Gợi ý từ lộ trình DSA cũ",
-    "roadmapIntro": "Lộ trình cũ chỉ còn là gợi ý: bấm Thêm thì mục đó thành pattern (trống) của bạn, bài và tài liệu của nó hiện ở trang pattern để bạn chọn.",
+    "title": "Gợi ý: {{name}}",
+    "roadmapIntro": "Chỉ là gợi ý: bấm Thêm thì mục đó thành pattern (trống) của bạn, bài và tài liệu của nó hiện ở trang pattern để bạn chọn.",
     "patternIntro": "Chỉ thêm vào pattern khi bạn bấm.",
     "left_other": "{{count}} chưa thêm",
     "add": "Thêm",

@@ -5,13 +5,13 @@ import { mergeNotebooks } from "@/notebook/merge"
 import { EPOCH, migrateProgress, withDefaultTopics } from "@/notebook/migrate"
 import { emptyNotebook } from "@/notebook/schema"
 import { patternIdFor } from "@/notebook/suggestions"
+import { legacyModule } from "@/progress/legacy"
 import type { Progress } from "@/progress/schema"
 
 const content = buildContent(dataFiles)
-const firstPhase = content.phases[0]!
-const withProblems = content.phases
-  .flatMap((p) => p.items)
-  .find((i) => (i.problems?.length ?? 0) > 1)!
+const phases = legacyModule(content)!.phases
+const firstPhase = phases[0]!
+const withProblems = phases.flatMap((p) => p.items).find((i) => (i.problems?.length ?? 0) > 1)!
 const url = withProblems.problems![0]!.url
 
 const old: Progress = {

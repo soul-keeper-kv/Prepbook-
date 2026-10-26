@@ -1,0 +1,193 @@
+{
+  "id": "p3",
+  "name": { "vi": "Giai đoạn 3 · Đệ quy, tham lam, cây, đồ thị cơ bản", "en": "Phase 3 · Recursion, greedy, trees, basic graphs" },
+  "items": [
+    {
+      "id": "p3-recur",
+      "title": { "vi": "Đệ quy, chia để trị, đếm nghịch thế", "en": "Recursion, divide and conquer, counting inversions" },
+      "problems": [
+        { "title": "Fibonacci Number", "url": "https://leetcode.com/problems/fibonacci-number/", "level": "Easy" },
+        { "title": "Pow(x, n)", "url": "https://leetcode.com/problems/powx-n/", "level": "Medium" },
+        { "title": "Sort an Array", "url": "https://leetcode.com/problems/sort-an-array/", "level": "Medium" },
+        { "title": "Reverse Pairs", "url": "https://leetcode.com/problems/reverse-pairs/", "level": "Hard" },
+        { "title": "Count of Smaller Numbers After Self", "url": "https://leetcode.com/problems/count-of-smaller-numbers-after-self/", "level": "Hard" },
+        { "title": "Recursion: Fibonacci Numbers", "url": "https://www.hackerrank.com/challenges/ctci-fibonacci-numbers/problem", "level": "Easy" },
+        { "title": "Recursion: Davis' Staircase", "url": "https://www.hackerrank.com/challenges/ctci-recursive-staircase/problem", "level": "Medium" },
+        { "title": "Recursive Digit Sum", "url": "https://www.hackerrank.com/challenges/recursive-digit-sum/problem", "level": "Medium" },
+        { "title": "The Power Sum", "url": "https://www.hackerrank.com/challenges/the-power-sum/problem", "level": "Medium" },
+        { "title": "Merge Sort: Counting Inversions", "url": "https://www.hackerrank.com/challenges/ctci-merge-sort/problem", "level": "Hard" }
+      ],
+      "resources": [
+        { "type": "video", "title": "freeCodeCamp: Recursion in Programming - Full Course", "url": "https://www.youtube.com/watch?v=IJDJ0kBx2LM" },
+        { "type": "article", "title": "Tech Interview Handbook: Recursion", "url": "https://www.techinterviewhandbook.org/algorithms/recursion/" },
+        { "type": "practice", "title": "LeetCode tag: Recursion", "url": "https://leetcode.com/problem-list/recursion/" },
+        { "type": "practice", "title": "LeetCode tag: Divide and Conquer", "url": "https://leetcode.com/problem-list/divide-and-conquer/" }
+      ]
+    },
+    {
+      "id": "p3-tree",
+      "title": { "vi": "Cây: duyệt pre/in/post/level-order, BST", "en": "Trees: pre/in/post/level-order traversal, BST" },
+      "problems": [
+        { "title": "Binary Tree Inorder Traversal", "url": "https://leetcode.com/problems/binary-tree-inorder-traversal/", "level": "Easy" },
+        { "title": "Binary Tree Preorder Traversal", "url": "https://leetcode.com/problems/binary-tree-preorder-traversal/", "level": "Easy" },
+        { "title": "Search in a Binary Search Tree", "url": "https://leetcode.com/problems/search-in-a-binary-search-tree/", "level": "Easy" },
+        { "title": "Binary Tree Level Order Traversal", "url": "https://leetcode.com/problems/binary-tree-level-order-traversal/", "level": "Medium" },
+        { "title": "Insert into a Binary Search Tree", "url": "https://leetcode.com/problems/insert-into-a-binary-search-tree/", "level": "Medium" },
+        { "title": "Delete Node in a BST", "url": "https://leetcode.com/problems/delete-node-in-a-bst/", "level": "Medium" },
+        { "title": "Tree: Preorder Traversal", "url": "https://www.hackerrank.com/challenges/tree-preorder-traversal/problem", "level": "Easy" },
+        { "title": "Tree: Inorder Traversal", "url": "https://www.hackerrank.com/challenges/tree-inorder-traversal/problem", "level": "Easy" },
+        { "title": "Tree: Postorder Traversal", "url": "https://www.hackerrank.com/challenges/tree-postorder-traversal/problem", "level": "Easy" },
+        { "title": "Tree: Level Order Traversal", "url": "https://www.hackerrank.com/challenges/tree-level-order-traversal/problem", "level": "Easy" },
+        { "title": "Tree: Height of a Binary Tree", "url": "https://www.hackerrank.com/challenges/tree-height-of-a-binary-tree/problem", "level": "Easy" },
+        { "title": "Tree : Top View", "url": "https://www.hackerrank.com/challenges/tree-top-view/problem", "level": "Easy" },
+        { "title": "Binary Search Tree : Insertion", "url": "https://www.hackerrank.com/challenges/binary-search-tree-insertion/problem", "level": "Easy" }
+      ],
+      "resources": [
+        { "type": "visual", "title": "VisuAlgo: Binary Search Tree", "url": "https://visualgo.net/en/bst" },
+        { "type": "article", "title": "Tech Interview Handbook: Tree", "url": "https://www.techinterviewhandbook.org/algorithms/tree/" },
+        { "type": "video", "title": "freeCodeCamp: Binary Tree Algorithms for Technical Interviews", "url": "https://www.youtube.com/watch?v=fAAZixBzIAI" },
+        { "type": "practice", "title": "LeetCode tag: Tree", "url": "https://leetcode.com/problem-list/tree/" }
+      ]
+    },
+    {
+      "id": "p3-graph",
+      "title": { "vi": "Đồ thị: danh sách kề, BFS, DFS, sắp xếp topo", "en": "Graphs: adjacency lists, BFS, DFS, topological sort" },
+      "problems": [
+        { "title": "Find if Path Exists in Graph", "url": "https://leetcode.com/problems/find-if-path-exists-in-graph/", "level": "Easy" },
+        { "title": "Clone Graph", "url": "https://leetcode.com/problems/clone-graph/", "level": "Medium" },
+        { "title": "All Paths From Source to Target", "url": "https://leetcode.com/problems/all-paths-from-source-to-target/", "level": "Medium" },
+        { "title": "Course Schedule", "url": "https://leetcode.com/problems/course-schedule/", "level": "Medium" },
+        { "title": "Course Schedule II", "url": "https://leetcode.com/problems/course-schedule-ii/", "level": "Medium" },
+        { "title": "Breadth First Search: Shortest Reach", "url": "https://www.hackerrank.com/challenges/bfsshortreach/problem", "level": "Medium" },
+        { "title": "Roads and Libraries", "url": "https://www.hackerrank.com/challenges/torque-and-development/problem", "level": "Medium" },
+        { "title": "Journey to the Moon", "url": "https://www.hackerrank.com/challenges/journey-to-the-moon/problem", "level": "Medium" },
+        { "title": "Even Tree", "url": "https://www.hackerrank.com/challenges/even-tree/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "cp-algorithms: Breadth-first search", "url": "https://cp-algorithms.com/graph/breadth-first-search.html" },
+        { "type": "article", "title": "cp-algorithms: Topological sorting", "url": "https://cp-algorithms.com/graph/topological-sort.html" },
+        { "type": "visual", "title": "VisuAlgo: Graph Traversal (DFS/BFS)", "url": "https://visualgo.net/en/dfsbfs" },
+        { "type": "video", "title": "freeCodeCamp: Graph Algorithms for Technical Interviews", "url": "https://www.youtube.com/watch?v=tWVWeAqZ0WU" },
+        { "type": "practice", "title": "LeetCode tag: Breadth-First Search", "url": "https://leetcode.com/problem-list/breadth-first-search/" },
+        { "type": "practice", "title": "LeetCode tag: Topological Sort", "url": "https://leetcode.com/problem-list/topological-sort/" }
+      ]
+    },
+    {
+      "id": "p3-backtrack",
+      "title": { "vi": "Dạng bài Backtracking (hoán vị, tổ hợp, N-Queens)", "en": "Backtracking problems (permutations, combinations, N-Queens)" },
+      "problems": [
+        { "title": "Subsets", "url": "https://leetcode.com/problems/subsets/", "level": "Medium" },
+        { "title": "Combination Sum", "url": "https://leetcode.com/problems/combination-sum/", "level": "Medium" },
+        { "title": "Permutations", "url": "https://leetcode.com/problems/permutations/", "level": "Medium" },
+        { "title": "Subsets II", "url": "https://leetcode.com/problems/subsets-ii/", "level": "Medium" },
+        { "title": "Combination Sum II", "url": "https://leetcode.com/problems/combination-sum-ii/", "level": "Medium" },
+        { "title": "Word Search", "url": "https://leetcode.com/problems/word-search/", "level": "Medium" },
+        { "title": "Palindrome Partitioning", "url": "https://leetcode.com/problems/palindrome-partitioning/", "level": "Medium" },
+        { "title": "Letter Combinations of a Phone Number", "url": "https://leetcode.com/problems/letter-combinations-of-a-phone-number/", "level": "Medium" },
+        { "title": "N-Queens", "url": "https://leetcode.com/problems/n-queens/", "level": "Hard" },
+        { "title": "Crossword Puzzle", "url": "https://www.hackerrank.com/challenges/crossword-puzzle/problem", "level": "Medium" },
+        { "title": "Password Cracker", "url": "https://www.hackerrank.com/challenges/password-cracker/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "USACO Guide: Complete Search with Recursion", "url": "https://usaco.guide/bronze/complete-rec" },
+        { "type": "practice", "title": "LeetCode tag: Backtracking", "url": "https://leetcode.com/problem-list/backtracking/" }
+      ]
+    },
+    {
+      "id": "p3-greedy",
+      "title": { "vi": "Dạng bài Greedy (xếp lịch, khoảng)", "en": "Greedy problems (scheduling, intervals)" },
+      "problems": [
+        { "title": "Maximum Subarray", "url": "https://leetcode.com/problems/maximum-subarray/", "level": "Medium" },
+        { "title": "Jump Game", "url": "https://leetcode.com/problems/jump-game/", "level": "Medium" },
+        { "title": "Jump Game II", "url": "https://leetcode.com/problems/jump-game-ii/", "level": "Medium" },
+        { "title": "Gas Station", "url": "https://leetcode.com/problems/gas-station/", "level": "Medium" },
+        { "title": "Hand of Straights", "url": "https://leetcode.com/problems/hand-of-straights/", "level": "Medium" },
+        { "title": "Merge Intervals", "url": "https://leetcode.com/problems/merge-intervals/", "level": "Medium" },
+        { "title": "Insert Interval", "url": "https://leetcode.com/problems/insert-interval/", "level": "Medium" },
+        { "title": "Non-overlapping Intervals", "url": "https://leetcode.com/problems/non-overlapping-intervals/", "level": "Medium" },
+        { "title": "Partition Labels", "url": "https://leetcode.com/problems/partition-labels/", "level": "Medium" },
+        { "title": "Minimum Absolute Difference in an Array", "url": "https://www.hackerrank.com/challenges/minimum-absolute-difference-in-an-array/problem", "level": "Easy" },
+        { "title": "Luck Balance", "url": "https://www.hackerrank.com/challenges/luck-balance/problem", "level": "Easy" },
+        { "title": "Grid Challenge", "url": "https://www.hackerrank.com/challenges/grid-challenge/problem", "level": "Easy" },
+        { "title": "Greedy Florist", "url": "https://www.hackerrank.com/challenges/greedy-florist/problem", "level": "Medium" },
+        { "title": "Truck Tour", "url": "https://www.hackerrank.com/challenges/truck-tour/problem", "level": "Hard" }
+      ],
+      "resources": [
+        { "type": "article", "title": "USACO Guide: Greedy Algorithms with Sorting", "url": "https://usaco.guide/silver/greedy-sorting" },
+        { "type": "article", "title": "Tech Interview Handbook: Interval", "url": "https://www.techinterviewhandbook.org/algorithms/interval/" },
+        { "type": "practice", "title": "LeetCode tag: Greedy", "url": "https://leetcode.com/problem-list/greedy/" }
+      ]
+    },
+    {
+      "id": "p3-trees",
+      "title": { "vi": "Dạng bài Trees", "en": "Tree problems" },
+      "problems": [
+        { "title": "Invert Binary Tree", "url": "https://leetcode.com/problems/invert-binary-tree/", "level": "Easy" },
+        { "title": "Maximum Depth of Binary Tree", "url": "https://leetcode.com/problems/maximum-depth-of-binary-tree/", "level": "Easy" },
+        { "title": "Diameter of Binary Tree", "url": "https://leetcode.com/problems/diameter-of-binary-tree/", "level": "Easy" },
+        { "title": "Balanced Binary Tree", "url": "https://leetcode.com/problems/balanced-binary-tree/", "level": "Easy" },
+        { "title": "Same Tree", "url": "https://leetcode.com/problems/same-tree/", "level": "Easy" },
+        { "title": "Subtree of Another Tree", "url": "https://leetcode.com/problems/subtree-of-another-tree/", "level": "Easy" },
+        { "title": "Lowest Common Ancestor of a Binary Search Tree", "url": "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/", "level": "Medium" },
+        { "title": "Binary Tree Right Side View", "url": "https://leetcode.com/problems/binary-tree-right-side-view/", "level": "Medium" },
+        { "title": "Count Good Nodes in Binary Tree", "url": "https://leetcode.com/problems/count-good-nodes-in-binary-tree/", "level": "Medium" },
+        { "title": "Validate Binary Search Tree", "url": "https://leetcode.com/problems/validate-binary-search-tree/", "level": "Medium" },
+        { "title": "Kth Smallest Element in a BST", "url": "https://leetcode.com/problems/kth-smallest-element-in-a-bst/", "level": "Medium" },
+        { "title": "Construct Binary Tree from Preorder and Inorder Traversal", "url": "https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/", "level": "Medium" },
+        { "title": "Binary Tree Maximum Path Sum", "url": "https://leetcode.com/problems/binary-tree-maximum-path-sum/", "level": "Hard" },
+        { "title": "Serialize and Deserialize Binary Tree", "url": "https://leetcode.com/problems/serialize-and-deserialize-binary-tree/", "level": "Hard" },
+        { "title": "Binary Search Tree : Lowest Common Ancestor", "url": "https://www.hackerrank.com/challenges/binary-search-tree-lowest-common-ancestor/problem", "level": "Easy" },
+        { "title": "Trees: Is This a Binary Search Tree?", "url": "https://www.hackerrank.com/challenges/ctci-is-binary-search-tree/problem", "level": "Medium" },
+        { "title": "Tree: Huffman Decoding", "url": "https://www.hackerrank.com/challenges/tree-huffman-decoding/problem", "level": "Medium" },
+        { "title": "Swap Nodes [Algo]", "url": "https://www.hackerrank.com/challenges/swap-nodes-algo/problem", "level": "Medium" },
+        { "title": "Balanced Forest", "url": "https://www.hackerrank.com/challenges/balanced-forest/problem", "level": "Hard" }
+      ],
+      "resources": [
+        { "type": "practice", "title": "LeetCode tag: Binary Tree", "url": "https://leetcode.com/problem-list/binary-tree/" },
+        { "type": "practice", "title": "LeetCode tag: Binary Search Tree", "url": "https://leetcode.com/problem-list/binary-search-tree/" }
+      ]
+    },
+    {
+      "id": "p3-graphs",
+      "title": { "vi": "Dạng bài Graphs (loang lưới, thành phần liên thông)", "en": "Graph problems (grid flood fill, connected components)" },
+      "problems": [
+        { "title": "Number of Islands", "url": "https://leetcode.com/problems/number-of-islands/", "level": "Medium" },
+        { "title": "Max Area of Island", "url": "https://leetcode.com/problems/max-area-of-island/", "level": "Medium" },
+        { "title": "Clone Graph", "url": "https://leetcode.com/problems/clone-graph/", "level": "Medium" },
+        { "title": "Rotting Oranges", "url": "https://leetcode.com/problems/rotting-oranges/", "level": "Medium" },
+        { "title": "Pacific Atlantic Water Flow", "url": "https://leetcode.com/problems/pacific-atlantic-water-flow/", "level": "Medium" },
+        { "title": "Surrounded Regions", "url": "https://leetcode.com/problems/surrounded-regions/", "level": "Medium" },
+        { "title": "Course Schedule", "url": "https://leetcode.com/problems/course-schedule/", "level": "Medium" },
+        { "title": "Course Schedule II", "url": "https://leetcode.com/problems/course-schedule-ii/", "level": "Medium" },
+        { "title": "Word Ladder", "url": "https://leetcode.com/problems/word-ladder/", "level": "Hard" },
+        { "title": "Connected Cells in a Grid", "url": "https://www.hackerrank.com/challenges/connected-cell-in-a-grid/problem", "level": "Medium" },
+        { "title": "Count Luck", "url": "https://www.hackerrank.com/challenges/count-luck/problem", "level": "Medium" },
+        { "title": "Castle on the Grid", "url": "https://www.hackerrank.com/challenges/castle-on-the-grid/problem", "level": "Medium" },
+        { "title": "KnightL on a Chessboard", "url": "https://www.hackerrank.com/challenges/knightl-on-chessboard/problem", "level": "Medium" },
+        { "title": "Find the nearest clone", "url": "https://www.hackerrank.com/challenges/find-the-nearest-clone/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "USACO Guide: Flood Fill", "url": "https://usaco.guide/silver/flood-fill" },
+        { "type": "practice", "title": "LeetCode study plan: Graph Theory", "url": "https://leetcode.com/studyplan/graph-theory/" },
+        { "type": "practice", "title": "LeetCode tag: Graph Theory", "url": "https://leetcode.com/problem-list/graph/" },
+        { "type": "practice", "title": "LeetCode tag: Matrix", "url": "https://leetcode.com/problem-list/matrix/" }
+      ]
+    },
+    {
+      "id": "p3-cses",
+      "title": { "vi": "CSES Graph Algorithms nửa đầu, Codeforces 1000–1300", "en": "First half of CSES Graph Algorithms, Codeforces 1000–1300" },
+      "problems": [
+        { "title": "Counting Rooms", "url": "https://cses.fi/problemset/task/1192" },
+        { "title": "Labyrinth", "url": "https://cses.fi/problemset/task/1193" },
+        { "title": "Building Roads", "url": "https://cses.fi/problemset/task/1666" },
+        { "title": "Message Route", "url": "https://cses.fi/problemset/task/1667" },
+        { "title": "Building Teams", "url": "https://cses.fi/problemset/task/1668" },
+        { "title": "Round Trip", "url": "https://cses.fi/problemset/task/1669" }
+      ],
+      "resources": [
+        { "type": "book", "title": "Competitive Programmer's Handbook (PDF)", "url": "https://cses.fi/book/book.pdf" },
+        { "type": "practice", "title": "Codeforces rating 1000–1300", "url": "https://codeforces.com/problemset?order=BY_RATING_ASC&tags=1000-1300" }
+      ]
+    }
+  ]
+}

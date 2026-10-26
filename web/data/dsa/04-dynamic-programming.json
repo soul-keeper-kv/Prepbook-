@@ -1,0 +1,190 @@
+{
+  "id": "p4",
+  "name": { "vi": "Giai đoạn 4 · Quy hoạch động và đồ thị nâng cao", "en": "Phase 4 · Dynamic programming and advanced graphs" },
+  "items": [
+    {
+      "id": "p4-dp",
+      "title": { "vi": "DP cổ điển: knapsack, LIS, LCS, edit distance", "en": "Classic DP: knapsack, LIS, LCS, edit distance" },
+      "problems": [
+        { "title": "Coin Change", "url": "https://leetcode.com/problems/coin-change/", "level": "Medium" },
+        { "title": "Longest Increasing Subsequence", "url": "https://leetcode.com/problems/longest-increasing-subsequence/", "level": "Medium" },
+        { "title": "Longest Common Subsequence", "url": "https://leetcode.com/problems/longest-common-subsequence/", "level": "Medium" },
+        { "title": "Edit Distance", "url": "https://leetcode.com/problems/edit-distance/", "level": "Medium" },
+        { "title": "Partition Equal Subset Sum", "url": "https://leetcode.com/problems/partition-equal-subset-sum/", "level": "Medium" },
+        { "title": "Target Sum", "url": "https://leetcode.com/problems/target-sum/", "level": "Medium" },
+        { "title": "Max Array Sum", "url": "https://www.hackerrank.com/challenges/max-array-sum/problem", "level": "Medium" },
+        { "title": "The Coin Change Problem", "url": "https://www.hackerrank.com/challenges/coin-change/problem", "level": "Medium" },
+        { "title": "Knapsack", "url": "https://www.hackerrank.com/challenges/unbounded-knapsack/problem", "level": "Medium" },
+        { "title": "The Longest Common Subsequence", "url": "https://www.hackerrank.com/challenges/dynamic-programming-classics-the-longest-common-subsequence/problem", "level": "Medium" },
+        { "title": "Common Child", "url": "https://www.hackerrank.com/challenges/common-child/problem", "level": "Medium" },
+        { "title": "Abbreviation", "url": "https://www.hackerrank.com/challenges/abbr/problem", "level": "Medium" },
+        { "title": "Candies", "url": "https://www.hackerrank.com/challenges/candies/problem", "level": "Medium" },
+        { "title": "The Longest Increasing Subsequence", "url": "https://www.hackerrank.com/challenges/longest-increasing-subsequent/problem", "level": "Advanced" }
+      ],
+      "resources": [
+        { "type": "article", "title": "cp-algorithms: Introduction to Dynamic Programming", "url": "https://cp-algorithms.com/dynamic_programming/intro-to-dp.html" },
+        { "type": "article", "title": "cp-algorithms: Knapsack problem", "url": "https://cp-algorithms.com/dynamic_programming/knapsack.html" },
+        { "type": "video", "title": "freeCodeCamp: Dynamic Programming - Learn to Solve Algorithmic Problems", "url": "https://www.youtube.com/watch?v=oBt53YbR9Kk" },
+        { "type": "practice", "title": "LeetCode study plan: Dynamic Programming", "url": "https://leetcode.com/studyplan/dynamic-programming/" },
+        { "type": "practice", "title": "LeetCode tag: Dynamic Programming", "url": "https://leetcode.com/problem-list/dynamic-programming/" }
+      ]
+    },
+    {
+      "id": "p4-dp-adv",
+      "title": { "vi": "DP lưới, DP đoạn, DP bitmask, DP trên cây", "en": "Grid DP, interval DP, bitmask DP, tree DP" },
+      "problems": [
+        { "title": "Unique Paths", "url": "https://leetcode.com/problems/unique-paths/", "level": "Medium" },
+        { "title": "Minimum Path Sum", "url": "https://leetcode.com/problems/minimum-path-sum/", "level": "Medium" },
+        { "title": "Longest Palindromic Subsequence", "url": "https://leetcode.com/problems/longest-palindromic-subsequence/", "level": "Medium" },
+        { "title": "House Robber III", "url": "https://leetcode.com/problems/house-robber-iii/", "level": "Medium" },
+        { "title": "Partition to K Equal Sum Subsets", "url": "https://leetcode.com/problems/partition-to-k-equal-sum-subsets/", "level": "Medium" },
+        { "title": "Burst Balloons", "url": "https://leetcode.com/problems/burst-balloons/", "level": "Hard" },
+        { "title": "Shortest Path Visiting All Nodes", "url": "https://leetcode.com/problems/shortest-path-visiting-all-nodes/", "level": "Hard" },
+        { "title": "Sherlock and Cost", "url": "https://www.hackerrank.com/challenges/sherlock-and-cost/problem", "level": "Medium" },
+        { "title": "Construct the Array", "url": "https://www.hackerrank.com/challenges/construct-the-array/problem", "level": "Medium" },
+        { "title": "Kingdom Division", "url": "https://www.hackerrank.com/challenges/kingdom-division/problem", "level": "Medium" },
+        { "title": "Red John is Back", "url": "https://www.hackerrank.com/challenges/red-john-is-back/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "USACO Guide: DP on Trees", "url": "https://usaco.guide/gold/dp-trees" },
+        { "type": "article", "title": "USACO Guide: Bitmask DP", "url": "https://usaco.guide/gold/dp-bitmasks" },
+        { "type": "article", "title": "USACO Guide: Range DP", "url": "https://usaco.guide/gold/dp-ranges" },
+        { "type": "practice", "title": "LeetCode tag: Bitmask", "url": "https://leetcode.com/problem-list/bitmask/" }
+      ]
+    },
+    {
+      "id": "p4-sp",
+      "title": "Dijkstra, Bellman-Ford, Floyd-Warshall",
+      "problems": [
+        { "title": "Network Delay Time", "url": "https://leetcode.com/problems/network-delay-time/", "level": "Medium" },
+        { "title": "Path With Minimum Effort", "url": "https://leetcode.com/problems/path-with-minimum-effort/", "level": "Medium" },
+        { "title": "Cheapest Flights Within K Stops", "url": "https://leetcode.com/problems/cheapest-flights-within-k-stops/", "level": "Medium" },
+        { "title": "Find the City With the Smallest Number of Neighbors at a Threshold Distance", "url": "https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/", "level": "Medium" },
+        { "title": "Swim in Rising Water", "url": "https://leetcode.com/problems/swim-in-rising-water/", "level": "Hard" },
+        { "title": "Jack goes to Rapture", "url": "https://www.hackerrank.com/challenges/jack-goes-to-rapture/problem", "level": "Medium" },
+        { "title": "Dijkstra: Shortest Reach 2", "url": "https://www.hackerrank.com/challenges/dijkstrashortreach/problem", "level": "Hard" },
+        { "title": "Floyd : City of Blinding Lights", "url": "https://www.hackerrank.com/challenges/floyd-city-of-blinding-lights/problem", "level": "Hard" }
+      ],
+      "resources": [
+        { "type": "article", "title": "cp-algorithms: Dijkstra's algorithm", "url": "https://cp-algorithms.com/graph/dijkstra.html" },
+        { "type": "article", "title": "cp-algorithms: Bellman-Ford", "url": "https://cp-algorithms.com/graph/bellman_ford.html" },
+        { "type": "article", "title": "cp-algorithms: Floyd-Warshall", "url": "https://cp-algorithms.com/graph/all-pair-shortest-path-floyd-warshall.html" },
+        { "type": "visual", "title": "VisuAlgo: Single-Source Shortest Paths", "url": "https://visualgo.net/en/sssp" },
+        { "type": "practice", "title": "LeetCode tag: Shortest Path", "url": "https://leetcode.com/problem-list/shortest-path/" }
+      ]
+    },
+    {
+      "id": "p4-dsu",
+      "title": { "vi": "DSU, Kruskal/Prim, khớp và cầu, SCC", "en": "DSU, Kruskal/Prim, articulation points and bridges, SCC" },
+      "problems": [
+        { "title": "Number of Provinces", "url": "https://leetcode.com/problems/number-of-provinces/", "level": "Medium" },
+        { "title": "Redundant Connection", "url": "https://leetcode.com/problems/redundant-connection/", "level": "Medium" },
+        { "title": "Accounts Merge", "url": "https://leetcode.com/problems/accounts-merge/", "level": "Medium" },
+        { "title": "Min Cost to Connect All Points", "url": "https://leetcode.com/problems/min-cost-to-connect-all-points/", "level": "Medium" },
+        { "title": "Critical Connections in a Network", "url": "https://leetcode.com/problems/critical-connections-in-a-network/", "level": "Hard" },
+        { "title": "Components in a graph", "url": "https://www.hackerrank.com/challenges/components-in-graph/problem", "level": "Medium" },
+        { "title": "Friend Circle Queries", "url": "https://www.hackerrank.com/challenges/friend-circle-queries/problem", "level": "Medium" },
+        { "title": "Merging Communities", "url": "https://www.hackerrank.com/challenges/merging-communities/problem", "level": "Hard" },
+        { "title": "Kruskal (MST): Really Special Subtree", "url": "https://www.hackerrank.com/challenges/kruskalmstrsub/problem", "level": "Medium" },
+        { "title": "Prim's (MST) : Special Subtree", "url": "https://www.hackerrank.com/challenges/primsmstsub/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "cp-algorithms: Disjoint Set Union", "url": "https://cp-algorithms.com/data_structures/disjoint_set_union.html" },
+        { "type": "article", "title": "cp-algorithms: Kruskal with DSU", "url": "https://cp-algorithms.com/graph/mst_kruskal_with_dsu.html" },
+        { "type": "visual", "title": "VisuAlgo: Union-Find", "url": "https://visualgo.net/en/ufds" },
+        { "type": "practice", "title": "LeetCode tag: Union-Find", "url": "https://leetcode.com/problem-list/union-find/" },
+        { "type": "practice", "title": "LeetCode tag: Minimum Spanning Tree", "url": "https://leetcode.com/problem-list/minimum-spanning-tree/" }
+      ]
+    },
+    {
+      "id": "p4-neet-dp",
+      "title": { "vi": "Dạng bài 1-D DP và 2-D DP (NeetCode)", "en": "1-D DP and 2-D DP problems (NeetCode)" },
+      "problems": [
+        { "title": "Climbing Stairs", "url": "https://leetcode.com/problems/climbing-stairs/", "level": "Easy" },
+        { "title": "Min Cost Climbing Stairs", "url": "https://leetcode.com/problems/min-cost-climbing-stairs/", "level": "Easy" },
+        { "title": "House Robber", "url": "https://leetcode.com/problems/house-robber/", "level": "Medium" },
+        { "title": "House Robber II", "url": "https://leetcode.com/problems/house-robber-ii/", "level": "Medium" },
+        { "title": "Longest Palindromic Substring", "url": "https://leetcode.com/problems/longest-palindromic-substring/", "level": "Medium" },
+        { "title": "Palindromic Substrings", "url": "https://leetcode.com/problems/palindromic-substrings/", "level": "Medium" },
+        { "title": "Decode Ways", "url": "https://leetcode.com/problems/decode-ways/", "level": "Medium" },
+        { "title": "Coin Change", "url": "https://leetcode.com/problems/coin-change/", "level": "Medium" },
+        { "title": "Maximum Product Subarray", "url": "https://leetcode.com/problems/maximum-product-subarray/", "level": "Medium" },
+        { "title": "Word Break", "url": "https://leetcode.com/problems/word-break/", "level": "Medium" },
+        { "title": "Longest Increasing Subsequence", "url": "https://leetcode.com/problems/longest-increasing-subsequence/", "level": "Medium" },
+        { "title": "Unique Paths", "url": "https://leetcode.com/problems/unique-paths/", "level": "Medium" },
+        { "title": "Longest Common Subsequence", "url": "https://leetcode.com/problems/longest-common-subsequence/", "level": "Medium" },
+        { "title": "Coin Change II", "url": "https://leetcode.com/problems/coin-change-ii/", "level": "Medium" },
+        { "title": "Edit Distance", "url": "https://leetcode.com/problems/edit-distance/", "level": "Medium" },
+        { "title": "The Maximum Subarray", "url": "https://www.hackerrank.com/challenges/maxsubarray/problem", "level": "Medium" },
+        { "title": "Stock Maximize", "url": "https://www.hackerrank.com/challenges/stockmax/problem", "level": "Medium" },
+        { "title": "Equal", "url": "https://www.hackerrank.com/challenges/equal/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "Tech Interview Handbook: Dynamic programming", "url": "https://www.techinterviewhandbook.org/algorithms/dynamic-programming/" },
+        { "type": "practice", "title": "NeetCode Roadmap", "url": "https://neetcode.io/roadmap" },
+        { "type": "practice", "title": "LeetCode study plan: Dynamic Programming", "url": "https://leetcode.com/studyplan/dynamic-programming/" }
+      ]
+    },
+    {
+      "id": "p4-adv-graph",
+      "title": { "vi": "Dạng bài Advanced Graphs", "en": "Advanced Graph problems" },
+      "problems": [
+        { "title": "Network Delay Time", "url": "https://leetcode.com/problems/network-delay-time/", "level": "Medium" },
+        { "title": "Min Cost to Connect All Points", "url": "https://leetcode.com/problems/min-cost-to-connect-all-points/", "level": "Medium" },
+        { "title": "Cheapest Flights Within K Stops", "url": "https://leetcode.com/problems/cheapest-flights-within-k-stops/", "level": "Medium" },
+        { "title": "Reconstruct Itinerary", "url": "https://leetcode.com/problems/reconstruct-itinerary/", "level": "Hard" },
+        { "title": "Swim in Rising Water", "url": "https://leetcode.com/problems/swim-in-rising-water/", "level": "Hard" },
+        { "title": "Alien Dictionary", "url": "https://leetcode.com/problems/alien-dictionary/", "level": "Hard" },
+        { "title": "Roads in HackerLand", "url": "https://www.hackerrank.com/challenges/johnland/problem", "level": "Medium" },
+        { "title": "Rust & Murderer", "url": "https://www.hackerrank.com/challenges/rust-murderer/problem", "level": "Medium" },
+        { "title": "Matrix", "url": "https://www.hackerrank.com/challenges/matrix/problem", "level": "Hard" }
+      ],
+      "resources": [
+        { "type": "video", "title": "freeCodeCamp: Graph Theory Tutorial from a Google Engineer", "url": "https://www.youtube.com/watch?v=09_LlHjoEiY" },
+        { "type": "article", "title": "cp-algorithms: Eulerian path", "url": "https://cp-algorithms.com/graph/euler_path.html" },
+        { "type": "practice", "title": "LeetCode tag: Shortest Path", "url": "https://leetcode.com/problem-list/shortest-path/" },
+        { "type": "practice", "title": "LeetCode tag: Eulerian Circuit", "url": "https://leetcode.com/problem-list/eulerian-circuit/" }
+      ]
+    },
+    {
+      "id": "p4-atcoder",
+      "title": "AtCoder Educational DP Contest (A → Z)",
+      "problems": [
+        { "title": "A - Frog 1", "url": "https://atcoder.jp/contests/dp/tasks/dp_a" },
+        { "title": "B - Frog 2", "url": "https://atcoder.jp/contests/dp/tasks/dp_b" },
+        { "title": "C - Vacation", "url": "https://atcoder.jp/contests/dp/tasks/dp_c" },
+        { "title": "D - Knapsack 1", "url": "https://atcoder.jp/contests/dp/tasks/dp_d" },
+        { "title": "E - Knapsack 2", "url": "https://atcoder.jp/contests/dp/tasks/dp_e" },
+        { "title": "F - LCS", "url": "https://atcoder.jp/contests/dp/tasks/dp_f" },
+        { "title": "G - Longest Path", "url": "https://atcoder.jp/contests/dp/tasks/dp_g" },
+        { "title": "H - Grid 1", "url": "https://atcoder.jp/contests/dp/tasks/dp_h" }
+      ],
+      "resources": [
+        { "type": "practice", "title": { "vi": "Toàn bộ DP Contest", "en": "Full DP Contest" }, "url": "https://atcoder.jp/contests/dp/tasks" }
+      ]
+    },
+    {
+      "id": "p4-cses",
+      "title": { "vi": "CSES Dynamic Programming (làm hết)", "en": "CSES Dynamic Programming (do them all)" },
+      "problems": [
+        { "title": "Dice Combinations", "url": "https://cses.fi/problemset/task/1633" },
+        { "title": "Minimizing Coins", "url": "https://cses.fi/problemset/task/1634" },
+        { "title": "Coin Combinations I", "url": "https://cses.fi/problemset/task/1635" },
+        { "title": "Grid Paths", "url": "https://cses.fi/problemset/task/1638" },
+        { "title": "Book Shop", "url": "https://cses.fi/problemset/task/1158" },
+        { "title": "Edit Distance", "url": "https://cses.fi/problemset/task/1639" }
+      ],
+      "resources": [
+        { "type": "book", "title": "Competitive Programmer's Handbook (PDF)", "url": "https://cses.fi/book/book.pdf" },
+        { "type": "practice", "title": { "vi": "Toàn bộ CSES Problem Set", "en": "Full CSES Problem Set" }, "url": "https://cses.fi/problemset/" }
+      ]
+    },
+    {
+      "id": "p4-cf",
+      "title": "Codeforces 1300–1600",
+      "resources": [
+        { "type": "practice", "title": "Codeforces rating 1300–1600", "url": "https://codeforces.com/problemset?order=BY_RATING_ASC&tags=1300-1600" }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest"
-import { buildContent, dataFiles } from "@/content/load"
+import { buildContent, dataFiles, modulesOf } from "@/content/load"
 import { KEYS, storage } from "@/lib/storage"
 import { normalizeUrl, problemIdFor } from "@/notebook/ids"
 import { liveValues, patternsOf, phasesOf, problemsOf } from "@/notebook/logic"
@@ -127,7 +127,7 @@ describe("notebookActions", () => {
 
   it("adds every suggested item of a phase in one change, and undoes it", () => {
     const content = buildContent(dataFiles)
-    const phase = content.phases[1]!
+    const phase = modulesOf(content, "t_dsa")[0]!.phases[1]!
     const ids = phase.items.map((i) => i.id)
     let changes = 0
     const stop = onLocalNotebookChange(() => changes++)

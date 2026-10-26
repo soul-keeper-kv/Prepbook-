@@ -3,8 +3,9 @@ import { localize } from "@/content/localize"
 import type { Lang } from "@/i18n/languages"
 import { hashId, problemIdFor } from "@/notebook/ids"
 import type { Notebook, Pattern, Phase, Problem } from "@/notebook/schema"
-import { oldPhaseOf, patternIdFor, phaseIdFor, suggestedProblems } from "@/notebook/suggestions"
-import { DEFAULT_TOPICS, DSA_TOPIC_ID } from "@/notebook/templates"
+import { patternIdFor, phaseIdFor, suggestedProblems } from "@/notebook/suggestions"
+import { DEFAULT_TOPICS } from "@/notebook/templates"
+import { legacyModule } from "@/progress/legacy"
 import type { Progress } from "@/progress/schema"
 
 // Carries the old roadmap progress (ticks, notes, code, solved problems) into the notebook,
@@ -34,7 +35,7 @@ export function withDefaultTopics(nb: Notebook, lang: Lang): Notebook {
   return { ...nb, topics }
 }
 
-/** The phase and pattern an old roadmap item becomes; nothing filled in yet */
+/** The phase and pattern a suggested item becomes, in its module's topic; nothing filled in yet */
 export function patternFromItem(
   content: Content,
   itemId: string,
@@ -42,25 +43,24 @@ export function patternFromItem(
   at: string
 ): { phase: Phase; pattern: Pattern } | null {
   const entry = content.items.get(itemId)
-  const oldPhase = oldPhaseOf(content, itemId)
-  if (!entry || !oldPhase) return null
-  const phaseIndex = content.phases.indexOf(oldPhase)
+  if (!entry) return null
+  const { item, phase: oldPhase, module } = entry
   const phase: Phase = {
     id: phaseIdFor(oldPhase.id),
     updatedAt: at,
-    topicId: DSA_TOPIC_ID,
+    topicId: module.topicId,
     name: plain(localize(oldPhase.name, lang)),
-    order: phaseIndex,
+    order: module.phases.indexOf(oldPhase),
     sourceId: oldPhase.id,
   }
   const pattern: Pattern = {
     id: patternIdFor(itemId),
     updatedAt: at,
-    topicId: DSA_TOPIC_ID,
+    topicId: module.topicId,
     phaseId: phase.id,
-    name: plain(localize(entry.item.title, lang)),
-    order: oldPhase.items.indexOf(entry.item),
-    theory: !entry.item.problems?.length,
+    name: plain(localize(item.title, lang)),
+    order: oldPhase.items.indexOf(item),
+    theory: !item.problems?.length,
     sections: {},
     requires: [],
     related: [],
@@ -92,9 +92,12 @@ export function migrateProgress(
     attempts: { ...nb.attempts },
   }
 
-  for (const [itemId, entry] of content.items) {
+  // The old app only knew its own roadmap: other modules have nothing to carry over
+  const items = legacyModule(content)?.phases.flatMap((phase) => phase.items) ?? []
+  for (const item of items) {
+    const itemId = item.id
     const old = progress.items[itemId] ?? {}
-    const solved = suggestedProblems(entry.item, lang).filter((p) => progress.solved[p.url])
+    const solved = suggestedProblems(item, lang).filter((p) => progress.solved[p.url])
     const notes = old.notes?.trim() ?? ""
     const code = old.code?.trim() ? old.code : ""
     if (!old.done && !notes && !code && !solved.length) continue

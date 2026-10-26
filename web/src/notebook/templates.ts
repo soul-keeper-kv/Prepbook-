@@ -54,6 +54,3 @@ export const DEFAULT_TOPICS: DefaultTopic[] = [
     color: "pink",
   },
 ]
-
-/** The topic the old DSA roadmap's suggestions belong to */
-export const DSA_TOPIC_ID = "t_dsa"

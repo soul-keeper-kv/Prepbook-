@@ -1,7 +1,14 @@
+import type { Content, Module } from "@/content/load"
 import type { Phase } from "@/content/schema"
 import { nowIso } from "@/lib/dates"
 import { KEYS, storage } from "@/lib/storage"
 import { ProgressSchema, type Progress } from "@/progress/schema"
+
+/** The module the old roadmap app was: its progress is keyed by these item ids and phase order */
+export const LEGACY_MODULE = "dsa"
+
+export const legacyModule = (content: Content): Module | undefined =>
+  content.modules.find((m) => m.id === LEGACY_MODULE)
 
 // Progress the old roadmap app saved in this browser, read once to carry it into the
 // notebook (see notebook/load.ts). Copies saved before v3 only held ticks: v2 by item id,

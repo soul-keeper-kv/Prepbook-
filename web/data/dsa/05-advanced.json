@@ -1,0 +1,120 @@
+{
+  "id": "p5",
+  "name": { "vi": "Giai đoạn 5 · Nâng cao", "en": "Phase 5 · Advanced topics" },
+  "items": [
+    {
+      "id": "p5-rangeq",
+      "title": "Segment Tree (lazy), Fenwick Tree, Sparse Table, Trie",
+      "problems": [
+        { "title": "Range Sum Query - Mutable", "url": "https://leetcode.com/problems/range-sum-query-mutable/", "level": "Medium" },
+        { "title": "Count of Smaller Numbers After Self", "url": "https://leetcode.com/problems/count-of-smaller-numbers-after-self/", "level": "Hard" },
+        { "title": "Count of Range Sum", "url": "https://leetcode.com/problems/count-of-range-sum/", "level": "Hard" },
+        { "title": "My Calendar III", "url": "https://leetcode.com/problems/my-calendar-iii/", "level": "Hard" }
+      ],
+      "resources": [
+        { "type": "article", "title": "cp-algorithms: Fenwick Tree", "url": "https://cp-algorithms.com/data_structures/fenwick.html" },
+        { "type": "article", "title": "cp-algorithms: Segment Tree", "url": "https://cp-algorithms.com/data_structures/segment_tree.html" },
+        { "type": "visual", "title": "VisuAlgo: Segment Tree", "url": "https://visualgo.net/en/segmenttree" },
+        { "type": "practice", "title": "LeetCode tag: Binary Indexed Tree", "url": "https://leetcode.com/problem-list/binary-indexed-tree/" },
+        { "type": "practice", "title": "LeetCode tag: Segment Tree", "url": "https://leetcode.com/problem-list/segment-tree/" }
+      ]
+    },
+    {
+      "id": "p5-lca",
+      "title": "LCA binary lifting, Euler tour",
+      "problems": [
+        { "title": "Lowest Common Ancestor of a Binary Tree", "url": "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/", "level": "Medium" },
+        { "title": "Kth Ancestor of a Tree Node", "url": "https://leetcode.com/problems/kth-ancestor-of-a-tree-node/", "level": "Hard" }
+      ],
+      "resources": [
+        { "type": "article", "title": "cp-algorithms: LCA with binary lifting", "url": "https://cp-algorithms.com/graph/lca_binary_lifting.html" },
+        { "type": "article", "title": "USACO Guide: Binary Jumping", "url": "https://usaco.guide/plat/binary-jump" }
+      ]
+    },
+    {
+      "id": "p5-string",
+      "title": { "vi": "Chuỗi: hash, KMP, Z-function, Manacher", "en": "Strings: hashing, KMP, Z-function, Manacher" },
+      "problems": [
+        { "title": "Find the Index of the First Occurrence in a String", "url": "https://leetcode.com/problems/find-the-index-of-the-first-occurrence-in-a-string/", "level": "Easy" },
+        { "title": "Repeated Substring Pattern", "url": "https://leetcode.com/problems/repeated-substring-pattern/", "level": "Easy" },
+        { "title": "Longest Palindromic Substring", "url": "https://leetcode.com/problems/longest-palindromic-substring/", "level": "Medium" },
+        { "title": "Shortest Palindrome", "url": "https://leetcode.com/problems/shortest-palindrome/", "level": "Hard" },
+        { "title": "Longest Duplicate Substring", "url": "https://leetcode.com/problems/longest-duplicate-substring/", "level": "Hard" },
+        { "title": "Special String Again", "url": "https://www.hackerrank.com/challenges/special-palindrome-again/problem", "level": "Medium" },
+        { "title": "Yet Another KMP Problem", "url": "https://www.hackerrank.com/challenges/kmp-problem/problem", "level": "Hard" }
+      ],
+      "resources": [
+        { "type": "article", "title": "cp-algorithms: Prefix function (KMP)", "url": "https://cp-algorithms.com/string/prefix-function.html" },
+        { "type": "article", "title": "cp-algorithms: Z-function", "url": "https://cp-algorithms.com/string/z-function.html" },
+        { "type": "article", "title": "cp-algorithms: String hashing", "url": "https://cp-algorithms.com/string/string-hashing.html" },
+        { "type": "practice", "title": "LeetCode tag: String Matching", "url": "https://leetcode.com/problem-list/string-matching/" },
+        { "type": "practice", "title": "LeetCode tag: Rolling Hash", "url": "https://leetcode.com/problem-list/rolling-hash/" }
+      ]
+    },
+    {
+      "id": "p5-math",
+      "title": { "vi": "Toán: nghịch đảo modulo, tổ hợp mod p, nhân ma trận", "en": "Math: modular inverse, combinations mod p, matrix exponentiation" },
+      "problems": [
+        { "title": "Unique Paths", "url": "https://leetcode.com/problems/unique-paths/", "level": "Medium" },
+        { "title": "Count Good Numbers", "url": "https://leetcode.com/problems/count-good-numbers/", "level": "Medium" },
+        { "title": "Super Pow", "url": "https://leetcode.com/problems/super-pow/", "level": "Medium" },
+        { "title": "Count Sorted Vowel Strings", "url": "https://leetcode.com/problems/count-sorted-vowel-strings/", "level": "Medium" },
+        { "title": "Summing the N series", "url": "https://www.hackerrank.com/challenges/summing-the-n-series/problem", "level": "Medium" },
+        { "title": "Fibonacci Finding (easy)", "url": "https://www.hackerrank.com/challenges/fibonacci-finding-easy/problem", "level": "Easy" }
+      ],
+      "resources": [
+        { "type": "article", "title": "cp-algorithms: Modular inverse", "url": "https://cp-algorithms.com/algebra/module-inverse.html" },
+        { "type": "article", "title": "cp-algorithms: Binomial coefficients", "url": "https://cp-algorithms.com/combinatorics/binomial-coefficients.html" },
+        { "type": "practice", "title": "LeetCode tag: Combinatorics", "url": "https://leetcode.com/problem-list/combinatorics/" }
+      ]
+    },
+    {
+      "id": "p5-misc",
+      "title": "Sqrt decomposition, Mo, meet in the middle, max flow",
+      "problems": [
+        { "title": "Closest Subsequence Sum", "url": "https://leetcode.com/problems/closest-subsequence-sum/", "level": "Hard" },
+        { "title": "Partition Array Into Two Arrays to Minimize Sum Difference", "url": "https://leetcode.com/problems/partition-array-into-two-arrays-to-minimize-sum-difference/", "level": "Hard" }
+      ],
+      "resources": [
+        { "type": "article", "title": "cp-algorithms: Sqrt decomposition", "url": "https://cp-algorithms.com/data_structures/sqrt_decomposition.html" },
+        { "type": "article", "title": "cp-algorithms: Max flow (Edmonds-Karp)", "url": "https://cp-algorithms.com/graph/edmonds_karp.html" },
+        { "type": "article", "title": "USACO Guide: Meet In The Middle", "url": "https://usaco.guide/gold/meet-in-the-middle" }
+      ]
+    },
+    {
+      "id": "p5-trie",
+      "title": { "vi": "Dạng bài Tries và Bit Manipulation", "en": "Tries and Bit Manipulation problems" },
+      "problems": [
+        { "title": "Implement Trie (Prefix Tree)", "url": "https://leetcode.com/problems/implement-trie-prefix-tree/", "level": "Medium" },
+        { "title": "Design Add and Search Words Data Structure", "url": "https://leetcode.com/problems/design-add-and-search-words-data-structure/", "level": "Medium" },
+        { "title": "Word Search II", "url": "https://leetcode.com/problems/word-search-ii/", "level": "Hard" },
+        { "title": "Single Number", "url": "https://leetcode.com/problems/single-number/", "level": "Easy" },
+        { "title": "Number of 1 Bits", "url": "https://leetcode.com/problems/number-of-1-bits/", "level": "Easy" },
+        { "title": "Counting Bits", "url": "https://leetcode.com/problems/counting-bits/", "level": "Easy" },
+        { "title": "Reverse Bits", "url": "https://leetcode.com/problems/reverse-bits/", "level": "Easy" },
+        { "title": "Missing Number", "url": "https://leetcode.com/problems/missing-number/", "level": "Easy" },
+        { "title": "Sum of Two Integers", "url": "https://leetcode.com/problems/sum-of-two-integers/", "level": "Medium" },
+        { "title": "Lonely Integer", "url": "https://www.hackerrank.com/challenges/lonely-integer/problem", "level": "Easy" },
+        { "title": "Flipping bits", "url": "https://www.hackerrank.com/challenges/flipping-bits/problem", "level": "Easy" },
+        { "title": "Sum vs XOR", "url": "https://www.hackerrank.com/challenges/sum-vs-xor/problem", "level": "Easy" },
+        { "title": "Maximum Xor", "url": "https://www.hackerrank.com/challenges/maximum-xor/problem", "level": "Medium" },
+        { "title": "Contacts", "url": "https://www.hackerrank.com/challenges/contacts/problem", "level": "Medium" },
+        { "title": "No Prefix Set", "url": "https://www.hackerrank.com/challenges/no-prefix-set/problem", "level": "Hard" }
+      ],
+      "resources": [
+        { "type": "article", "title": "Tech Interview Handbook: Trie", "url": "https://www.techinterviewhandbook.org/algorithms/trie/" },
+        { "type": "article", "title": "Tech Interview Handbook: Binary", "url": "https://www.techinterviewhandbook.org/algorithms/binary/" },
+        { "type": "practice", "title": "LeetCode tag: Trie", "url": "https://leetcode.com/problem-list/trie/" },
+        { "type": "practice", "title": "LeetCode tag: Bit Manipulation", "url": "https://leetcode.com/problem-list/bit-manipulation/" }
+      ]
+    },
+    {
+      "id": "p5-cf",
+      "title": { "vi": "Codeforces 1600–2000+, contest đều đặn", "en": "Codeforces 1600–2000+, regular contests" },
+      "resources": [
+        { "type": "practice", "title": "Codeforces rating 1600–2000", "url": "https://codeforces.com/problemset?order=BY_RATING_ASC&tags=1600-2000" },
+        { "type": "practice", "title": "Codeforces Contests", "url": "https://codeforces.com/contests" }
+      ]
+    }
+  ]
+}

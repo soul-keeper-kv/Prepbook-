@@ -472,8 +472,8 @@
     "hoursMinutes": "{{h}} h {{m}} min"
   },
   "suggest": {
-    "title": "Suggestions from the old DSA roadmap",
-    "roadmapIntro": "The old roadmap is only a suggestion now: Add turns an item into an (empty) pattern of yours, and its problems and material show on the pattern page for you to pick.",
+    "title": "Suggestions: {{name}}",
+    "roadmapIntro": "Only a suggestion: Add turns an item into an (empty) pattern of yours, and its problems and material show on the pattern page for you to pick.",
     "patternIntro": "Added to the pattern only when you click.",
     "left_one": "{{count}} not added",
     "left_other": "{{count}} not added",

@@ -15,7 +15,7 @@ import { startDriveSync } from "@/sync"
 initTheme()
 
 const root = createRoot(document.getElementById("root")!)
-// The old roadmap in data/: suggestions, and the source the old progress is carried over from
+// The modules in data/: suggestions, and (dsa) the source the old progress is carried over from
 const result = loadContent()
 
 if (!result.ok) {

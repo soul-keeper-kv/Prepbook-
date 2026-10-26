@@ -15,6 +15,7 @@ import { ResourceList } from "@/components/pattern/resource-list"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useContent } from "@/content/context"
+import { localize } from "@/content/localize"
 import { useLang, useNotebook } from "@/notebook/hooks"
 import {
   DROP_AFTER_DAYS,
@@ -83,8 +84,8 @@ function PatternSuggestions({ pattern }: { pattern: Pattern }) {
   const content = useContent()
   const nb = useNotebook()
   const lang = useLang()
-  const { problems, resources } = patternSuggestions(content, nb, pattern, lang)
-  if (!pattern.sourceId || (!problems.length && !resources.length)) return null
+  const { module, problems, resources } = patternSuggestions(content, nb, pattern, lang)
+  if (!module || (!problems.length && !resources.length)) return null
 
   // Every suggested problem and link in one change, with Undo
   function addAll() {
@@ -112,7 +113,7 @@ function PatternSuggestions({ pattern }: { pattern: Pattern }) {
 
   return (
     <Panel
-      title={t("suggest.title")}
+      title={t("suggest.title", { name: localize(module.title, lang) })}
       actions={
         <Button size="xs" onClick={addAll}>
           <ListPlusIcon />

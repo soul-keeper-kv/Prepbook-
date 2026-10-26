@@ -1,0 +1,159 @@
+{
+  "id": "p1",
+  "name": { "vi": "Giai đoạn 1 · Tư duy cơ bản và độ phức tạp", "en": "Phase 1 · Core thinking and complexity" },
+  "items": [
+    {
+      "id": "p1-bigo",
+      "title": { "vi": "Big-O: ước lượng ~10⁸ phép tính/giây", "en": "Big-O: estimate ~10⁸ operations per second" },
+      "resources": [
+        { "type": "article", "title": "USACO Guide: Time Complexity", "url": "https://usaco.guide/bronze/time-comp" },
+        { "type": "article", "title": "Big-O Cheat Sheet", "url": "https://www.bigocheatsheet.com/" }
+      ]
+    },
+    {
+      "id": "p1-math",
+      "title": { "vi": "Toán cơ bản: GCD/LCM, số nguyên tố, sàng Eratosthenes, đồng dư", "en": "Basic math: GCD/LCM, primes, sieve of Eratosthenes, modular arithmetic" },
+      "problems": [
+        { "title": "Greatest Common Divisor of Strings", "url": "https://leetcode.com/problems/greatest-common-divisor-of-strings/", "level": "Easy" },
+        { "title": "Find Greatest Common Divisor of Array", "url": "https://leetcode.com/problems/find-greatest-common-divisor-of-array/", "level": "Easy" },
+        { "title": "Ugly Number", "url": "https://leetcode.com/problems/ugly-number/", "level": "Easy" },
+        { "title": "Count Primes", "url": "https://leetcode.com/problems/count-primes/", "level": "Medium" },
+        { "title": "Pow(x, n)", "url": "https://leetcode.com/problems/powx-n/", "level": "Medium" },
+        { "title": "Find the Point", "url": "https://www.hackerrank.com/challenges/find-point/problem", "level": "Easy" },
+        { "title": "Handshake", "url": "https://www.hackerrank.com/challenges/handshake/problem", "level": "Easy" },
+        { "title": "Restaurant", "url": "https://www.hackerrank.com/challenges/restaurant/problem", "level": "Easy" },
+        { "title": "Time Complexity: Primality", "url": "https://www.hackerrank.com/challenges/ctci-big-o/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "cp-algorithms: Euclidean algorithm (GCD)", "url": "https://cp-algorithms.com/algebra/euclid-algorithm.html" },
+        { "type": "article", "title": "cp-algorithms: Sieve of Eratosthenes", "url": "https://cp-algorithms.com/algebra/sieve-of-eratosthenes.html" },
+        { "type": "article", "title": "cp-algorithms: Binary exponentiation", "url": "https://cp-algorithms.com/algebra/binary-exp.html" },
+        { "type": "practice", "title": "LeetCode tag: Math", "url": "https://leetcode.com/problem-list/math/" },
+        { "type": "practice", "title": "LeetCode tag: Number Theory", "url": "https://leetcode.com/problem-list/number-theory/" }
+      ]
+    },
+    {
+      "id": "p1-sort",
+      "title": { "vi": "Sắp xếp: tự cài merge sort, quick sort", "en": "Sorting: implement merge sort and quick sort yourself" },
+      "problems": [
+        { "title": "Merge Sorted Array", "url": "https://leetcode.com/problems/merge-sorted-array/", "level": "Easy" },
+        { "title": "Sort an Array", "url": "https://leetcode.com/problems/sort-an-array/", "level": "Medium" },
+        { "title": "Sort Colors", "url": "https://leetcode.com/problems/sort-colors/", "level": "Medium" },
+        { "title": "Kth Largest Element in an Array", "url": "https://leetcode.com/problems/kth-largest-element-in-an-array/", "level": "Medium" },
+        { "title": "Largest Number", "url": "https://leetcode.com/problems/largest-number/", "level": "Medium" },
+        { "title": "Sorting: Bubble Sort", "url": "https://www.hackerrank.com/challenges/ctci-bubble-sort/problem", "level": "Easy" },
+        { "title": "Insertion Sort - Part 1", "url": "https://www.hackerrank.com/challenges/insertionsort1/problem", "level": "Easy" },
+        { "title": "Quicksort 1 - Partition", "url": "https://www.hackerrank.com/challenges/quicksort1/problem", "level": "Easy" },
+        { "title": "Find the Median", "url": "https://www.hackerrank.com/challenges/find-the-median/problem", "level": "Easy" },
+        { "title": "Mark and Toys", "url": "https://www.hackerrank.com/challenges/mark-and-toys/problem", "level": "Easy" },
+        { "title": "Sorting: Comparator", "url": "https://www.hackerrank.com/challenges/ctci-comparator-sorting/problem", "level": "Medium" },
+        { "title": "Fraudulent Activity Notifications", "url": "https://www.hackerrank.com/challenges/fraudulent-activity-notifications/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "visual", "title": "VisuAlgo: Sorting", "url": "https://visualgo.net/en/sorting" },
+        { "type": "article", "title": "Tech Interview Handbook: Sorting and searching", "url": "https://www.techinterviewhandbook.org/algorithms/sorting-searching/" },
+        { "type": "course", "title": "Coursera: Algorithms, Part I (Princeton)", "url": "https://www.coursera.org/learn/algorithms-part1" },
+        { "type": "practice", "title": "LeetCode tag: Sorting", "url": "https://leetcode.com/problem-list/sorting/" }
+      ]
+    },
+    {
+      "id": "p1-hashing",
+      "title": { "vi": "Dạng bài Arrays and Hashing (NeetCode 150)", "en": "Arrays and Hashing problems (NeetCode 150)" },
+      "problems": [
+        { "title": "Contains Duplicate", "url": "https://leetcode.com/problems/contains-duplicate/", "level": "Easy" },
+        { "title": "Valid Anagram", "url": "https://leetcode.com/problems/valid-anagram/", "level": "Easy" },
+        { "title": "Two Sum", "url": "https://leetcode.com/problems/two-sum/", "level": "Easy" },
+        { "title": "Group Anagrams", "url": "https://leetcode.com/problems/group-anagrams/", "level": "Medium" },
+        { "title": "Top K Frequent Elements", "url": "https://leetcode.com/problems/top-k-frequent-elements/", "level": "Medium" },
+        { "title": "Product of Array Except Self", "url": "https://leetcode.com/problems/product-of-array-except-self/", "level": "Medium" },
+        { "title": "Valid Sudoku", "url": "https://leetcode.com/problems/valid-sudoku/", "level": "Medium" },
+        { "title": "Longest Consecutive Sequence", "url": "https://leetcode.com/problems/longest-consecutive-sequence/", "level": "Medium" },
+        { "title": "Hash Tables: Ransom Note", "url": "https://www.hackerrank.com/challenges/ctci-ransom-note/problem", "level": "Easy" },
+        { "title": "Two Strings", "url": "https://www.hackerrank.com/challenges/two-strings/problem", "level": "Easy" },
+        { "title": "Strings: Making Anagrams", "url": "https://www.hackerrank.com/challenges/ctci-making-anagrams/problem", "level": "Easy" },
+        { "title": "2D Array - DS", "url": "https://www.hackerrank.com/challenges/2d-array/problem", "level": "Easy" },
+        { "title": "Sherlock and the Valid String", "url": "https://www.hackerrank.com/challenges/sherlock-and-valid-string/problem", "level": "Medium" },
+        { "title": "Sherlock and Anagrams", "url": "https://www.hackerrank.com/challenges/sherlock-and-anagrams/problem", "level": "Medium" },
+        { "title": "Count Triplets", "url": "https://www.hackerrank.com/challenges/count-triplets-1/problem", "level": "Medium" },
+        { "title": "Frequency Queries", "url": "https://www.hackerrank.com/challenges/frequency-queries/problem", "level": "Medium" },
+        { "title": "New Year Chaos", "url": "https://www.hackerrank.com/challenges/new-year-chaos/problem", "level": "Medium" },
+        { "title": "Minimum Swaps 2", "url": "https://www.hackerrank.com/challenges/minimum-swaps-2/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "Tech Interview Handbook: Hash table", "url": "https://www.techinterviewhandbook.org/algorithms/hash-table/" },
+        { "type": "visual", "title": "VisuAlgo: Hash Table", "url": "https://visualgo.net/en/hashtable" },
+        { "type": "practice", "title": "NeetCode Roadmap", "url": "https://neetcode.io/roadmap" },
+        { "type": "practice", "title": "LeetCode tag: Hash Table", "url": "https://leetcode.com/problem-list/hash-table/" }
+      ]
+    },
+    {
+      "id": "p1-prefix",
+      "title": { "vi": "Dạng bài Prefix sum và difference array", "en": "Prefix sum and difference array problems" },
+      "problems": [
+        { "title": "Range Sum Query - Immutable", "url": "https://leetcode.com/problems/range-sum-query-immutable/", "level": "Easy" },
+        { "title": "Subarray Sum Equals K", "url": "https://leetcode.com/problems/subarray-sum-equals-k/", "level": "Medium" },
+        { "title": "Contiguous Array", "url": "https://leetcode.com/problems/contiguous-array/", "level": "Medium" },
+        { "title": "Continuous Subarray Sum", "url": "https://leetcode.com/problems/continuous-subarray-sum/", "level": "Medium" },
+        { "title": "Corporate Flight Bookings", "url": "https://leetcode.com/problems/corporate-flight-bookings/", "level": "Medium" },
+        { "title": "Range Sum Query 2D - Immutable", "url": "https://leetcode.com/problems/range-sum-query-2d-immutable/", "level": "Medium" },
+        { "title": "Sherlock and Array", "url": "https://www.hackerrank.com/challenges/sherlock-and-array/problem", "level": "Easy" },
+        { "title": "Array Manipulation", "url": "https://www.hackerrank.com/challenges/crush/problem", "level": "Hard" },
+        { "title": "Maximum Subarray Sum", "url": "https://www.hackerrank.com/challenges/maximum-subarray-sum/problem", "level": "Hard" }
+      ],
+      "resources": [
+        { "type": "article", "title": "USACO Guide: Introduction to Prefix Sums", "url": "https://usaco.guide/silver/prefix-sums" },
+        { "type": "practice", "title": "LeetCode tag: Prefix Sum", "url": "https://leetcode.com/problem-list/prefix-sum/" }
+      ]
+    },
+    {
+      "id": "p1-twoptr",
+      "title": { "vi": "Dạng bài Two Pointers", "en": "Two Pointers problems" },
+      "problems": [
+        { "title": "Valid Palindrome", "url": "https://leetcode.com/problems/valid-palindrome/", "level": "Easy" },
+        { "title": "Two Sum II - Input Array Is Sorted", "url": "https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/", "level": "Medium" },
+        { "title": "3Sum", "url": "https://leetcode.com/problems/3sum/", "level": "Medium" },
+        { "title": "Container With Most Water", "url": "https://leetcode.com/problems/container-with-most-water/", "level": "Medium" },
+        { "title": "Trapping Rain Water", "url": "https://leetcode.com/problems/trapping-rain-water/", "level": "Hard" },
+        { "title": "Pairs", "url": "https://www.hackerrank.com/challenges/pairs/problem", "level": "Medium" },
+        { "title": "Triple sum", "url": "https://www.hackerrank.com/challenges/triple-sum/problem", "level": "Medium" },
+        { "title": "Game of Two Stacks", "url": "https://www.hackerrank.com/challenges/game-of-two-stacks/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "USACO Guide: Two Pointers", "url": "https://usaco.guide/silver/two-pointers" },
+        { "type": "practice", "title": "LeetCode tag: Two Pointers", "url": "https://leetcode.com/problem-list/two-pointers/" }
+      ]
+    },
+    {
+      "id": "p1-window",
+      "title": { "vi": "Dạng bài Sliding Window", "en": "Sliding Window problems" },
+      "problems": [
+        { "title": "Best Time to Buy and Sell Stock", "url": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/", "level": "Easy" },
+        { "title": "Longest Substring Without Repeating Characters", "url": "https://leetcode.com/problems/longest-substring-without-repeating-characters/", "level": "Medium" },
+        { "title": "Longest Repeating Character Replacement", "url": "https://leetcode.com/problems/longest-repeating-character-replacement/", "level": "Medium" },
+        { "title": "Permutation in String", "url": "https://leetcode.com/problems/permutation-in-string/", "level": "Medium" },
+        { "title": "Minimum Window Substring", "url": "https://leetcode.com/problems/minimum-window-substring/", "level": "Hard" },
+        { "title": "Sliding Window Maximum", "url": "https://leetcode.com/problems/sliding-window-maximum/", "level": "Hard" },
+        { "title": "Max Min", "url": "https://www.hackerrank.com/challenges/angry-children/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "GeeksforGeeks: Sliding Window Technique", "url": "https://www.geeksforgeeks.org/dsa/window-sliding-technique/" },
+        { "type": "practice", "title": "LeetCode tag: Sliding Window", "url": "https://leetcode.com/problem-list/sliding-window/" }
+      ]
+    },
+    {
+      "id": "p1-cses",
+      "title": "CSES: Introductory Problems",
+      "problems": [
+        { "title": "Weird Algorithm", "url": "https://cses.fi/problemset/task/1068" },
+        { "title": "Missing Number", "url": "https://cses.fi/problemset/task/1083" },
+        { "title": "Repetitions", "url": "https://cses.fi/problemset/task/1069" },
+        { "title": "Increasing Array", "url": "https://cses.fi/problemset/task/1094" },
+        { "title": "Permutations", "url": "https://cses.fi/problemset/task/1070" }
+      ],
+      "resources": [
+        { "type": "book", "title": "Competitive Programmer's Handbook (PDF)", "url": "https://cses.fi/book/book.pdf" },
+        { "type": "practice", "title": { "vi": "Toàn bộ CSES Problem Set", "en": "Full CSES Problem Set" }, "url": "https://cses.fi/problemset/" }
+      ]
+    }
+  ]
+}

@@ -1,8 +1,9 @@
 import { z } from "zod"
 import { LANG_CODES } from "@/i18n/languages"
+import { DEFAULT_TOPICS } from "@/notebook/templates"
 
 // Shape of the files in data/ (documented for authors in data/README.md).
-// Objects are strict, so a misspelt field ("keypoint") is reported instead of silently ignored.
+// Objects are strict, so a misspelt field ("resource") is reported instead of silently ignored.
 
 /** A plain value shared by every language, or one value per language: { "vi": ..., "en": ... } */
 const localized = <T extends z.ZodType>(inner: T) =>
@@ -16,26 +17,20 @@ const localized = <T extends z.ZodType>(inner: T) =>
 const httpUrl = z.url({ protocol: /^https?$/, message: "must be an http(s) URL" })
 
 const Text = localized(z.string())
-const TextList = localized(z.array(localized(z.string())))
 
-const Example = z.strictObject({
-  title: Text.optional(),
-  input: Text.optional(),
-  output: Text.optional(),
-  explain: Text.optional(),
-})
+/** Lowercase kebab-case: "p1-twoptr", "java-collections" */
+export const KEBAB = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
-const Template = z.strictObject({
-  lang: z.string().min(1),
-  /** One string, or one string per line */
-  code: localized(z.union([z.string(), z.array(z.string())])),
-})
+/**
+ * Patterns and phases made from a suggestion keep its id (pt_<id>, ph_<id>) in the notebook:
+ * renaming one breaks the link to what the user already added.
+ */
+const Id = z.string().regex(KEBAB, "must be lowercase kebab-case, e.g. java-collections")
 
 const Problem = z.strictObject({
   title: Text,
   url: httpUrl,
   level: z.string().optional(),
-  note: Text.optional(),
   guides: z.array(z.strictObject({ title: Text.optional(), url: httpUrl })).optional(),
 })
 
@@ -55,52 +50,33 @@ const Resource = z.strictObject({
   url: httpUrl,
 })
 
-export const ITEM_TYPES = ["theory", "practice"] as const
-
 export const ItemSchema = z.strictObject({
-  /** Progress is stored under this id: renaming it loses the item's ticks and notes */
-  id: z.string().min(1),
-  type: z.enum(ITEM_TYPES),
+  id: Id,
   title: Text,
-  description: Text.optional(),
-  keyPoints: TextList.optional(),
-  examples: localized(z.array(Example)).optional(),
-  template: z
-    .union([Template, z.array(Template)])
-    .transform((t) => (Array.isArray(t) ? t : [t]))
-    .refine((list) => new Set(list.map((t) => t.lang)).size === list.length, {
-      message: "two templates use the same lang",
-    })
-    .optional(),
-  complexity: Text.optional(),
-  pitfalls: TextList.optional(),
   problems: z.array(Problem).optional(),
   resources: z.array(Resource).optional(),
 })
 
 export const PhaseSchema = z.strictObject({
-  id: z.string().min(1),
+  id: Id,
   name: Text,
-  time: Text.optional(),
   items: z.array(ItemSchema),
 })
 
-export const ManifestSchema = z.strictObject({
+const TOPIC_IDS = DEFAULT_TOPICS.map((t) => t.id)
+
+export const ModuleSchema = z.strictObject({
+  /** The topic whose page offers this module: a default topic, since their ids never change */
+  topic: z.string().refine((id) => TOPIC_IDS.includes(id), {
+    message: `must be one of ${TOPIC_IDS.join(", ")}`,
+  }),
   title: Text,
-  subtitle: Text.optional(),
-  /** Phase files, in display order */
-  phases: z.array(z.string().min(1)).min(1),
-  codeReviewChecklist: z.array(z.strictObject({ id: z.string().min(1), text: Text })).default([]),
 })
 
 export type Localized<T> = T | Partial<Record<(typeof LANG_CODES)[number], T>>
 export type Item = z.infer<typeof ItemSchema>
 export type Phase = z.infer<typeof PhaseSchema>
-export type Manifest = z.infer<typeof ManifestSchema>
+export type ModuleMeta = z.infer<typeof ModuleSchema>
 export type Problem = z.infer<typeof Problem>
 export type Resource = z.infer<typeof Resource>
 export type ResourceType = (typeof RESOURCE_TYPES)[number]
-export type Template = z.infer<typeof Template>
-export type Example = z.infer<typeof Example>
-export type ItemType = (typeof ITEM_TYPES)[number]
-export type ChecklistEntry = Manifest["codeReviewChecklist"][number]

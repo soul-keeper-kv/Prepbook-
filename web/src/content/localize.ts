@@ -22,7 +22,3 @@ export function useLocalize() {
   const lang = readLang(i18n.resolvedLanguage)
   return useCallback(<T>(value: Localized<T> | undefined) => localize(value, lang) as T, [lang])
 }
-
-/** Code templates are a string or one string per line */
-export const codeText = (code: string | string[]): string =>
-  Array.isArray(code) ? code.join("\n") : code
