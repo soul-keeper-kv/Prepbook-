@@ -105,4 +105,18 @@ describe("buildContent", () => {
     )
     expect(() => build([["dsa/module.json", meta()]])).toThrow(/has no phase files/)
   })
+
+  it("accepts notes only for the sections of the module's topic", () => {
+    const withNotes = (topic: string, notes: unknown) =>
+      build([
+        ["m/module.json", meta(topic)],
+        ["m/01-a.json", { id: "p1", name: "P", items: [{ id: "x", title: "X", notes }] }],
+      ])
+    const notes = { recognition: { vi: ["- a"], en: "- a" }, template: ["```java", "```"] }
+    expect(withNotes("t_dsa", notes).items.get("x")?.item.notes).toEqual(notes)
+    expect(() => withNotes("t_sd", notes)).toThrow(
+      /item "x": notes\.recognition is not a section of a design topic/
+    )
+    expect(() => withNotes("t_dsa", { recognize: "-" })).toThrow(/recognize/)
+  })
 })

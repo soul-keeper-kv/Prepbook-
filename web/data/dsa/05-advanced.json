@@ -17,7 +17,104 @@
         { "type": "visual", "title": "VisuAlgo: Segment Tree", "url": "https://visualgo.net/en/segmenttree" },
         { "type": "practice", "title": "LeetCode tag: Binary Indexed Tree", "url": "https://leetcode.com/problem-list/binary-indexed-tree/" },
         { "type": "practice", "title": "LeetCode tag: Segment Tree", "url": "https://leetcode.com/problem-list/segment-tree/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Mảng **bị cập nhật** xen kẽ với truy vấn tổng / min / max trên đoạn, cả hai tới 10⁵ lần: prefix sum phải dựng lại O(n) sau mỗi update (Range Sum Query - Mutable)",
+            "- Đếm \"bao nhiêu phần tử phía trước / phía sau nhỏ hơn x\": duyệt mảng, Fenwick đánh chỉ số theo **giá trị** (nén toạ độ nếu giá trị lớn) (Count of Smaller Numbers After Self, Count of Range Sum)",
+            "- Cộng cả một đoạn rồi hỏi max: segment tree với lazy propagation (My Calendar III, dù sweep line với TreeMap gọn hơn)",
+            "- Khác với prefix sum: mảng không đổi thì prefix sum O(1) là đủ; min / max trên mảng không đổi thì sparse table"
+          ],
+          "en": [
+            "- The array **gets updated** between range sum / min / max queries, both up to 10⁵ times: prefix sums would need an O(n) rebuild after each update (Range Sum Query - Mutable)",
+            "- Count \"how many elements before / after are smaller than x\": scan the array with a Fenwick tree indexed by **value** (compress coordinates if values are large) (Count of Smaller Numbers After Self, Count of Range Sum)",
+            "- Add to a whole range, then ask for the max: segment tree with lazy propagation (My Calendar III, although a TreeMap sweep line is shorter)",
+            "- Unlike prefix sums: a static array only needs O(1) prefix sums; min / max on a static array calls for a sparse table"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "- **Fenwick (BIT)**, 1-indexed: `tree[i]` giữ tổng của `i & -i` phần tử kết thúc tại i. Update đi lên `i += i & -i`, prefix sum đi xuống `i -= i & -i`. Tổng đoạn = `prefix(r) - prefix(l - 1)`, nên chỉ hợp với phép có nghịch đảo (tổng, đếm)",
+            "- **Segment tree**: mỗi node giữ kết quả của một đoạn, hai con là hai nửa; mọi đoạn truy vấn tách thành O(log n) node. Gộp được gì thì dùng được nấy (tổng, min, max, gcd)",
+            "- **Lazy propagation**: update cả đoạn bằng cách ghi \"nợ\" ở node phủ trọn đoạn, chỉ đẩy xuống hai con khi sau này phải đi xuyên qua node đó",
+            "- **Sparse table**: `st[k][i]` = min của đoạn dài 2^k bắt đầu ở i; min(l..r) là min của hai đoạn 2^k chồng nhau, O(1), chỉ cho mảng tĩnh và phép idempotent (min, max, gcd)",
+            "",
+            "Phỏng vấn hiếm khi đòi lazy; Fenwick ngắn nên đáng thuộc.",
+            "",
+            "Độ phức tạp: Fenwick và segment tree O(log n) mỗi update / query, O(n) bộ nhớ; sparse table O(n log n) dựng, O(1) mỗi query."
+          ],
+          "en": [
+            "- **Fenwick (BIT)**, 1-indexed: `tree[i]` holds the sum of the `i & -i` elements ending at i. Updates climb with `i += i & -i`, prefix sums descend with `i -= i & -i`. A range sum is `prefix(r) - prefix(l - 1)`, so it only suits invertible operations (sums, counts)",
+            "- **Segment tree**: each node holds the result for a range, its two children the two halves; any query range splits into O(log n) nodes. Anything you can combine works (sum, min, max, gcd)",
+            "- **Lazy propagation**: update a whole range by leaving a pending value on the nodes that fully cover it, and push it down to the children only when a later operation has to pass through",
+            "- **Sparse table**: `st[k][i]` = min of the range of length 2^k starting at i; min(l..r) is the min of two overlapping 2^k ranges, O(1), only for static arrays and idempotent operations (min, max, gcd)",
+            "",
+            "Interviews rarely ask for lazy propagation; the Fenwick tree is short and worth knowing by heart.",
+            "",
+            "Complexity: Fenwick and segment tree O(log n) per update / query, O(n) space; sparse table O(n log n) to build, O(1) per query."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Fenwick tree (BIT), indices 1..n: point add, prefix sum",
+          "static class Fenwick {",
+          "    final long[] tree;",
+          "    Fenwick(int n) { tree = new long[n + 1]; }",
+          "    void add(int i, long delta) {                    // a[i] += delta",
+          "        for (; i < tree.length; i += i & -i) tree[i] += delta;",
+          "    }",
+          "    long prefix(int i) {                             // a[1] + ... + a[i]",
+          "        long s = 0;",
+          "        for (; i > 0; i -= i & -i) s += tree[i];",
+          "        return s;",
+          "    }",
+          "    long range(int l, int r) { return prefix(r) - prefix(l - 1); }",
+          "}",
+          "",
+          "// Segment tree, point set + range sum; node k covers [lo, hi], children 2k and 2k + 1",
+          "static class SegTree {",
+          "    final int n;",
+          "    final int[] t;",
+          "    SegTree(int[] a) { n = a.length; t = new int[4 * n]; build(a, 1, 0, n - 1); }",
+          "    void build(int[] a, int k, int lo, int hi) {",
+          "        if (lo == hi) { t[k] = a[lo]; return; }",
+          "        int mid = (lo + hi) / 2;",
+          "        build(a, 2 * k, lo, mid);",
+          "        build(a, 2 * k + 1, mid + 1, hi);",
+          "        t[k] = t[2 * k] + t[2 * k + 1];              // combine: +, min, max, gcd",
+          "    }",
+          "    void set(int k, int lo, int hi, int i, int val) {   // call set(1, 0, n - 1, i, val)",
+          "        if (lo == hi) { t[k] = val; return; }",
+          "        int mid = (lo + hi) / 2;",
+          "        if (i <= mid) set(2 * k, lo, mid, i, val);",
+          "        else set(2 * k + 1, mid + 1, hi, i, val);",
+          "        t[k] = t[2 * k] + t[2 * k + 1];",
+          "    }",
+          "    int query(int k, int lo, int hi, int l, int r) { // call query(1, 0, n - 1, l, r)",
+          "        if (r < lo || hi < l) return 0;              // no overlap: identity (0 for sum)",
+          "        if (l <= lo && hi <= r) return t[k];         // fully inside",
+          "        int mid = (lo + hi) / 2;",
+          "        return query(2 * k, lo, mid, l, r) + query(2 * k + 1, mid + 1, hi, l, r);",
+          "    }",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Fenwick dùng index 0: `i += i & -i` với i = 0 lặp vô hạn; luôn dời sang 1-indexed (Range Sum Query - Mutable)",
+            "- Fenwick chỉ có \"cộng thêm\": đề yêu cầu gán `a[i] = val` thì cộng `val - a[i]` và giữ mảng a để lần sau còn tính được (Range Sum Query - Mutable)",
+            "- Giá trị lớn hoặc âm (prefix sum tới 10¹⁴): nén toạ độ bằng sort + binary search rồi mới đưa vào Fenwick, và dùng `long` (Count of Range Sum)",
+            "- Segment tree đệ quy cấp mảng `2n`: thiếu chỗ, cần `4n`; nhánh ngoài đoạn phải trả phần tử trung hoà (0 cho tổng, `Integer.MAX_VALUE` cho min)"
+          ],
+          "en": [
+            "- A Fenwick tree with index 0: `i += i & -i` never moves from 0 and loops forever; always shift to 1-indexed (Range Sum Query - Mutable)",
+            "- A Fenwick tree only adds: when the problem sets `a[i] = val`, add `val - a[i]` and keep array a for later updates (Range Sum Query - Mutable)",
+            "- Large or negative values (prefix sums up to 10¹⁴): compress coordinates with sort + binary search before using them as Fenwick indices, and use `long` (Count of Range Sum)",
+            "- A recursive segment tree with an array of `2n`: too small, it needs `4n`; a branch outside the range must return the identity (0 for sum, `Integer.MAX_VALUE` for min)"
+          ]
+        }
+      }
     },
     {
       "id": "p5-lca",
@@ -29,7 +126,99 @@
       "resources": [
         { "type": "article", "title": "cp-algorithms: LCA with binary lifting", "url": "https://cp-algorithms.com/graph/lca_binary_lifting.html" },
         { "type": "article", "title": "USACO Guide: Binary Jumping", "url": "https://usaco.guide/plat/binary-jump" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Hỏi **tổ tiên chung thấp nhất** của hai node, hoặc khoảng cách hai node trên cây: `depth[u] + depth[v] - 2 * depth[lca]` (Lowest Common Ancestor of a Binary Tree)",
+            "- Chỉ một truy vấn: DFS đệ quy O(n) là đủ, không cần tiền xử lý",
+            "- **Nhiều truy vấn** (tới 10⁵) trên một cây cố định: tổ tiên thứ k, LCA, khoảng cách. Mỗi truy vấn O(n) sẽ TLE, cần binary lifting (Kth Ancestor of a Tree Node)",
+            "- Khác với BST: trên BST so giá trị với p, q là biết đi trái hay phải, không cần các kỹ thuật này"
+          ],
+          "en": [
+            "- Asks for the **lowest common ancestor** of two nodes, or the distance between two tree nodes: `depth[u] + depth[v] - 2 * depth[lca]` (Lowest Common Ancestor of a Binary Tree)",
+            "- A single query: a recursive O(n) DFS is enough, no preprocessing",
+            "- **Many queries** (up to 10⁵) on one fixed tree: k-th ancestor, LCA, distance. O(n) per query times out, so use binary lifting (Kth Ancestor of a Tree Node)",
+            "- Unlike a BST: in a BST comparing values with p and q tells you whether to go left or right, none of this is needed"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "- **Một truy vấn**: hàm đệ quy trả về p hoặc q nếu gặp trong cây con, null nếu không. Node nhận non-null từ cả hai con là LCA; chỉ một bên thì đẩy kết quả bên đó lên",
+            "- **Binary lifting**: `up[0][v]` là cha, `up[k][v] = up[k-1][up[k-1][v]]` (nhảy 2^k bằng hai lần nhảy 2^(k-1)). Tổ tiên thứ k: phân tích k theo bit, nhảy theo từng bit bật",
+            "- **LCA bằng binary lifting**: đưa node sâu hơn lên cùng độ sâu, trùng nhau thì xong. Nếu chưa, với k từ lớn tới nhỏ, nhảy cả hai khi `up[k][u] != up[k][v]`; cuối cùng `up[0][u]` là LCA",
+            "- **Euler tour** (biết thêm): ghi `tin` / `tout` khi DFS; u là tổ tiên của v khi `tin[u] <= tin[v]` và `tout[v] <= tout[u]`, mỗi cây con thành một đoạn liên tiếp nên truy vấn cây con thành truy vấn đoạn",
+            "",
+            "Độ phức tạp: đệ quy O(n) mỗi truy vấn; binary lifting O(n log n) tiền xử lý và bộ nhớ, O(log n) mỗi truy vấn."
+          ],
+          "en": [
+            "- **One query**: a recursive function returns p or q if found in the subtree, null otherwise. The node that gets non-null from both children is the LCA; if only one side is non-null, pass that result up",
+            "- **Binary lifting**: `up[0][v]` is the parent, `up[k][v] = up[k-1][up[k-1][v]]` (a 2^k jump is two 2^(k-1) jumps). K-th ancestor: split k into bits and jump once per set bit",
+            "- **LCA with binary lifting**: lift the deeper node to the same depth; if they meet, done. Otherwise, for k from large to small, jump both while `up[k][u] != up[k][v]`; at the end `up[0][u]` is the LCA",
+            "- **Euler tour** (good to know): record `tin` / `tout` during DFS; u is an ancestor of v when `tin[u] <= tin[v]` and `tout[v] <= tout[u]`, and each subtree becomes a contiguous range, so subtree queries become range queries",
+            "",
+            "Complexity: recursive O(n) per query; binary lifting O(n log n) preprocessing and space, O(log n) per query."
+          ]
+        },
+        "template": [
+          "```java",
+          "// One query: recursive LCA on a binary tree, O(n)",
+          "TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {",
+          "    if (root == null || root == p || root == q) return root;",
+          "    TreeNode l = lowestCommonAncestor(root.left, p, q);",
+          "    TreeNode r = lowestCommonAncestor(root.right, p, q);",
+          "    if (l != null && r != null) return root;         // p and q on different sides",
+          "    return l != null ? l : r;",
+          "}",
+          "",
+          "// Many queries: binary lifting, up[k][v] = 2^k-th ancestor of v (-1 above the root)",
+          "static class TreeAncestor {",
+          "    static final int LOG = 17;                       // 2^LOG > max depth (n <= 10^5)",
+          "    final int[][] up = new int[LOG][];",
+          "    final int[] depth;",
+          "    TreeAncestor(int n, int[] parent) {              // parent[root] = -1",
+          "        up[0] = parent.clone();",
+          "        for (int k = 1; k < LOG; k++) {",
+          "            up[k] = new int[n];",
+          "            for (int v = 0; v < n; v++)",
+          "                up[k][v] = up[k - 1][v] == -1 ? -1 : up[k - 1][up[k - 1][v]];",
+          "        }",
+          "        depth = new int[n];",
+          "        for (int v = 0; v < n; v++)                  // depth from the table itself",
+          "            for (int k = LOG - 1, u = v; k >= 0; k--)",
+          "                if (up[k][u] != -1) { u = up[k][u]; depth[v] += 1 << k; }",
+          "    }",
+          "    int getKthAncestor(int v, int k) {",
+          "        for (int b = 0; b < LOG && v != -1; b++)",
+          "            if ((k >> b & 1) == 1) v = up[b][v];     // one jump per set bit of k",
+          "        return v;",
+          "    }",
+          "    int lca(int u, int v) {",
+          "        if (depth[u] < depth[v]) { int t = u; u = v; v = t; }",
+          "        u = getKthAncestor(u, depth[u] - depth[v]);  // same depth",
+          "        if (u == v) return u;",
+          "        for (int k = LOG - 1; k >= 0; k--)           // large to small, jump while different",
+          "            if (up[k][u] != up[k][v]) { u = up[k][u]; v = up[k][v]; }",
+          "        return up[0][u];",
+          "    }",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- `LOG` nhỏ hơn số bit của độ sâu tối đa hoặc của k: bit cao bị bỏ qua, trả sai mà không báo lỗi (Kth Ancestor of a Tree Node)",
+            "- Không chặn -1 khi nhảy quá gốc: `up[k - 1][-1]` ném ArrayIndexOutOfBounds (Kth Ancestor of a Tree Node)",
+            "- Vòng tìm LCA phải đi k từ **lớn xuống nhỏ** và chỉ nhảy khi hai tổ tiên **khác** nhau; đáp án là `up[0][u]`, không phải u",
+            "- Bản đệ quy giả định p và q đều có trong cây; nếu đề không đảm bảo thì phải đếm số node tìm thấy (Lowest Common Ancestor of a Binary Tree II)"
+          ],
+          "en": [
+            "- `LOG` smaller than the number of bits of the maximum depth or of k: the high bits are ignored and the answer is silently wrong (Kth Ancestor of a Tree Node)",
+            "- Not guarding -1 when jumping past the root: `up[k - 1][-1]` throws ArrayIndexOutOfBounds (Kth Ancestor of a Tree Node)",
+            "- The LCA loop must go k from **large to small** and jump only while the two ancestors **differ**; the answer is `up[0][u]`, not u",
+            "- The recursive version assumes both p and q are in the tree; if that is not guaranteed, count how many were found (Lowest Common Ancestor of a Binary Tree II)"
+          ]
+        }
+      }
     },
     {
       "id": "p5-string",
@@ -48,7 +237,100 @@
         { "type": "article", "title": "cp-algorithms: String hashing", "url": "https://cp-algorithms.com/string/string-hashing.html" },
         { "type": "practice", "title": "LeetCode tag: String Matching", "url": "https://leetcode.com/problem-list/string-matching/" },
         { "type": "practice", "title": "LeetCode tag: Rolling Hash", "url": "https://leetcode.com/problem-list/rolling-hash/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Tìm **pattern trong text** (vị trí đầu tiên / mọi vị trí) với n, m lớn: so từng vị trí O(n·m) có thể TLE (Find the Index of the First Occurrence in a String)",
+            "- Hỏi về **tiền tố đồng thời là hậu tố**, hay chuỗi có phải một khối lặp lại không: prefix function (Repeated Substring Pattern)",
+            "- Tiền tố palindrome dài nhất: KMP trên `s + \"#\" + reverse(s)` (Shortest Palindrome)",
+            "- So **nhiều chuỗi con** với nhau, tìm chuỗi con xuất hiện hai lần dài nhất: rolling hash, thường kèm binary search trên độ dài (Longest Duplicate Substring)",
+            "- Khác với bài palindrome thường: Longest Palindromic Substring chỉ cần expand-around-center O(n²); Manacher O(n) hiếm khi cần"
+          ],
+          "en": [
+            "- Find a **pattern in a text** (first or every position) with large n, m: comparing at every position is O(n·m) and can time out (Find the Index of the First Occurrence in a String)",
+            "- Asks about a **prefix that is also a suffix**, or whether a string is one block repeated: prefix function (Repeated Substring Pattern)",
+            "- Longest palindromic prefix: KMP on `s + \"#\" + reverse(s)` (Shortest Palindrome)",
+            "- Compare **many substrings** with each other, find the longest substring that occurs twice: rolling hash, usually with binary search on the length (Longest Duplicate Substring)",
+            "- Unlike ordinary palindrome problems: Longest Palindromic Substring only needs O(n²) expand-around-center; O(n) Manacher is rarely required"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "- **Prefix function (KMP)**: `pi[i]` = độ dài tiền tố thật dài nhất của `s[0..i]` cũng là hậu tố của nó. Khi lệch, không quay về 0 mà lùi `j = pi[j - 1]` để tái dùng phần đã khớp. Tìm pattern: tính `pi` trên `pattern + '#' + text`, chỗ nào `pi[i] == m` là một lần khớp. Số lần lùi không vượt số lần tiến nên tổng là O(n + m)",
+            "- Chu kỳ: `p = n - pi[n - 1]`; chuỗi là một khối lặp lại khi `pi[n - 1] > 0` và `n % p == 0`",
+            "- **Z-function**: `z[i]` = độ dài tiền tố chung dài nhất của s và `s[i..]`, giải được cùng loại bài với prefix function",
+            "- **Rolling hash (Rabin-Karp)**: `h = (h * B + c) % M`; trượt cửa sổ dài L thì trừ `s[i - L] * B^L`, nên so hai chuỗi con mất O(1). Hash bằng nhau thì so lại chuỗi thật (hoặc dùng hai mod) để tránh đụng độ",
+            "",
+            "Độ phức tạp: KMP và Z-function O(n + m); rolling hash O(n) cho mỗi độ dài, kèm binary search là O(n log n)."
+          ],
+          "en": [
+            "- **Prefix function (KMP)**: `pi[i]` = length of the longest proper prefix of `s[0..i]` that is also its suffix. On a mismatch, do not restart from 0 but fall back `j = pi[j - 1]` to reuse what already matched. Pattern search: compute `pi` over `pattern + '#' + text`; every `pi[i] == m` is a match. Fall-backs never outnumber advances, so the total is O(n + m)",
+            "- Period: `p = n - pi[n - 1]`; the string is one block repeated when `pi[n - 1] > 0` and `n % p == 0`",
+            "- **Z-function**: `z[i]` = length of the longest common prefix of s and `s[i..]`; it solves the same kind of problems as the prefix function",
+            "- **Rolling hash (Rabin-Karp)**: `h = (h * B + c) % M`; sliding a window of length L subtracts `s[i - L] * B^L`, so comparing two substrings is O(1). On equal hashes compare the actual strings (or use two moduli) to rule out collisions",
+            "",
+            "Complexity: KMP and Z-function O(n + m); rolling hash O(n) per length, O(n log n) with binary search."
+          ]
+        },
+        "template": [
+          "```java",
+          "// pi[i] = length of the longest proper prefix of s[0..i] that is also a suffix of it",
+          "int[] prefixFunction(String s) {",
+          "    int[] pi = new int[s.length()];",
+          "    for (int i = 1; i < s.length(); i++) {",
+          "        int j = pi[i - 1];",
+          "        while (j > 0 && s.charAt(i) != s.charAt(j)) j = pi[j - 1];   // fall back, not to 0",
+          "        if (s.charAt(i) == s.charAt(j)) j++;",
+          "        pi[i] = j;",
+          "    }",
+          "    return pi;",
+          "}",
+          "",
+          "// KMP search (Find the Index of the First Occurrence in a String), O(n + m)",
+          "int strStr(String haystack, String needle) {",
+          "    int m = needle.length();",
+          "    int[] pi = prefixFunction(needle + '#' + haystack);   // '#' occurs in neither string",
+          "    for (int i = 2 * m; i < pi.length; i++)",
+          "        if (pi[i] == m) return i - 2 * m;",
+          "    return -1;",
+          "}",
+          "",
+          "// Rolling hash (Longest Duplicate Substring): binary search on len + check(len)",
+          "int repeatOfLength(String s, int len) {             // start of a repeated substring, or -1",
+          "    final long M = 1_000_000_007L, B = 131;",
+          "    long h = 0, pow = 1;                             // pow = B^len",
+          "    for (int i = 0; i < len; i++) { h = (h * B + s.charAt(i)) % M; pow = pow * B % M; }",
+          "    Map<Long, List<Integer>> seen = new HashMap<>();",
+          "    seen.computeIfAbsent(h, x -> new ArrayList<>()).add(0);",
+          "    for (int i = len; i < s.length(); i++) {",
+          "        h = (h * B + s.charAt(i) - s.charAt(i - len) * pow % M + M) % M;   // slide by one",
+          "        int start = i - len + 1;",
+          "        for (int j : seen.getOrDefault(h, List.of()))   // same hash: confirm the text",
+          "            if (s.regionMatches(j, s, start, len)) return start;",
+          "        seen.computeIfAbsent(h, x -> new ArrayList<>()).add(start);",
+          "    }",
+          "    return -1;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- KMP lùi bằng `if` thay vì `while`, hoặc reset `j = 0` khi lệch: sai kết quả hoặc mất O(n + m) (Find the Index of the First Occurrence in a String)",
+            "- Quên ký tự phân cách khi nối `s + \"#\" + reverse(s)`: `pi` có thể dài hơn s (Shortest Palindrome)",
+            "- Kiểm tra chu kỳ thiếu điều kiện `pi[n - 1] > 0`: \"abc\" có p = 3 chia hết n nên bị coi là lặp (Repeated Substring Pattern)",
+            "- Rolling hash trừ xong quên `+ M` trước khi `% M`: `%` của Java giữ dấu âm, hai chuỗi giống nhau ra hash khác nhau (Longest Duplicate Substring)",
+            "- Chọn M cỡ 10¹⁸ thì `h * B` tràn `long`, giữ M cỡ 10⁹; chỉ so hash mà không kiểm tra chuỗi thật thì đụng độ cho đáp án sai (Longest Duplicate Substring)"
+          ],
+          "en": [
+            "- Falling back with `if` instead of `while`, or resetting `j = 0` on a mismatch: wrong answers or no longer O(n + m) (Find the Index of the First Occurrence in a String)",
+            "- Forgetting the separator in `s + \"#\" + reverse(s)`: `pi` can grow longer than s (Shortest Palindrome)",
+            "- Checking the period without `pi[n - 1] > 0`: for \"abc\", p = 3 divides n, so it is wrongly reported as repeated (Repeated Substring Pattern)",
+            "- Subtracting in a rolling hash without `+ M` before `% M`: Java's `%` keeps the negative sign, so equal strings get different hashes (Longest Duplicate Substring)",
+            "- An M around 10¹⁸ makes `h * B` overflow `long`, keep M around 10⁹; comparing hashes without checking the actual text lets a collision produce a wrong answer (Longest Duplicate Substring)"
+          ]
+        }
+      }
     },
     {
       "id": "p5-math",
@@ -65,7 +347,106 @@
         { "type": "article", "title": "cp-algorithms: Modular inverse", "url": "https://cp-algorithms.com/algebra/module-inverse.html" },
         { "type": "article", "title": "cp-algorithms: Binomial coefficients", "url": "https://cp-algorithms.com/combinatorics/binomial-coefficients.html" },
         { "type": "practice", "title": "LeetCode tag: Combinatorics", "url": "https://leetcode.com/problem-list/combinatorics/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đề nói \"trả về kết quả **modulo 10⁹ + 7**\": đáp án rất lớn, thường là đếm số cách",
+            "- Đếm theo tổ hợp: chọn vị trí, đường đi trên lưới chỉ sang phải / xuống là C(m + n - 2, m - 1) (Unique Paths, Count Sorted Vowel Strings)",
+            "- Số mũ khổng lồ (n tới 10¹⁵) nên phải lũy thừa nhanh O(log n) (Count Good Numbers, Super Pow)",
+            "- Truy hồi tuyến tính (Fibonacci, f(n) = a·f(n-1) + b·f(n-2)) với n tới 10⁹ trở lên: lũy thừa ma trận (Fibonacci Finding (easy))",
+            "- Khác với DP thường: n ≤ 10⁵ thì DP O(n) là đủ; công thức đóng / ma trận chỉ cần khi n khổng lồ"
+          ],
+          "en": [
+            "- The statement says \"return the answer **modulo 10⁹ + 7**\": the answer is huge, usually a count of ways",
+            "- Counting with combinations: choosing positions; a grid path going only right / down is C(m + n - 2, m - 1) (Unique Paths, Count Sorted Vowel Strings)",
+            "- A huge exponent (n up to 10¹⁵) calls for O(log n) fast power (Count Good Numbers, Super Pow)",
+            "- A linear recurrence (Fibonacci, f(n) = a·f(n-1) + b·f(n-2)) with n of 10⁹ or more: matrix exponentiation (Fibonacci Finding (easy))",
+            "- Unlike ordinary DP: for n ≤ 10⁵ an O(n) DP is enough; closed forms / matrices only matter when n is huge"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "- Lấy mod sau **mỗi** phép cộng và nhân; phép trừ viết `(a - b + MOD) % MOD`. Không chia trực tiếp được: nhân với nghịch đảo modulo",
+            "- **Lũy thừa nhanh**: xét từng bit của e, bit bật thì nhân kết quả với a, mỗi bước bình phương a: O(log e)",
+            "- **Nghịch đảo modulo** khi MOD nguyên tố (định lý Fermat nhỏ): nghịch đảo của a là `a^(MOD - 2) % MOD`, với a không chia hết cho MOD",
+            "- **nCr**: dựng `fact[i]` và `invFact[i]` một lần trong O(n) (`invFact[i - 1] = invFact[i] * i`), mỗi truy vấn `fact[n] * invFact[r] * invFact[n - r]` là O(1)",
+            "- **Lũy thừa ma trận**: viết truy hồi bậc k thành `v(n) = M · v(n - 1)`, khi đó `v(n) = M^n · v(0)`; tính M^n bằng lũy thừa nhanh trên ma trận k×k",
+            "",
+            "Độ phức tạp: lũy thừa nhanh O(log e); bảng giai thừa O(n) để dựng, O(1) mỗi nCr; lũy thừa ma trận O(k³ log n)."
+          ],
+          "en": [
+            "- Take the mod after **every** addition and multiplication; write subtraction as `(a - b + MOD) % MOD`. You cannot divide directly: multiply by the modular inverse",
+            "- **Fast power**: go through the bits of e, multiply the result by a when the bit is set, square a at every step: O(log e)",
+            "- **Modular inverse** when MOD is prime (Fermat's little theorem): the inverse of a is `a^(MOD - 2) % MOD`, for a not divisible by MOD",
+            "- **nCr**: build `fact[i]` and `invFact[i]` once in O(n) (`invFact[i - 1] = invFact[i] * i`), then each query `fact[n] * invFact[r] * invFact[n - r]` is O(1)",
+            "- **Matrix exponentiation**: write an order-k recurrence as `v(n) = M · v(n - 1)`, so `v(n) = M^n · v(0)`; compute M^n with fast power on k×k matrices",
+            "",
+            "Complexity: fast power O(log e); factorial tables O(n) to build, O(1) per nCr; matrix exponentiation O(k³ log n)."
+          ]
+        },
+        "template": [
+          "```java",
+          "static final int MOD = 1_000_000_007;",
+          "",
+          "long power(long a, long e) {                         // a^e % MOD in O(log e)",
+          "    long res = 1;",
+          "    a %= MOD;",
+          "    for (; e > 0; e >>= 1, a = a * a % MOD)",
+          "        if ((e & 1) == 1) res = res * a % MOD;",
+          "    return res;",
+          "}",
+          "",
+          "long inverse(long a) { return power(a, MOD - 2); }  // Fermat: MOD must be prime",
+          "",
+          "long[] fact, invFact;",
+          "void initFactorials(int n) {                         // O(n) once, then nCr in O(1)",
+          "    fact = new long[n + 1];",
+          "    invFact = new long[n + 1];",
+          "    fact[0] = 1;",
+          "    for (int i = 1; i <= n; i++) fact[i] = fact[i - 1] * i % MOD;",
+          "    invFact[n] = inverse(fact[n]);",
+          "    for (int i = n; i > 0; i--) invFact[i - 1] = invFact[i] * i % MOD;",
+          "}",
+          "long nCr(int n, int r) {",
+          "    if (r < 0 || r > n) return 0;",
+          "    return fact[n] * invFact[r] % MOD * invFact[n - r] % MOD;",
+          "}",
+          "",
+          "// Matrix power for linear recurrences: [[1, 1], [1, 0]]^n = [[F(n+1), F(n)], [F(n), F(n-1)]]",
+          "long[][] multiply(long[][] a, long[][] b) {",
+          "    int n = a.length;",
+          "    long[][] c = new long[n][n];",
+          "    for (int i = 0; i < n; i++)",
+          "        for (int k = 0; k < n; k++)",
+          "            for (int j = 0; j < n; j++) c[i][j] = (c[i][j] + a[i][k] * b[k][j]) % MOD;",
+          "    return c;",
+          "}",
+          "long fib(long n) {",
+          "    long[][] res = {{1, 0}, {0, 1}}, m = {{1, 1}, {1, 0}};   // identity, step matrix",
+          "    for (; n > 0; n >>= 1, m = multiply(m, m))",
+          "        if ((n & 1) == 1) res = multiply(res, m);",
+          "    return res[0][1];",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Nhân hai `int` nhỏ hơn MOD rồi mới mod: tích tràn trước khi mod; viết `(long) a * b % MOD` (Count Good Numbers)",
+            "- n tới 10¹⁶ mà tính `n * n` trước khi mod: tràn `long`; mod n trước rồi mới nhân (Summing the N series)",
+            "- Chia sau khi đã mod (`fact[n] / fact[r]`) là sai, phải nhân nghịch đảo. Không có mod thì C(m + n - 2, m - 1) qua giai thừa tràn `long`; nhân chia xen kẽ `res = res * (N - r + i) / i` vẫn ra số nguyên (Unique Paths)",
+            "- Fermat chỉ đúng khi MOD nguyên tố. Super Pow dùng mod 1337 = 7 × 191 nên không rút gọn số mũ theo Fermat được; dùng `a^(10x + d) = (a^x)^10 · a^d` theo từng chữ số (Super Pow)",
+            "- `%` của Java giữ dấu: số âm mod ra số âm, cộng thêm MOD trước khi trả về"
+          ],
+          "en": [
+            "- Multiplying two `int`s below MOD and only then taking the mod: the product overflows first; write `(long) a * b % MOD` (Count Good Numbers)",
+            "- n up to 10¹⁶ and computing `n * n` before the mod: `long` overflows; reduce n mod MOD first, then multiply (Summing the N series)",
+            "- Dividing after taking the mod (`fact[n] / fact[r]`) is wrong, multiply by the inverse instead. Without a mod, C(m + n - 2, m - 1) through factorials overflows `long`; alternating `res = res * (N - r + i) / i` stays an integer (Unique Paths)",
+            "- Fermat only holds for a prime MOD. Super Pow uses mod 1337 = 7 × 191, so the exponent cannot be reduced with Fermat; use `a^(10x + d) = (a^x)^10 · a^d` digit by digit (Super Pow)",
+            "- Java's `%` keeps the sign: a negative number mod MOD is negative, add MOD before returning"
+          ]
+        }
+      }
     },
     {
       "id": "p5-bitmask",
@@ -79,7 +460,108 @@
       "resources": [
         { "type": "article", "title": "USACO Guide: Bitmask DP", "url": "https://usaco.guide/gold/dp-bitmasks" },
         { "type": "practice", "title": "LeetCode tag: Bitmask", "url": "https://leetcode.com/problem-list/bitmask/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- **n ≤ 20** (đôi khi ≤ 16): 2ⁿ ≈ 10⁶ trạng thái là chấp nhận được, gợi ý duyệt theo tập con",
+            "- Trạng thái phải nhớ **những phần tử nào đã dùng**, không chỉ đã dùng bao nhiêu (Can I Win, Partition to K Equal Sum Subsets)",
+            "- Ghép / đi qua **tất cả** phần tử theo thứ tự tốt nhất, dạng TSP: `dp[mask][last]` (Find the Shortest Superstring)",
+            "- Đường ngắn nhất thăm mọi đỉnh, được đi lại đỉnh và cạnh cũ: BFS trên trạng thái `(node, mask)` (Shortest Path Visiting All Nodes)",
+            "- Khác với backtracking: backtracking thử n! thứ tự; bitmask DP gộp mọi thứ tự có cùng tập đã dùng thành một trạng thái, chỉ còn 2ⁿ·n"
+          ],
+          "en": [
+            "- **n ≤ 20** (sometimes ≤ 16): 2ⁿ ≈ 10⁶ states is affordable, a hint to work over subsets",
+            "- The state must remember **which elements are used**, not just how many (Can I Win, Partition to K Equal Sum Subsets)",
+            "- Visit / chain **all** elements in the best order, TSP style: `dp[mask][last]` (Find the Shortest Superstring)",
+            "- Shortest walk visiting every node, revisits allowed: BFS over the state `(node, mask)` (Shortest Path Visiting All Nodes)",
+            "- Unlike backtracking: backtracking tries n! orders; bitmask DP merges every order with the same used set into one state, leaving 2ⁿ·n"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Mask là một số nguyên, bit i bật nghĩa là phần tử i đã chọn. `dp[mask]` (hoặc `dp[mask][i]`, i là phần tử cuối) là kết quả tốt nhất cho tập đó; chuyển trạng thái bằng cách bật thêm một bit.",
+            "",
+            "- Thao tác bit: kiểm tra `(mask >> i & 1) == 1`, bật `mask | 1 << i`, tập đầy `(1 << n) - 1`",
+            "- Duyệt mọi submask: `for (int s = mask; s > 0; s = (s - 1) & mask)`; làm cho mọi mask thì tổng cộng O(3ⁿ)",
+            "- Trò chơi (Can I Win): memo theo mask đã dùng, thắng nếu có một nước đi khiến đối thủ thua; tổng còn lại suy ra được từ mask nên không cần đưa vào khoá",
+            "- Mỗi bước tốn 1 (Shortest Path Visiting All Nodes): BFS đa nguồn với `seen[node][mask]`",
+            "",
+            "Độ phức tạp: O(2ⁿ·n) thời gian cho `dp[mask]`, O(2ⁿ·n²) cho `dp[mask][last]`; bộ nhớ O(2ⁿ) hoặc O(2ⁿ·n)."
+          ],
+          "en": [
+            "A mask is an integer whose bit i is set when element i is chosen. `dp[mask]` (or `dp[mask][i]`, with i the last element) is the best result for that set; transitions set one more bit.",
+            "",
+            "- Bit operations: test `(mask >> i & 1) == 1`, set `mask | 1 << i`, full set `(1 << n) - 1`",
+            "- Every submask: `for (int s = mask; s > 0; s = (s - 1) & mask)`; doing it for every mask costs O(3ⁿ) in total",
+            "- Games (Can I Win): memoise on the used mask; a position wins if some move leaves the opponent losing. The remaining total follows from the mask, so it does not belong in the key",
+            "- Unit-cost steps (Shortest Path Visiting All Nodes): multi-source BFS with `seen[node][mask]`",
+            "",
+            "Complexity: O(2ⁿ·n) time for `dp[mask]`, O(2ⁿ·n²) for `dp[mask][last]`; O(2ⁿ) or O(2ⁿ·n) space."
+          ]
+        },
+        "template": [
+          "```java",
+          "// dp over masks (Partition to K Equal Sum Subsets)",
+          "// fill[mask] = sum of the chosen elements % target, -1 if the mask is unreachable",
+          "boolean canPartitionKSubsets(int[] nums, int k) {",
+          "    int n = nums.length, sum = Arrays.stream(nums).sum();",
+          "    if (sum % k != 0) return false;",
+          "    int target = sum / k;",
+          "    int[] fill = new int[1 << n];",
+          "    Arrays.fill(fill, -1);",
+          "    fill[0] = 0;",
+          "    for (int mask = 0; mask < 1 << n; mask++) {",
+          "        if (fill[mask] == -1) continue;",
+          "        for (int i = 0; i < n; i++) {",
+          "            int next = mask | 1 << i;",
+          "            if (next == mask || fill[next] != -1 || fill[mask] + nums[i] > target) continue;",
+          "            fill[next] = (fill[mask] + nums[i]) % target;   // a full bucket wraps to 0",
+          "        }",
+          "    }",
+          "    return fill[(1 << n) - 1] == 0;",
+          "}",
+          "",
+          "// BFS over (node, visited mask) (Shortest Path Visiting All Nodes)",
+          "int shortestPathLength(int[][] graph) {",
+          "    int n = graph.length, full = (1 << n) - 1;",
+          "    boolean[][] seen = new boolean[n][1 << n];",
+          "    Deque<int[]> q = new ArrayDeque<>();",
+          "    for (int i = 0; i < n; i++) {                    // may start anywhere: multi-source",
+          "        q.offer(new int[]{i, 1 << i});",
+          "        seen[i][1 << i] = true;",
+          "    }",
+          "    for (int steps = 0; !q.isEmpty(); steps++) {",
+          "        for (int size = q.size(); size > 0; size--) {",
+          "            int[] cur = q.poll();",
+          "            if (cur[1] == full) return steps;",
+          "            for (int v : graph[cur[0]]) {",
+          "                int mask = cur[1] | 1 << v;",
+          "                if (!seen[v][mask]) { seen[v][mask] = true; q.offer(new int[]{v, mask}); }",
+          "            }",
+          "        }",
+          "    }",
+          "    return -1;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Thiếu ngoặc với toán tử bit: `==` ưu tiên cao hơn `&`, nên `mask & 1 << i == 0` không compile; viết `(mask & (1 << i)) == 0`",
+            "- Quên xử lý trước: tổng 1..maxChoosableInteger nhỏ hơn desiredTotal thì không ai thắng, trả false; desiredTotal = 0 thì người đi trước thắng (Can I Win)",
+            "- BFS đánh dấu visited theo node thay vì theo `(node, mask)`: không quay lại được đỉnh cũ, bỏ sót đường ngắn nhất (Shortest Path Visiting All Nodes)",
+            "- Chỉ tính độ dài mà không lưu `parent[mask][last]`: không dựng lại được chuỗi đáp án (Find the Shortest Superstring)",
+            "- `int[1 << 20][20]` đã khoảng 80 MB: tính bộ nhớ trước khi thêm một chiều vào trạng thái"
+          ],
+          "en": [
+            "- Missing parentheses around bit operators: `==` binds tighter than `&`, so `mask & 1 << i == 0` does not compile; write `(mask & (1 << i)) == 0`",
+            "- Not handling the edge cases first: if 1..maxChoosableInteger sums to less than desiredTotal nobody wins, return false; desiredTotal = 0 means the first player wins (Can I Win)",
+            "- BFS marking visited by node instead of by `(node, mask)`: old nodes can never be revisited and the shortest walk is missed (Shortest Path Visiting All Nodes)",
+            "- Computing only the length without storing `parent[mask][last]`: the answer string cannot be rebuilt (Find the Shortest Superstring)",
+            "- `int[1 << 20][20]` is already about 80 MB: estimate memory before adding a dimension to the state"
+          ]
+        }
+      }
     },
     {
       "id": "p5-misc",
@@ -92,7 +574,88 @@
         { "type": "article", "title": "cp-algorithms: Sqrt decomposition", "url": "https://cp-algorithms.com/data_structures/sqrt_decomposition.html" },
         { "type": "article", "title": "cp-algorithms: Max flow (Edmonds-Karp)", "url": "https://cp-algorithms.com/graph/edmonds_karp.html" },
         { "type": "article", "title": "USACO Guide: Meet In The Middle", "url": "https://usaco.guide/gold/meet-in-the-middle" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- **n khoảng 30–40**: 2⁴⁰ quá lớn nhưng 2²⁰ ≈ 10⁶ thì được, nên chia đôi mảng rồi ghép kết quả hai nửa: meet in the middle (Closest Subsequence Sum)",
+            "- Chia 2n phần tử thành hai nhóm n phần tử (n ≤ 15) cho hiệu tổng nhỏ nhất: meet in the middle, nhóm tổng theo số phần tử lấy từ mỗi nửa (Partition Array Into Two Arrays to Minimize Sum Difference)",
+            "- Nhiều truy vấn đoạn biết trước (**offline**) mà kết quả không gộp được từ hai nửa, ví dụ số giá trị khác nhau trong đoạn: Mo's algorithm",
+            "- Update và truy vấn đoạn mà segment tree khó cài: chia mảng thành các khối √n (sqrt decomposition)",
+            "- Ghép cặp hai phía (người - việc), số đường đi không chung cạnh tối đa, cắt ít cạnh nhất để tách s khỏi t: max flow / min cut. Hiếm gặp khi phỏng vấn"
+          ],
+          "en": [
+            "- **n around 30–40**: 2⁴⁰ is too much but 2²⁰ ≈ 10⁶ is fine, so split the array in half and combine the two halves: meet in the middle (Closest Subsequence Sum)",
+            "- Split 2n elements into two groups of n (n ≤ 15) with the smallest sum difference: meet in the middle, grouping sums by how many elements each half contributes (Partition Array Into Two Arrays to Minimize Sum Difference)",
+            "- Many range queries known in advance (**offline**) whose answers cannot be merged from two halves, e.g. the number of distinct values in a range: Mo's algorithm",
+            "- Range updates and queries where a segment tree is awkward: split the array into blocks of √n (sqrt decomposition)",
+            "- Bipartite matching (people to jobs), the most edge-disjoint paths, the fewest edges to cut to separate s from t: max flow / min cut. Rare in interviews"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "- **Meet in the middle**: liệt kê tổng mọi tập con của nửa trái và nửa phải (mỗi bên 2^(n/2) tổng), sort một bên; với mỗi tổng bên kia, binary search phần bù gần nhất. 2ⁿ thành 2·2^(n/2)",
+            "- **Sqrt decomposition**: chia mảng thành các khối cỡ √n, mỗi khối giữ sẵn tổng (hoặc min). Truy vấn = các phần tử lẻ ở hai đầu + các khối nguyên ở giữa; update điểm chỉ sửa một khối",
+            "- **Mo's algorithm**: sort truy vấn [l, r] theo (khối của l, r), rồi dịch hai đầu cửa sổ từ truy vấn trước sang truy vấn sau, mỗi bước thêm / bớt một phần tử trong O(1). Chỉ dùng được offline",
+            "- **Max flow (Edmonds-Karp)**: lặp BFS tìm đường tăng luồng trên đồ thị dư, đẩy thêm luồng bằng sức chứa nhỏ nhất trên đường và tăng sức chứa cạnh ngược tương ứng. Hết đường tăng thì luồng là cực đại, và bằng lát cắt nhỏ nhất (max flow = min cut)",
+            "",
+            "Độ phức tạp: meet in the middle O(2^(n/2)·n); sqrt decomposition O(√n) mỗi thao tác; Mo O((n + q)·√n); Edmonds-Karp O(V·E²)."
+          ],
+          "en": [
+            "- **Meet in the middle**: list every subset sum of the left half and of the right half (2^(n/2) sums each), sort one side; for each sum on the other side, binary search the closest complement. 2ⁿ becomes 2·2^(n/2)",
+            "- **Sqrt decomposition**: split the array into blocks of size √n, each keeping its sum (or min). A query = the loose elements at both ends + the whole blocks in between; a point update touches one block",
+            "- **Mo's algorithm**: sort the queries [l, r] by (block of l, r), then move the window ends from one query to the next, adding / removing one element at a time in O(1). Offline only",
+            "- **Max flow (Edmonds-Karp)**: repeatedly BFS for an augmenting path in the residual graph, push the smallest capacity along it and raise the capacity of the matching reverse edges. With no augmenting path left the flow is maximum and equals the minimum cut (max flow = min cut)",
+            "",
+            "Complexity: meet in the middle O(2^(n/2)·n); sqrt decomposition O(√n) per operation; Mo O((n + q)·√n); Edmonds-Karp O(V·E²)."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Meet in the middle (Closest Subsequence Sum): n <= 40, two halves of <= 2^20 sums",
+          "int minAbsDifference(int[] nums, int goal) {",
+          "    int half = nums.length / 2;",
+          "    int[] left = subsetSums(Arrays.copyOfRange(nums, 0, half));",
+          "    int[] right = subsetSums(Arrays.copyOfRange(nums, half, nums.length));",
+          "    Arrays.sort(right);",
+          "    int best = Integer.MAX_VALUE;",
+          "    for (int s : left) {                             // want right[i] closest to goal - s",
+          "        int i = Arrays.binarySearch(right, goal - s);",
+          "        if (i >= 0) return 0;",
+          "        i = -i - 1;                                  // insertion point",
+          "        if (i < right.length) best = Math.min(best, Math.abs(s + right[i] - goal));",
+          "        if (i > 0) best = Math.min(best, Math.abs(s + right[i - 1] - goal));",
+          "    }",
+          "    return best;",
+          "}",
+          "",
+          "int[] subsetSums(int[] a) {                          // all 2^len subset sums, no recursion",
+          "    int[] sums = new int[1 << a.length];",
+          "    for (int mask = 1; mask < sums.length; mask++) {",
+          "        int low = Integer.numberOfTrailingZeros(mask);",
+          "        sums[mask] = sums[mask & (mask - 1)] + a[low];   // mask without its lowest bit",
+          "    }",
+          "    return sums;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Liệt kê 2²⁰ tổng bằng đệ quy và `List<Integer>`: boxing chậm, dễ TLE; dùng `int[1 << k]` và dựng mỗi tổng từ mask bỏ bit thấp nhất (Closest Subsequence Sum)",
+            "- Binary search chỉ xét insertion point mà quên phần tử ngay trước nó: bỏ sót tổng gần nhất (Closest Subsequence Sum)",
+            "- Ghép hai nửa mà không khớp số phần tử: lấy k phần tử từ nửa trái thì phải lấy n - k từ nửa phải; nhóm tổng theo k trước khi tìm (Partition Array Into Two Arrays to Minimize Sum Difference)",
+            "- Max flow quên cạnh ngược trong đồ thị dư: không \"rút lại\" được luồng đã đẩy sai hướng, kết quả nhỏ hơn cực đại",
+            "- Dùng Mo's algorithm cho truy vấn online (truy vấn sau phụ thuộc đáp án trước): không sort được nên không áp dụng được"
+          ],
+          "en": [
+            "- Listing 2²⁰ sums with recursion and a `List<Integer>`: boxing is slow and may time out; use `int[1 << k]` and build each sum from the mask without its lowest bit (Closest Subsequence Sum)",
+            "- Checking only the insertion point after a binary search and not the element just before it: the closest sum is missed (Closest Subsequence Sum)",
+            "- Combining the halves without matching counts: taking k elements from the left half means taking n - k from the right; group the sums by k before searching (Partition Array Into Two Arrays to Minimize Sum Difference)",
+            "- Max flow without reverse edges in the residual graph: flow pushed the wrong way can never be undone, so the result falls short of the maximum",
+            "- Using Mo's algorithm for online queries (a query depends on the previous answer): they cannot be sorted, so it does not apply"
+          ]
+        }
+      }
     },
     {
       "id": "p5-cf",

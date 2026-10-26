@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { LANG_CODES } from "@/i18n/languages"
-import { DEFAULT_TOPICS } from "@/notebook/templates"
+import { DEFAULT_TOPICS, SECTION_TEMPLATES } from "@/notebook/templates"
 
 // Shape of the files in data/ (documented for authors in data/README.md).
 // Objects are strict, so a misspelt field ("resource") is reported instead of silently ignored.
@@ -50,11 +50,22 @@ const Resource = z.strictObject({
   url: httpUrl,
 })
 
+/** Every note section of every topic kind; the loader checks they fit the module's topic */
+export const NOTE_KEYS = [...new Set(Object.values(SECTION_TEMPLATES).flat())] as [
+  string,
+  ...string[],
+]
+
+/** Markdown: one string, or one string per line */
+const NoteText = localized(z.union([z.string(), z.array(z.string())]))
+
 export const ItemSchema = z.strictObject({
   id: Id,
   title: Text,
   problems: z.array(Problem).optional(),
   resources: z.array(Resource).optional(),
+  /** Suggested text for the pattern's note sections, copied in only when the user asks */
+  notes: z.partialRecord(z.enum(NOTE_KEYS), NoteText).optional(),
 })
 
 export const PhaseSchema = z.strictObject({
@@ -79,4 +90,5 @@ export type Phase = z.infer<typeof PhaseSchema>
 export type ModuleMeta = z.infer<typeof ModuleSchema>
 export type Problem = z.infer<typeof Problem>
 export type Resource = z.infer<typeof Resource>
+export type NoteText = z.infer<typeof NoteText>
 export type ResourceType = (typeof RESOURCE_TYPES)[number]

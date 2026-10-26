@@ -302,6 +302,31 @@ describe("App", () => {
     )
   })
 
+  it("copies suggested theory into a pattern's notes only when asked", async () => {
+    const user = userEvent.setup()
+    const entry = [...content.items.values()].find(
+      (e) => e.item.notes?.recognition && e.item.notes.template
+    )!
+    const id = notebookActions.addSuggestedPattern(content, entry.item.id, "vi")!
+    renderApp()
+    await go(`#/pattern/${id}`)
+    await screen.findByRole("heading", { level: 1 })
+    expect(saved().patterns[id]?.sections).toEqual({})
+
+    // Copy straight from the list
+    await user.click(screen.getByRole("button", { name: "Chép Nhận diện vào ghi chú" }))
+    const recognition = saved().patterns[id]?.sections.recognition ?? ""
+    expect(recognition).toContain([localize(entry.item.notes!.recognition!, "vi")].flat()[0]!)
+    expect(screen.getByText("Đã chép")).toBeInTheDocument()
+
+    // Read first, then copy from the dialog: it goes below what is already there
+    await user.click(screen.getByRole("button", { name: "Template code" }))
+    const dialog = await screen.findByRole("dialog", { name: "Template code · gợi ý" })
+    await user.click(within(dialog).getByRole("button", { name: "Chép vào" }))
+    expect(saved().patterns[id]?.sections.template).toMatch(/^```java\n/)
+    expect(saved().patterns[id]?.sections.recognition).toBe(recognition)
+  })
+
   it("switches the app to English from the settings", async () => {
     const user = userEvent.setup()
     renderApp()

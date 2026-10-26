@@ -64,7 +64,10 @@ Pattern → Resources, note sections, Q&A cards
   Redo after 1 day (solution), 3 days (hint), growing gaps (alone).
 - The modules in `web/data/` (one folder per module, each bound to a topic) are a
   **suggestion source only**: shown in a "Suggestions: <module title>" box on that topic's
-  page, added to a pattern only when the user clicks.
+  page, added to a pattern only when the user clicks. On the pattern page the same box also
+  offers the item's suggested theory per note section: the name opens it in a dialog, and
+  "Copy in" appends it below what the section already holds (with Undo). Notes are never
+  filled in automatically.
 
 ## Screens
 

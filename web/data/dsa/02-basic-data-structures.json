@@ -23,7 +23,106 @@
         { "type": "article", "title": "Tech Interview Handbook: Stack", "url": "https://www.techinterviewhandbook.org/algorithms/stack/" },
         { "type": "visual", "title": "VisuAlgo: Linked List, Stack, Queue, Deque", "url": "https://visualgo.net/en/list" },
         { "type": "practice", "title": "LeetCode tag: Stack", "url": "https://leetcode.com/problem-list/stack/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Có cặp **mở/đóng lồng nhau**: ngoặc, thẻ, `k[...]` trong chuỗi mã hoá (Valid Parentheses, Decode String)",
+            "- Phải **quay lại trạng thái gần nhất**: `..` lên thư mục cha, undo, xoá thao tác vừa làm (Simplify Path, Simple Text Editor)",
+            "- Tính giá trị biểu thức: hậu tố (RPN), hoặc trung tố có ưu tiên `* /` trước `+ -` (Basic Calculator II)",
+            "- Thứ tự xử lý là \"vào sau ra trước\": phần tử mới nhất phải được giải quyết trước các phần tử cũ",
+            "- Đề bắt dựng queue từ hai stack (hoặc ngược lại) với chi phí amortized O(1)",
+            "- Khác với monotonic stack: ở đây pop vì gặp phần tử đóng khớp với đỉnh; monotonic stack pop vì so giá trị để tìm phần tử lớn hơn/nhỏ hơn gần nhất"
+          ],
+          "en": [
+            "- **Nested open/close pairs**: brackets, tags, `k[...]` in an encoded string (Valid Parentheses, Decode String)",
+            "- You must **go back to the most recent state**: `..` to the parent folder, undo, delete the last action (Simplify Path, Simple Text Editor)",
+            "- Evaluate an expression: postfix (RPN), or infix where `* /` bind tighter than `+ -` (Basic Calculator II)",
+            "- Last in, first out: the newest item must be resolved before the older ones",
+            "- Build a queue from two stacks (or the reverse) with amortized O(1) cost",
+            "- Unlike a monotonic stack: here you pop because a closer matches the top; a monotonic stack pops by comparing values to find the nearest greater/smaller element"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Stack giữ những thứ **đã mở mà chưa đóng**, mới nhất ở đỉnh. Phần tử đóng luôn ứng với phần tử mở gần nhất, nên chỉ cần nhìn đỉnh. Gặp một lớp lồng bên trong thì cất trạng thái hiện tại vào stack, ra khỏi lớp đó thì lấy lại.",
+            "",
+            "- Ngoặc: mở thì push, đóng thì pop và so khớp; hết chuỗi thì stack phải rỗng",
+            "- RPN: số thì push, toán tử thì pop `b` rồi `a`, push `a op b`",
+            "- `+ - * /` không có ngoặc: push số kèm dấu, gặp `*` `/` thì tính ngay với đỉnh, cuối cùng cộng cả stack",
+            "- Lồng nhau (Decode String): gặp `[` thì push (chuỗi đang dựng, số lần lặp), gặp `]` thì pop ra và ghép",
+            "- Queue từ hai stack: push vào `in`; chỉ khi `out` rỗng mới đổ hết `in` sang `out`. Mỗi phần tử chỉ chuyển một lần nên amortized O(1)",
+            "",
+            "Độ phức tạp: O(n) thời gian, O(n) bộ nhớ."
+          ],
+          "en": [
+            "The stack holds what is **open but not yet closed**, newest on top. A closer always matches the most recent opener, so you only look at the top. When you enter a nested level, save the current state on the stack; when you leave it, restore it.",
+            "",
+            "- Brackets: push on an opener, pop and match on a closer; the stack must be empty at the end",
+            "- RPN: push numbers; on an operator pop `b` then `a`, push `a op b`",
+            "- `+ - * /` without brackets: push signed numbers, apply `*` `/` to the top right away, sum the stack at the end",
+            "- Nesting (Decode String): on `[` push (string so far, repeat count), on `]` pop and combine",
+            "- Queue from two stacks: push into `in`; only when `out` is empty move all of `in` to `out`. Each element moves once, so amortized O(1)",
+            "",
+            "Complexity: O(n) time, O(n) space."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Brackets: push the closer we expect, pop and compare on a closer (Valid Parentheses)",
+          "boolean isValid(String s) {",
+          "    Deque<Character> stack = new ArrayDeque<>();",
+          "    for (char c : s.toCharArray()) {",
+          "        if (c == '(') stack.push(')');",
+          "        else if (c == '[') stack.push(']');",
+          "        else if (c == '{') stack.push('}');",
+          "        else if (stack.isEmpty() || stack.pop() != c) return false; // closer with no match",
+          "    }",
+          "    return stack.isEmpty();                     // leftover openers are invalid too",
+          "}",
+          "",
+          "// Expression with + - * / and no brackets (Basic Calculator II)",
+          "int calculate(String s) {",
+          "    Deque<Integer> stack = new ArrayDeque<>();",
+          "    int num = 0;",
+          "    char op = '+';                              // operator in front of the current number",
+          "    for (int i = 0; i < s.length(); i++) {",
+          "        char c = s.charAt(i);",
+          "        if (Character.isDigit(c)) num = num * 10 + (c - '0');",
+          "        if ((!Character.isDigit(c) && c != ' ') || i == s.length() - 1) {",
+          "            switch (op) {                       // apply the previous operator",
+          "                case '+' -> stack.push(num);",
+          "                case '-' -> stack.push(-num);",
+          "                case '*' -> stack.push(stack.pop() * num);",
+          "                case '/' -> stack.push(stack.pop() / num);",
+          "            }",
+          "            op = c;",
+          "            num = 0;",
+          "        }",
+          "    }",
+          "    int result = 0;",
+          "    for (int x : stack) result += x;            // only additions are left",
+          "    return result;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- `pop()` khi stack rỗng (chuỗi bắt đầu bằng ngoặc đóng), hoặc quên kiểm tra stack rỗng ở cuối với `\"((\"` (Valid Parentheses)",
+            "- Đảo thứ tự toán hạng: pop ra `b` trước, phải tính `a - b` và `a / b`, không phải `b - a` (Evaluate Reverse Polish Notation)",
+            "- Số nhiều chữ số và số cuối chuỗi: phải gom `num = num * 10 + d`, và áp toán tử còn treo khi tới ký tự cuối (Basic Calculator II)",
+            "- `..` ở thư mục gốc thì bỏ qua; kết quả ghép từ đáy lên đỉnh, mà for-each trên `ArrayDeque` dùng làm stack lại đi từ đỉnh xuống (Simplify Path)",
+            "- Đổ `in` sang `out` mỗi lần pop dù `out` chưa rỗng làm sai thứ tự FIFO (Implement Queue using Stacks)"
+          ],
+          "en": [
+            "- Calling `pop()` on an empty stack (string starts with a closer), or not checking the stack is empty at the end for `\"((\"` (Valid Parentheses)",
+            "- Swapping operands: `b` comes off first, so compute `a - b` and `a / b`, not `b - a` (Evaluate Reverse Polish Notation)",
+            "- Multi-digit numbers and the last number: build `num = num * 10 + d`, and apply the pending operator at the last character (Basic Calculator II)",
+            "- `..` at the root is ignored; the result is joined bottom to top, but a for-each over an `ArrayDeque` used as a stack goes top to bottom (Simplify Path)",
+            "- Moving `in` to `out` on every pop even when `out` is not empty breaks FIFO order (Implement Queue using Stacks)"
+          ]
+        }
+      }
     },
     {
       "id": "p2-stackq",
@@ -44,7 +143,97 @@
         { "type": "article", "title": "cp-algorithms: Minimum stack / Minimum queue", "url": "https://cp-algorithms.com/data_structures/stack_queue_modification.html" },
         { "type": "practice", "title": "LeetCode tag: Monotonic Stack", "url": "https://leetcode.com/problem-list/monotonic-stack/" },
         { "type": "practice", "title": "LeetCode tag: Monotonic Queue", "url": "https://leetcode.com/problem-list/monotonic-queue/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đề hỏi phần tử **lớn hơn / nhỏ hơn gần nhất** bên phải hoặc bên trái, \"bao nhiêu ngày nữa thì ấm hơn\" (Daily Temperatures)",
+            "- Đếm bao nhiêu phần tử liên tiếp ngay trước đó nhỏ hơn hoặc bằng phần tử hiện tại (Online Stock Span)",
+            "- Với mỗi phần tử, cần đoạn rộng nhất mà nó là min hoặc max (Largest Rectangle in Histogram, Min Max Riddle)",
+            "- Max/min của mọi cửa sổ trượt cỡ k: monotonic deque (Sliding Window Maximum)",
+            "- n tới 10⁵, hai vòng lồng nhau O(n²) sẽ TLE",
+            "- Khác với stack thường: pop vì phần tử mới \"che\" phần tử cũ khi so giá trị, không phải vì khớp cặp mở/đóng. Khác với heap: deque cho max cửa sổ O(1) mỗi bước và bỏ phần tử hết hạn ngay ở đầu"
+          ],
+          "en": [
+            "- Asks for the **nearest greater / smaller** element to the right or left, \"how many days until a warmer one\" (Daily Temperatures)",
+            "- Count how many consecutive elements just before the current one are less than or equal to it (Online Stock Span)",
+            "- For each element, the widest range where it is the min or max (Largest Rectangle in Histogram, Min Max Riddle)",
+            "- Max/min of every sliding window of size k: a monotonic deque (Sliding Window Maximum)",
+            "- n up to 10⁵, so two nested loops in O(n²) time out",
+            "- Unlike a plain stack: you pop because the new element \"hides\" older ones by value, not because a closer matches. Unlike a heap: the deque gives the window max in O(1) per step and drops expired elements right at the front"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Giữ stack các **index** sao cho giá trị đơn điệu (tìm next greater: giảm dần từ đáy lên đỉnh). Khi `a[i]` tới, mọi index ở đỉnh có giá trị nhỏ hơn `a[i]` vừa tìm được phần tử lớn hơn gần nhất bên phải, chính là `a[i]`: pop và ghi đáp án. Chúng không còn là đáp án cho ai về sau, vì `a[i]` vừa lớn hơn vừa gần hơn. Mỗi index push và pop tối đa một lần nên tổng là O(n).",
+            "",
+            "- Next smaller: đảo phép so sánh. Previous greater/smaller: đáp án là đỉnh còn lại sau khi pop",
+            "- Mảng vòng: duyệt `2n` lần với `i % n` (Next Greater Element II)",
+            "- Histogram: stack tăng dần; pop chiều cao `h` tại `i` thì biên phải là `i`, biên trái là đỉnh mới (hoặc -1), rộng `i - left - 1`",
+            "- Car Fleet: sort theo vị trí giảm dần, tính thời gian tới đích; xe nào không muộn hơn đội phía trước thì nhập đội đó",
+            "- Cửa sổ trượt: deque giảm dần; cuối deque bỏ phần tử ≤ phần tử mới, đầu deque bỏ index đã ra khỏi cửa sổ; đầu deque là max",
+            "",
+            "Độ phức tạp: O(n) thời gian, O(n) bộ nhớ (deque cửa sổ: O(k))."
+          ],
+          "en": [
+            "Keep a stack of **indices** whose values are monotonic (next greater: decreasing from bottom to top). When `a[i]` arrives, every index on top with a smaller value has just found its nearest greater element to the right, which is `a[i]`: pop it and record the answer. It can never be anyone's answer later, because `a[i]` is both larger and closer. Each index is pushed and popped at most once, so the total is O(n).",
+            "",
+            "- Next smaller: flip the comparison. Previous greater/smaller: the answer is whatever is left on top after popping",
+            "- Circular array: loop `2n` times with `i % n` (Next Greater Element II)",
+            "- Histogram: increasing stack; popping height `h` at `i` gives right edge `i`, left edge the new top (or -1), width `i - left - 1`",
+            "- Car Fleet: sort by position descending, compute each car's arrival time; a car that arrives no later than the fleet ahead joins it",
+            "- Sliding window: decreasing deque; drop from the back everything ≤ the new element, drop from the front indices that left the window; the front is the max",
+            "",
+            "Complexity: O(n) time, O(n) space (window deque: O(k))."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Next greater element to the right, as an index (-1 if none)",
+          "int[] nextGreater(int[] a) {",
+          "    int[] next = new int[a.length];",
+          "    Arrays.fill(next, -1);",
+          "    Deque<Integer> stack = new ArrayDeque<>();   // indices, values decreasing bottom -> top",
+          "    for (int i = 0; i < a.length; i++) {",
+          "        while (!stack.isEmpty() && a[stack.peek()] < a[i]) { // next smaller: flip to >",
+          "            next[stack.pop()] = i;               // a[i] answers every index it pops",
+          "        }",
+          "        stack.push(i);",
+          "    }",
+          "    return next;   // Daily Temperatures: next[j] == -1 ? 0 : next[j] - j",
+          "}",
+          "",
+          "// Max of every window of size k (Sliding Window Maximum)",
+          "int[] maxSlidingWindow(int[] a, int k) {",
+          "    int[] res = new int[a.length - k + 1];",
+          "    Deque<Integer> dq = new ArrayDeque<>();      // indices, values decreasing front -> back",
+          "    for (int i = 0; i < a.length; i++) {",
+          "        while (!dq.isEmpty() && a[dq.peekLast()] <= a[i]) dq.pollLast(); // never the max again",
+          "        dq.offerLast(i);",
+          "        if (dq.peekFirst() <= i - k) dq.pollFirst();   // front has left the window",
+          "        if (i >= k - 1) res[i - k + 1] = a[dq.peekFirst()];",
+          "    }",
+          "    return res;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Chọn sai `<` hay `<=` khi pop: next greater phải lớn hơn hẳn nên pop khi `a[top] < a[i]` (Next Greater Element I); span tính cả giá bằng nên pop khi `<=` (Online Stock Span)",
+            "- Lưu giá trị thay vì index: mất khoảng cách, và không biết phần tử ở đầu deque đã ra khỏi cửa sổ chưa (Daily Temperatures, Sliding Window Maximum)",
+            "- Hết mảng mà còn cột trong stack chưa tính diện tích: thêm một cột cao 0 ở cuối (cho `i` chạy tới `n`) để pop hết (Largest Rectangle in Histogram)",
+            "- Mảng vòng mà chỉ duyệt một lần: bỏ sót đáp án nằm ở đầu mảng (Next Greater Element II)",
+            "- Tính thời gian tới đích bằng chia số nguyên, hoặc quên sort theo vị trí trước (Car Fleet)"
+          ],
+          "en": [
+            "- Picking `<` vs `<=` wrong when popping: next greater means strictly greater, so pop while `a[top] < a[i]` (Next Greater Element I); the span counts equal prices, so pop while `<=` (Online Stock Span)",
+            "- Storing values instead of indices: you lose the distance, and cannot tell whether the deque front has left the window (Daily Temperatures, Sliding Window Maximum)",
+            "- Bars still on the stack at the end never get their area: add a bar of height 0 at the end (let `i` run to `n`) to flush them (Largest Rectangle in Histogram)",
+            "- Looping only once over a circular array: answers that wrap to the start are missed (Next Greater Element II)",
+            "- Computing arrival time with integer division, or forgetting to sort by position first (Car Fleet)"
+          ]
+        }
+      }
     },
     {
       "id": "p2-list",
@@ -70,7 +259,109 @@
         { "type": "article", "title": "Tech Interview Handbook: Linked list", "url": "https://www.techinterviewhandbook.org/algorithms/linked-list/" },
         { "type": "visual", "title": "VisuAlgo: Linked List, Stack, Queue, Deque", "url": "https://visualgo.net/en/list" },
         { "type": "practice", "title": "LeetCode tag: Linked List", "url": "https://leetcode.com/problem-list/linked-list/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Input là `ListNode head`, đề đòi làm tại chỗ với O(1) bộ nhớ thêm",
+            "- Đảo cả danh sách, một đoạn `[left, right]`, hoặc từng nhóm k node (Reverse Nodes in k-Group)",
+            "- Gộp hoặc xen kẽ danh sách: Merge Two Sorted Lists, Reorder List (L0 → Ln → L1 → Ln-1 ...)",
+            "- Có thể phải xoá hoặc chèn ngay tại `head`: dấu hiệu cần dummy node (Remove Nth Node From End of List)",
+            "- Số lưu ngược theo từng chữ số trong list (Add Two Numbers), hoặc node có con trỏ phụ cần sao chép sâu (Copy List with Random Pointer)",
+            "- Khác với Fast & Slow: ở đây trọng tâm là nối lại `next`; tìm node giữa hay chu trình thì dùng hai con trỏ khác tốc độ (Reorder List cần cả hai)"
+          ],
+          "en": [
+            "- The input is a `ListNode head` and the task must be done in place with O(1) extra space",
+            "- Reverse the whole list, a range `[left, right]`, or every group of k nodes (Reverse Nodes in k-Group)",
+            "- Merge or interleave lists: Merge Two Sorted Lists, Reorder List (L0 → Ln → L1 → Ln-1 ...)",
+            "- You may have to delete or insert at `head` itself: a sign you need a dummy node (Remove Nth Node From End of List)",
+            "- A number stored digit by digit in reverse (Add Two Numbers), or nodes with an extra pointer to deep-copy (Copy List with Random Pointer)",
+            "- Unlike fast and slow pointers: the focus here is rewiring `next`; finding the middle or a cycle uses two pointers at different speeds (Reorder List needs both)"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Bài linked list ít về thuật toán, chủ yếu kiểm tra thao tác con trỏ cẩn thận. Vẽ 3–4 node ra giấy và đánh số thứ tự các phép gán `next` trước khi code.",
+            "",
+            "- **Dummy node** trước `head`: node nào cũng có node đứng trước, khỏi xét riêng đầu danh sách; trả về `dummy.next`. Dựng danh sách mới (gộp, cộng số) thì dùng dummy + con trỏ `tail`",
+            "- **Đảo tại chỗ** với `prev`, `cur`: lưu `cur.next` trước khi gán `cur.next = prev`. Invariant: `prev` là đầu phần đã đảo, `cur` là đầu phần chưa đảo",
+            "- Đảo một đoạn / nhóm k: giữ node đứng trước đoạn, đảo đoạn, rồi nối hai đầu lại",
+            "- **Hai con trỏ cách nhau n bước**: con trỏ trước chạm cuối thì con trỏ sau đứng ngay trước node thứ n từ cuối",
+            "- Ghép kỹ thuật: Reorder List = tìm giữa + đảo nửa sau + xen kẽ; Copy List with Random Pointer = HashMap node cũ → node mới (hoặc chèn bản sao xen kẽ để O(1) bộ nhớ)",
+            "",
+            "Độ phức tạp: O(n) thời gian, O(1) bộ nhớ (Copy List dùng HashMap thì O(n))."
+          ],
+          "en": [
+            "Linked list problems are less about algorithms and more about careful pointer work. Draw 3–4 nodes on paper and number the `next` assignments before you code.",
+            "",
+            "- **Dummy node** before `head`: every node has a predecessor, so the head needs no special case; return `dummy.next`. To build a new list (merge, add numbers) use a dummy plus a `tail` pointer",
+            "- **Reverse in place** with `prev`, `cur`: save `cur.next` before setting `cur.next = prev`. Invariant: `prev` heads the reversed part, `cur` heads the rest",
+            "- Reverse a range / a group of k: keep the node before the range, reverse the range, then reconnect both ends",
+            "- **Two pointers n apart**: when the leading one reaches the end, the trailing one sits right before the n-th node from the end",
+            "- Combining tricks: Reorder List = find the middle + reverse the second half + interleave; Copy List with Random Pointer = HashMap old node → new node (or interleave copies for O(1) space)",
+            "",
+            "Complexity: O(n) time, O(1) space (Copy List with a HashMap: O(n))."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Reverse the whole list. prev = head of the reversed part, cur = head of the rest",
+          "ListNode reverse(ListNode head) {",
+          "    ListNode prev = null, cur = head;",
+          "    while (cur != null) {",
+          "        ListNode next = cur.next;               // save before rewiring",
+          "        cur.next = prev;",
+          "        prev = cur;",
+          "        cur = next;",
+          "    }",
+          "    return prev;",
+          "}",
+          "",
+          "// Reverse positions left..right, 1-based (Reverse Linked List II)",
+          "ListNode reverseBetween(ListNode head, int left, int right) {",
+          "    ListNode dummy = new ListNode(0, head);     // left == 1 needs no special case",
+          "    ListNode before = dummy;",
+          "    for (int i = 1; i < left; i++) before = before.next;",
+          "    ListNode tail = before.next;                // first node of the range, ends up last",
+          "    for (int i = left; i < right; i++) {        // move the node after tail to the front",
+          "        ListNode moved = tail.next;",
+          "        tail.next = moved.next;",
+          "        moved.next = before.next;",
+          "        before.next = moved;",
+          "    }",
+          "    return dummy.next;",
+          "}",
+          "",
+          "// Remove the n-th node from the end: lead starts n steps ahead of lag",
+          "ListNode removeNthFromEnd(ListNode head, int n) {",
+          "    ListNode dummy = new ListNode(0, head), lead = dummy, lag = dummy;",
+          "    for (int i = 0; i < n; i++) lead = lead.next;",
+          "    while (lead.next != null) {",
+          "        lead = lead.next;",
+          "        lag = lag.next;",
+          "    }",
+          "    lag.next = lag.next.next;                   // lag is right before the target",
+          "    return dummy.next;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Gán `cur.next` trước khi lưu node kế tiếp: mất phần còn lại của danh sách (Reverse Linked List)",
+            "- Không dùng dummy rồi quên trường hợp thao tác ngay tại `head`: `left = 1`, hoặc node cần xoá chính là `head` (Reverse Linked List II, Remove Nth Node From End of List)",
+            "- Không kiểm tra còn đủ k node trước khi đảo: nhóm cuối thiếu node phải giữ nguyên thứ tự (Reverse Nodes in k-Group)",
+            "- Quên cắt đôi (`mid.next = null`) trước khi đảo nửa sau, lúc xen kẽ thì tạo chu trình (Reorder List)",
+            "- Quên số nhớ cuối: hết cả hai danh sách mà `carry = 1` thì vẫn phải thêm một node (Add Two Numbers)"
+          ],
+          "en": [
+            "- Setting `cur.next` before saving the next node: the rest of the list is lost (Reverse Linked List)",
+            "- No dummy, then forgetting the case that touches `head` itself: `left = 1`, or the node to delete is `head` (Reverse Linked List II, Remove Nth Node From End of List)",
+            "- Not checking that k nodes remain before reversing: a short last group must stay as it is (Reverse Nodes in k-Group)",
+            "- Not cutting the list (`mid.next = null`) before reversing the second half, which creates a cycle when interleaving (Reorder List)",
+            "- Forgetting the final carry: when both lists end with `carry = 1` you still need one more node (Add Two Numbers)"
+          ]
+        }
+      }
     },
     {
       "id": "p2-fast-slow",
@@ -85,7 +376,113 @@
         { "title": "Find the Duplicate Number", "url": "https://leetcode.com/problems/find-the-duplicate-number/", "level": "Medium" },
         { "title": "Linked Lists: Detect a Cycle", "url": "https://www.hackerrank.com/challenges/ctci-linked-list-cycle/problem", "level": "Easy" },
         { "title": "Find Merge Point of Two Lists", "url": "https://www.hackerrank.com/challenges/find-the-merge-point-of-two-joined-linked-lists/problem", "level": "Easy" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Hỏi linked list có chu trình không, chu trình bắt đầu ở đâu, với O(1) bộ nhớ (Linked List Cycle II)",
+            "- Cần node giữa trong một lần duyệt, không biết trước độ dài (Middle of the Linked List)",
+            "- Dãy sinh bởi `x → f(x)` trên tập hữu hạn chắc chắn rơi vào vòng lặp: Happy Number, hoặc mảng `n + 1` số trong `[1, n]` mà không được sửa mảng (Find the Duplicate Number)",
+            "- Kiểm tra palindrome trên linked list với O(1) bộ nhớ: tìm giữa rồi đảo nửa sau để so (Palindrome Linked List)",
+            "- Hai danh sách dài khác nhau nhập vào nhau ở một node (Intersection of Two Linked Lists)",
+            "- Khác với HashSet `visited`: cũng đúng nhưng tốn O(n) bộ nhớ; đề đòi O(1) bộ nhớ là tín hiệu dùng Floyd"
+          ],
+          "en": [
+            "- Asks whether a linked list has a cycle, or where it starts, in O(1) space (Linked List Cycle II)",
+            "- Needs the middle node in one pass without knowing the length (Middle of the Linked List)",
+            "- A sequence `x → f(x)` over a finite set must end up in a loop: Happy Number, or an array of `n + 1` numbers in `[1, n]` that you may not modify (Find the Duplicate Number)",
+            "- Palindrome check on a linked list in O(1) space: find the middle, reverse the second half, compare (Palindrome Linked List)",
+            "- Two lists of different lengths merge at some node (Intersection of Two Linked Lists)",
+            "- Unlike a `visited` HashSet: that also works but costs O(n) space; an O(1) space requirement points to Floyd"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "`slow` đi 1 bước, `fast` đi 2 bước. Không có chu trình thì `fast` chạm `null` trước. Có chu trình thì khi cả hai đã vào vòng, mỗi bước `fast` rút ngắn khoảng cách thêm 1, nên chắc chắn gặp nhau.",
+            "",
+            "Tìm đầu chu trình (Floyd): gọi `a` là đoạn từ `head` tới đầu chu trình, `b` từ đầu chu trình tới điểm gặp, `c` là độ dài vòng. Lúc gặp, `fast` đã đi gấp đôi: `2(a + b) = a + b + kc`, suy ra `a = kc - b`. Đưa một con trỏ về `head`, cả hai cùng đi 1 bước: chúng gặp nhau đúng ở đầu chu trình.",
+            "",
+            "- Node giữa: khi `fast` hết đường thì `slow` ở giữa",
+            "- Find the Duplicate Number: coi `i → nums[i]` là con trỏ `next`, xuất phát từ index 0; số trùng có hai mũi tên trỏ vào nên chính là đầu chu trình",
+            "- Intersection: con trỏ `a` hết A thì nhảy sang đầu B, `b` hết B thì sang đầu A; cả hai cùng đi `m + n` bước nên gặp nhau ở giao điểm, hoặc cùng là `null`",
+            "",
+            "Độ phức tạp: O(n) thời gian, O(1) bộ nhớ."
+          ],
+          "en": [
+            "`slow` moves 1 step, `fast` moves 2. Without a cycle `fast` hits `null` first. With a cycle, once both are inside it `fast` closes the gap by 1 each step, so they must meet.",
+            "",
+            "Cycle start (Floyd): let `a` be the distance from `head` to the cycle start, `b` from the cycle start to the meeting point, `c` the cycle length. At the meeting point `fast` has walked twice as far: `2(a + b) = a + b + kc`, so `a = kc - b`. Put one pointer back at `head` and move both 1 step at a time: they meet exactly at the cycle start.",
+            "",
+            "- Middle node: when `fast` runs out, `slow` is in the middle",
+            "- Find the Duplicate Number: treat `i → nums[i]` as a `next` pointer starting from index 0; the duplicate has two arrows into it, so it is the cycle start",
+            "- Intersection: pointer `a` jumps to the head of B when A ends, `b` to the head of A when B ends; both walk `m + n` steps, so they meet at the intersection, or both are `null`",
+            "",
+            "Complexity: O(n) time, O(1) space."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Start of the cycle, or null (Linked List Cycle II)",
+          "ListNode detectCycle(ListNode head) {",
+          "    ListNode slow = head, fast = head;",
+          "    while (fast != null && fast.next != null) {",
+          "        slow = slow.next;",
+          "        fast = fast.next.next;",
+          "        if (slow == fast) {                     // met inside the cycle",
+          "            ListNode p = head;                  // head and meeting point are equally far",
+          "            while (p != slow) {                 // from the cycle start",
+          "                p = p.next;",
+          "                slow = slow.next;",
+          "            }",
+          "            return p;",
+          "        }",
+          "    }",
+          "    return null;                                // fast reached the end: no cycle",
+          "}",
+          "",
+          "// Middle node; for even length this is the second middle",
+          "ListNode middleNode(ListNode head) {",
+          "    ListNode slow = head, fast = head;",
+          "    while (fast != null && fast.next != null) {",
+          "        slow = slow.next;",
+          "        fast = fast.next.next;",
+          "    }",
+          "    return slow;",
+          "}",
+          "",
+          "// Same Floyd on an array: i -> nums[i] is the next pointer (Find the Duplicate Number)",
+          "int findDuplicate(int[] nums) {",
+          "    int slow = nums[0], fast = nums[nums[0]];   // both already moved once from index 0",
+          "    while (slow != fast) {",
+          "        slow = nums[slow];",
+          "        fast = nums[nums[fast]];",
+          "    }",
+          "    int p = 0;                                  // phase 2 restarts from the same start",
+          "    while (p != slow) {",
+          "        p = nums[p];",
+          "        slow = nums[slow];",
+          "    }",
+          "    return p;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Đi `fast.next.next` mà không kiểm tra `fast != null && fast.next != null` trước, hoặc so `slow == fast` trước khi di chuyển nên \"gặp nhau\" ngay ở `head` (Linked List Cycle)",
+            "- Phase 2 phải xuất phát từ đúng điểm xuất phát của phase 1 (`head`, hoặc index 0); lệch một bước là sai đáp án (Find the Duplicate Number)",
+            "- Độ dài chẵn có hai node giữa: `fast != null && fast.next != null` cho node thứ hai, `fast.next != null && fast.next.next != null` cho node thứ nhất. Cắt đôi danh sách 2 node bằng node thứ hai thì đệ quy mãi (Sort List)",
+            "- Hai con trỏ cũng gặp nhau khi cùng dừng ở 1 (vì 1 → 1): phải xem giá trị tại điểm gặp có bằng 1 không (Happy Number)",
+            "- Đảo nửa sau để so palindrome làm hỏng input; nếu người phỏng vấn quan tâm thì đảo lại sau khi so (Palindrome Linked List)"
+          ],
+          "en": [
+            "- Taking `fast.next.next` without checking `fast != null && fast.next != null` first, or comparing `slow == fast` before moving so they \"meet\" at `head` (Linked List Cycle)",
+            "- Phase 2 must start from the same place phase 1 started (`head`, or index 0); being one step off gives a wrong answer (Find the Duplicate Number)",
+            "- Even length has two middles: `fast != null && fast.next != null` gives the second, `fast.next != null && fast.next.next != null` the first. Splitting a 2-node list at the second middle recurses forever (Sort List)",
+            "- The pointers also meet when both settle on 1 (since 1 → 1): check whether the meeting value is 1 (Happy Number)",
+            "- Reversing the second half for the palindrome check damages the input; reverse it back after comparing if the interviewer cares (Palindrome Linked List)"
+          ]
+        }
+      }
     },
     {
       "id": "p2-ds",
@@ -103,7 +500,114 @@
       "resources": [
         { "type": "video", "title": "freeCodeCamp: Data Structures Easy to Advanced Course", "url": "https://www.youtube.com/watch?v=RBSGKlAvoiM" },
         { "type": "practice", "title": "LeetCode tag: Design", "url": "https://leetcode.com/problem-list/design/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đề cho một class với các method và yêu cầu độ phức tạp cho từng thao tác: \"`get` và `put` đều O(1) trung bình\"",
+            "- Cần cả tra cứu theo key O(1) lẫn một thứ tự (dùng gần nhất, tần suất, thời gian): ghép HashMap với một cấu trúc giữ thứ tự (LRU Cache, LFU Cache)",
+            "- Cần min/max hiện tại sau mỗi push/pop (Min Stack)",
+            "- Cần xoá theo giá trị và lấy phần tử ngẫu nhiên, đều O(1) (Insert Delete GetRandom O(1))",
+            "- Phỏng vấn backend hay hỏi tiếp từ dạng này: thread-safe thế nào, giới hạn bộ nhớ, chính sách eviction",
+            "- Khác với bài thuật toán: không có một mẹo duy nhất; điểm là chọn cấu trúc con cho từng thao tác và giữ chúng đồng bộ"
+          ],
+          "en": [
+            "- You get a class with methods and a required cost per operation: \"`get` and `put` must each run in O(1) average time\"",
+            "- You need both O(1) lookup by key and an order (recency, frequency, time): combine a HashMap with a structure that keeps the order (LRU Cache, LFU Cache)",
+            "- You need the current min/max after every push/pop (Min Stack)",
+            "- You need delete by value and a uniform random pick, both O(1) (Insert Delete GetRandom O(1))",
+            "- Backend interviews often follow up from here: thread safety, memory limits, eviction policy",
+            "- Unlike algorithm problems: there is no single trick; the point is picking a structure per operation and keeping them in sync"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Liệt kê từng thao tác với độ phức tạp đề đòi, chọn cấu trúc đáp ứng từng thao tác, rồi ghép lại. Mỗi thao tác phải cập nhật **mọi** cấu trúc con cho đồng bộ.",
+            "",
+            "- LRU Cache: HashMap key → node, cộng danh sách liên kết đôi theo thứ tự dùng (mới nhất ở đầu). Danh sách phải là liên kết đôi để gỡ một node bất kỳ trong O(1). Java có sẵn `new LinkedHashMap<>(capacity, 0.75f, true)` + override `removeEldestEntry`, nên nói ra, nhưng thường sẽ bị yêu cầu tự cài",
+            "- LFU Cache: key → (value, freq), freq → `LinkedHashSet` các key (giữ thứ tự LRU trong cùng tần suất), thêm biến `minFreq` để biết xoá ai",
+            "- Min Stack: mỗi phần tử push kèm min tại thời điểm đó",
+            "- Insert Delete GetRandom O(1): `ArrayList` giá trị + HashMap giá trị → index; xoá bằng cách đổi chỗ với phần tử cuối rồi bỏ phần tử cuối",
+            "- Design Twitter: user → danh sách tweet kèm timestamp; news feed là K-way merge bằng heap trên danh sách của những người đang follow",
+            "",
+            "Độ phức tạp: O(1) mỗi thao tác cho LRU, LFU, Min Stack, Insert Delete GetRandom; bộ nhớ O(số phần tử đang lưu)."
+          ],
+          "en": [
+            "List each operation with its required cost, pick a structure that meets each one, then combine them. Every operation must update **all** the inner structures so they stay in sync.",
+            "",
+            "- LRU Cache: HashMap key → node, plus a doubly linked list in usage order (newest at the front). It must be doubly linked so any node can be unlinked in O(1). Java already has `new LinkedHashMap<>(capacity, 0.75f, true)` + an overridden `removeEldestEntry`, worth mentioning, but you will usually be asked to build it yourself",
+            "- LFU Cache: key → (value, freq), freq → `LinkedHashSet` of keys (LRU order within one frequency), plus a `minFreq` variable to know what to evict",
+            "- Min Stack: push each element together with the minimum at that moment",
+            "- Insert Delete GetRandom O(1): `ArrayList` of values + HashMap value → index; delete by swapping with the last element and removing the last",
+            "- Design Twitter: user → list of tweets with timestamps; the news feed is a K-way merge with a heap over the lists of followed users",
+            "",
+            "Complexity: O(1) per operation for LRU, LFU, Min Stack, Insert Delete GetRandom; O(stored elements) space."
+          ]
+        },
+        "template": [
+          "```java",
+          "// LRU Cache: HashMap for O(1) lookup + doubly linked list in recency order",
+          "class LRUCache {",
+          "    private static class Node {",
+          "        int key, val;                           // key is needed to evict from the map",
+          "        Node prev, next;",
+          "        Node(int key, int val) { this.key = key; this.val = val; }",
+          "    }",
+          "    private final int capacity;",
+          "    private final Map<Integer, Node> map = new HashMap<>();",
+          "    private final Node head = new Node(0, 0), tail = new Node(0, 0); // sentinels: no null checks",
+          "",
+          "    LRUCache(int capacity) {",
+          "        this.capacity = capacity;",
+          "        head.next = tail; tail.prev = head;",
+          "    }",
+          "    int get(int key) {",
+          "        Node node = map.get(key);",
+          "        if (node == null) return -1;",
+          "        unlink(node);",
+          "        addFront(node);                         // most recently used sits right after head",
+          "        return node.val;",
+          "    }",
+          "    void put(int key, int value) {",
+          "        Node node = map.get(key);",
+          "        if (node != null) {                     // existing key: update and mark as used",
+          "            node.val = value;",
+          "            unlink(node);",
+          "        } else {",
+          "            if (map.size() == capacity) {       // full: evict the node right before tail",
+          "                map.remove(tail.prev.key);",
+          "                unlink(tail.prev);",
+          "            }",
+          "            node = new Node(key, value);",
+          "            map.put(key, node);",
+          "        }",
+          "        addFront(node);",
+          "    }",
+          "    private void unlink(Node n) { n.prev.next = n.next; n.next.prev = n.prev; }",
+          "    private void addFront(Node n) {",
+          "        n.prev = head; n.next = head.next;",
+          "        head.next.prev = n; head.next = n;",
+          "    }",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Node không lưu `key`: lúc evict node cuối danh sách không biết xoá key nào khỏi HashMap (LRU Cache)",
+            "- `put` một key đã có: chỉ cập nhật value và đưa lên đầu; evict trước khi kiểm tra key đã tồn tại là xoá oan một key khác (LRU Cache)",
+            "- Quên cập nhật `minFreq`: tăng lên khi nhóm `minFreq` vừa rỗng do `get`, đặt lại 1 khi thêm key mới (LFU Cache)",
+            "- Chỉ giữ một biến `min`: pop đúng phần tử nhỏ nhất thì không khôi phục được min cũ (Min Stack)",
+            "- Đổi chỗ với phần tử cuối nhưng quên cập nhật index của phần tử bị dời trong map, hoặc làm sai khi phần tử bị xoá chính là phần tử cuối (Insert Delete GetRandom O(1))"
+          ],
+          "en": [
+            "- The node does not store its `key`: when evicting the last node you cannot tell which key to remove from the HashMap (LRU Cache)",
+            "- `put` on an existing key: only update the value and move it to the front; evicting before checking whether the key exists removes an innocent key (LRU Cache)",
+            "- Forgetting to update `minFreq`: bump it when `get` empties the `minFreq` group, reset it to 1 when a new key is added (LFU Cache)",
+            "- Keeping a single `min` variable: after popping the minimum you cannot recover the previous one (Min Stack)",
+            "- Swapping with the last element but not updating the moved element's index in the map, or breaking when the removed element is itself the last one (Insert Delete GetRandom O(1))"
+          ]
+        }
+      }
     },
     {
       "id": "p2-bsearch",
@@ -125,7 +629,109 @@
         { "type": "article", "title": "USACO Guide: Binary Search", "url": "https://usaco.guide/silver/binary-search" },
         { "type": "practice", "title": "LeetCode study plan: Binary Search", "url": "https://leetcode.com/studyplan/binary-search/" },
         { "type": "practice", "title": "LeetCode tag: Binary Search", "url": "https://leetcode.com/problem-list/binary-search/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Mảng đã sắp xếp (hoặc sắp xếp rồi bị xoay một lần) và đề đòi O(log n)",
+            "- Tìm vị trí đầu tiên / cuối cùng của một giá trị, vị trí chèn, số phần tử `< x` (Find First and Last Position of Element in Sorted Array, Search Insert Position)",
+            "- Ma trận mỗi hàng đã sort và hàng sau lớn hơn hàng trước: coi như một mảng dài `m * n` (Search a 2D Matrix)",
+            "- Dữ liệu thêm vào theo thời gian tăng dần, hỏi \"giá trị tại thời điểm gần nhất ≤ t\" (Time Based Key-Value Store)",
+            "- Rất nhiều truy vấn trên cùng một mảng: sort một lần, mỗi truy vấn O(log n) (Climbing the Leaderboard)",
+            "- Khác với binary search trên đáp án: ở đây tìm trong một mảng có sẵn; nếu phải đoán giá trị đáp án rồi kiểm tra \"có làm được không\" thì là dạng kia"
+          ],
+          "en": [
+            "- The array is sorted (or sorted and then rotated once) and O(log n) is required",
+            "- Find the first / last position of a value, the insert position, the number of elements `< x` (Find First and Last Position of Element in Sorted Array, Search Insert Position)",
+            "- A matrix whose rows are sorted and each row starts above the previous one: treat it as one array of length `m * n` (Search a 2D Matrix)",
+            "- Data arrives with increasing timestamps and you ask for \"the value at the latest time ≤ t\" (Time Based Key-Value Store)",
+            "- Many queries on the same array: sort once, answer each query in O(log n) (Climbing the Leaderboard)",
+            "- Unlike binary search on the answer: here you search an existing array; if you guess the answer value and check \"can it be done\", that is the other pattern"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Viết mọi bài dưới dạng: tìm index nhỏ nhất `i` mà `cond(i)` đúng, với `cond` có dạng `false ... false true ... true` trên mảng. Invariant: đáp án luôn nằm trong `[lo, hi]` (`hi = n` nghĩa là \"không có\"). Nhìn `mid`: `cond(mid)` đúng thì đáp án ≤ `mid` nên `hi = mid`, sai thì đáp án > `mid` nên `lo = mid + 1`. Dừng khi `lo == hi`.",
+            "",
+            "- Lower bound: `cond(i) = a[i] >= x`. Upper bound: `a[i] > x`. Vị trí đầu/cuối của x là `lowerBound(x)` và `upperBound(x) - 1`",
+            "- Mảng xoay, tìm min: `cond(i) = a[i] <= a[n - 1]`",
+            "- Mảng xoay, tìm target: luôn có một nửa đã sort (so `a[lo]` với `a[mid]`); target nằm trong khoảng của nửa đó thì đi vào, không thì sang nửa kia",
+            "- Ma trận 2-D: index `k` ứng với `matrix[k / cols][k % cols]`",
+            "",
+            "Độ phức tạp: O(log n) thời gian, O(1) bộ nhớ."
+          ],
+          "en": [
+            "Phrase every problem as: find the smallest index `i` where `cond(i)` is true, with `cond` shaped `false ... false true ... true` over the array. Invariant: the answer is always in `[lo, hi]` (`hi = n` means \"none\"). Look at `mid`: if `cond(mid)` holds the answer is ≤ `mid`, so `hi = mid`; otherwise it is > `mid`, so `lo = mid + 1`. Stop when `lo == hi`.",
+            "",
+            "- Lower bound: `cond(i) = a[i] >= x`. Upper bound: `a[i] > x`. First/last position of x are `lowerBound(x)` and `upperBound(x) - 1`",
+            "- Rotated array, minimum: `cond(i) = a[i] <= a[n - 1]`",
+            "- Rotated array, target: one half is always sorted (compare `a[lo]` with `a[mid]`); if the target lies in that half's range go there, otherwise go to the other half",
+            "- 2-D matrix: index `k` maps to `matrix[k / cols][k % cols]`",
+            "",
+            "Complexity: O(log n) time, O(1) space."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Lower bound: first i with a[i] >= x, or a.length if none (= Search Insert Position)",
+          "// Invariant: the answer is always in [lo, hi]; hi = a.length means \"not found\"",
+          "int lowerBound(int[] a, int x) {",
+          "    int lo = 0, hi = a.length;",
+          "    while (lo < hi) {",
+          "        int mid = lo + (hi - lo) / 2;           // lo <= mid < hi, so a[mid] is safe",
+          "        if (a[mid] >= x) hi = mid;              // cond holds: answer is mid or left of it",
+          "        else lo = mid + 1;                      // cond fails: answer is right of mid",
+          "    }",
+          "    return lo;",
+          "}",
+          "// First/last position of x: lowerBound(a, x) and lowerBound(a, x + 1) - 1",
+          "",
+          "// Same loop, other condition: the minimum of a rotated array is the first a[i] <= a[n - 1]",
+          "int findMin(int[] a) {",
+          "    int lo = 0, hi = a.length - 1;              // the last index always qualifies",
+          "    while (lo < hi) {",
+          "        int mid = lo + (hi - lo) / 2;",
+          "        if (a[mid] <= a[a.length - 1]) hi = mid;",
+          "        else lo = mid + 1;",
+          "    }",
+          "    return a[lo];",
+          "}",
+          "",
+          "// Exact match in a rotated array, distinct values (Search in Rotated Sorted Array)",
+          "int search(int[] a, int target) {",
+          "    int lo = 0, hi = a.length - 1;              // closed range [lo, hi]",
+          "    while (lo <= hi) {",
+          "        int mid = lo + (hi - lo) / 2;",
+          "        if (a[mid] == target) return mid;",
+          "        if (a[lo] <= a[mid]) {                  // left half [lo, mid] is sorted",
+          "            if (a[lo] <= target && target < a[mid]) hi = mid - 1;",
+          "            else lo = mid + 1;",
+          "        } else {                                // right half [mid, hi] is sorted",
+          "            if (a[mid] < target && target <= a[hi]) lo = mid + 1;",
+          "            else hi = mid - 1;",
+          "        }",
+          "    }",
+          "    return -1;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Trộn hai kiểu biên: nửa mở `hi = n` đi với `while (lo < hi)` và `hi = mid`; đoạn đóng `hi = n - 1` đi với `while (lo <= hi)` và `hi = mid - 1`. Lẫn lộn, hoặc gán `lo = mid` khi `mid` làm tròn xuống, là lặp vô hạn hoặc bỏ sót phần tử (Search Insert Position)",
+            "- Viết `a[lo] < a[mid]` (thiếu dấu `=`): khi `lo == mid` nửa trái chỉ có một phần tử, vẫn là nửa đã sort (Search in Rotated Sorted Array)",
+            "- Tìm min mảng xoay mà so `a[mid]` với `a[lo]`: mảng không bị xoay thì đi nhầm sang phải; so với phần tử cuối (Find Minimum in Rotated Sorted Array)",
+            "- Cần giá trị có timestamp **≤ t** lớn nhất, tức `upperBound(t) - 1`, và trả `\"\"` khi kết quả là -1 (Time Based Key-Value Store)",
+            "- Đổi index 1 chiều sang 2 chiều bằng số hàng thay vì số cột: phải là `k / cols`, `k % cols` (Search a 2D Matrix)"
+          ],
+          "en": [
+            "- Mixing the two boundary styles: half-open `hi = n` goes with `while (lo < hi)` and `hi = mid`; closed `hi = n - 1` goes with `while (lo <= hi)` and `hi = mid - 1`. Mixing them, or writing `lo = mid` while `mid` rounds down, loops forever or skips an element (Search Insert Position)",
+            "- Writing `a[lo] < a[mid]` without `=`: when `lo == mid` the left half has one element and is still sorted (Search in Rotated Sorted Array)",
+            "- Finding the rotated minimum by comparing `a[mid]` with `a[lo]`: on an unrotated array it wrongly goes right; compare with the last element (Find Minimum in Rotated Sorted Array)",
+            "- You need the largest timestamp **≤ t**, i.e. `upperBound(t) - 1`, and must return `\"\"` when that is -1 (Time Based Key-Value Store)",
+            "- Converting a 1-D index to 2-D with the row count instead of the column count: it is `k / cols`, `k % cols` (Search a 2D Matrix)"
+          ]
+        }
+      }
     },
     {
       "id": "p2-bsearch-answer",
@@ -139,7 +745,109 @@
       ],
       "resources": [
         { "type": "article", "title": "USACO Guide: Binary Search", "url": "https://usaco.guide/silver/binary-search" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đề hỏi giá trị **nhỏ nhất / lớn nhất** (tốc độ, sức chứa, số ngày, tổng) sao cho làm xong việc trong giới hạn cho trước (Koko Eating Bananas)",
+            "- Cho trước một giá trị x thì kiểm tra \"có làm được không\" dễ hơn nhiều so với tính thẳng đáp án, thường bằng một vòng greedy O(n)",
+            "- Đơn điệu: x làm được thì mọi giá trị lớn hơn x cũng làm được (hoặc ngược lại)",
+            "- Cụm \"minimize the maximum\" / \"maximize the minimum\" (Split Array Largest Sum)",
+            "- Khoảng đáp án lớn (tới 10⁹) nhưng n vừa phải: O(n log(range)) chạy thoải mái",
+            "- Khác với binary search trên mảng: không có mảng sort nào để tìm; ta tìm trên miền giá trị của đáp án, mỗi bước gọi `feasible`"
+          ],
+          "en": [
+            "- Asks for the **smallest / largest** value (speed, capacity, days, sum) that gets the job done within a limit (Koko Eating Bananas)",
+            "- Given a value x, checking \"can it be done\" is much easier than computing the answer directly, usually one greedy O(n) pass",
+            "- Monotonic: if x works, every value larger than x works too (or the reverse)",
+            "- The phrase \"minimize the maximum\" / \"maximize the minimum\" (Split Array Largest Sum)",
+            "- The answer range is large (up to 10⁹) but n is moderate: O(n log(range)) is comfortable",
+            "- Unlike binary search on an array: there is no sorted array to search; you search the range of answer values and call `feasible` at each step"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Định nghĩa `feasible(x)`: với giá trị x thì có làm được không. Nếu theo x nó có dạng `false ... false true ... true`, đáp án là x nhỏ nhất làm nó đúng, tìm bằng đúng vòng lặp lower bound trên `[lo, hi]`.",
+            "",
+            "1. Chọn biên: `lo` là giá trị nhỏ nhất có nghĩa (Ship: `max(weights)`), `hi` là giá trị chắc chắn làm được (Ship: `sum(weights)`, Koko: `max(piles)`)",
+            "2. Viết `feasible(x)` bằng greedy: Koko cộng `ceil(p / x)` giờ; Ship và Split Array dồn phần tử vào nhóm hiện tại, vượt `x` thì mở nhóm mới, rồi so số nhóm với giới hạn",
+            "3. Kiểm tra đơn điệu: tăng x không bao giờ làm việc khó hơn",
+            "",
+            "Đề hỏi giá trị **lớn nhất** làm được thì tìm x nhỏ nhất **không** làm được rồi trừ 1.",
+            "",
+            "Độ phức tạp: O(n · log(hi - lo)) thời gian, O(1) bộ nhớ."
+          ],
+          "en": [
+            "Define `feasible(x)`: can the job be done with value x? If it goes `false ... false true ... true` as x grows, the answer is the smallest x that makes it true, found with the same lower-bound loop over `[lo, hi]`.",
+            "",
+            "1. Pick the bounds: `lo` is the smallest value that makes sense (Ship: `max(weights)`), `hi` a value that surely works (Ship: `sum(weights)`, Koko: `max(piles)`)",
+            "2. Write `feasible(x)` greedily: Koko adds up `ceil(p / x)` hours; Ship and Split Array pack elements into the current group, open a new group when `x` would be exceeded, then compare the group count with the limit",
+            "3. Check monotonicity: a larger x never makes the job harder",
+            "",
+            "If the problem asks for the **largest** x that works, find the smallest x that does **not** work and subtract 1.",
+            "",
+            "Complexity: O(n · log(hi - lo)) time, O(1) space."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Smallest x in [lo, hi] with feasible(x) true. feasible: false...false true...true,",
+          "// and feasible(hi) must be true",
+          "long firstFeasible(long lo, long hi, LongPredicate feasible) {",
+          "    while (lo < hi) {",
+          "        long mid = lo + (hi - lo) / 2;",
+          "        if (feasible.test(mid)) hi = mid;       // mid works: the answer is mid or smaller",
+          "        else lo = mid + 1;                      // mid fails: need something larger",
+          "    }",
+          "    return lo;",
+          "}",
+          "",
+          "// Capacity To Ship Packages Within D Days (Split Array Largest Sum is the same check)",
+          "int shipWithinDays(int[] weights, int days) {",
+          "    long lo = 0, hi = 0;",
+          "    for (int w : weights) {",
+          "        lo = Math.max(lo, w);                   // the heaviest box must fit",
+          "        hi += w;                                // everything in one day always works",
+          "    }",
+          "    return (int) firstFeasible(lo, hi, cap -> {",
+          "        int used = 1;",
+          "        long load = 0;",
+          "        for (int w : weights) {                 // greedy: fill a day until it overflows",
+          "            if (load + w > cap) { used++; load = 0; }",
+          "            load += w;",
+          "        }",
+          "        return used <= days;",
+          "    });",
+          "}",
+          "",
+          "// Koko Eating Bananas: hours at speed k must be <= h",
+          "int minEatingSpeed(int[] piles, int h) {",
+          "    int max = Arrays.stream(piles).max().getAsInt();",
+          "    return (int) firstFeasible(1, max, k -> {",
+          "        long hours = 0;                         // can reach 10^4 * 10^9: long",
+          "        for (int p : piles) hours += (p + k - 1) / k;   // ceil(p / k)",
+          "        return hours <= h;",
+          "    });",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Biên dưới sai: sức chứa phải bắt đầu từ `max(weights)`; bắt đầu từ 1 thì greedy trong `feasible` đếm sai vì có gói không bao giờ lên được thuyền (Capacity To Ship Packages Within D Days)",
+            "- Làm tròn lên sai: số giờ là `(p + k - 1) / k`, không phải `p / k + 1` (sai khi chia hết); và cộng giờ bằng `long` vì tổng có thể tới 10¹³ (Koko Eating Bananas)",
+            "- Hoa trong một bó phải **liền kề**: gặp hoa chưa nở thì reset bộ đếm về 0; và trả -1 ngay khi `(long) m * k > n`, vì `m * k` có thể tràn `int` (Minimum Number of Days to Make m Bouquets)",
+            "- Viết `feasible` ngược chiều, hoặc không đơn điệu, rồi vẫn dùng template \"x nhỏ nhất làm được\": trước khi code, chắc chắn `feasible(hi)` đúng và tăng x không làm việc khó hơn (Split Array Largest Sum)",
+            "- Đáp án có thể tới 10¹⁸: biên phải là `long`, và trong `feasible` dừng cộng ngay khi đã đủ `goal`, nếu không tổng các `mid / machine` tràn cả `long` (Minimum Time Required)"
+          ],
+          "en": [
+            "- Wrong lower bound: capacity must start at `max(weights)`; starting at 1 makes the greedy in `feasible` miscount, since some box never fits on the ship (Capacity To Ship Packages Within D Days)",
+            "- Wrong ceiling: hours are `(p + k - 1) / k`, not `p / k + 1` (wrong when it divides evenly); and sum the hours in a `long`, the total can reach 10¹³ (Koko Eating Bananas)",
+            "- Flowers in one bouquet must be **adjacent**: reset the counter on a flower that has not bloomed; and return -1 right away when `(long) m * k > n`, since `m * k` can overflow `int` (Minimum Number of Days to Make m Bouquets)",
+            "- Writing `feasible` the wrong way round, or non-monotonic, and still using the \"smallest x that works\" template: before coding, make sure `feasible(hi)` is true and a larger x never makes it harder (Split Array Largest Sum)",
+            "- The answer can reach 10¹⁸: the bounds must be `long`, and `feasible` must stop adding once `goal` is reached, or the sum of `mid / machine` overflows even a `long` (Minimum Time Required)"
+          ]
+        }
+      }
     },
     {
       "id": "p2-heap",
@@ -159,7 +867,104 @@
         { "type": "visual", "title": "VisuAlgo: Binary Heap", "url": "https://visualgo.net/en/heap" },
         { "type": "docs", "title": "Java docs: PriorityQueue", "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/PriorityQueue.html" },
         { "type": "practice", "title": "LeetCode tag: Heap (Priority Queue)", "url": "https://leetcode.com/problem-list/heap-priority-queue/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đề hỏi **k** phần tử lớn nhất / nhỏ nhất / gần nhất / xuất hiện nhiều nhất, hoặc phần tử thứ k (K Closest Points to Origin, Top K Frequent Elements)",
+            "- Dữ liệu đến dần (stream), phải trả lời sau mỗi lần thêm (Kth Largest Element in a Stream)",
+            "- Lặp đi lặp lại: lấy phần tử lớn nhất/nhỏ nhất, xử lý, đưa kết quả trở lại tập (Last Stone Weight, Jesse and Cookies)",
+            "- Lập lịch: mỗi bước chọn việc còn nhiều nhất hoặc gấp nhất (Task Scheduler)",
+            "- k nhỏ hơn nhiều so với n: O(n log k) nhanh hơn sort toàn bộ O(n log n)",
+            "- Khác với sort: heap chạy được trên stream và chỉ giữ k phần tử. Khác với K-way merge: heap ở đây giữ k ứng viên tốt nhất, không phải một con trỏ cho mỗi danh sách"
+          ],
+          "en": [
+            "- Asks for the **k** largest / smallest / closest / most frequent elements, or the k-th one (K Closest Points to Origin, Top K Frequent Elements)",
+            "- Data arrives as a stream and you must answer after every insert (Kth Largest Element in a Stream)",
+            "- Repeatedly take the largest/smallest element, process it, put the result back (Last Stone Weight, Jesse and Cookies)",
+            "- Scheduling: at each step pick the task with the most remaining or the most urgent one (Task Scheduler)",
+            "- k is much smaller than n: O(n log k) beats sorting everything in O(n log n)",
+            "- Unlike sorting: a heap works on a stream and keeps only k elements. Unlike K-way merge: the heap here holds the k best candidates, not one pointer per list"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Muốn k phần tử **lớn nhất** thì giữ một **min-heap** cỡ k. Đỉnh heap là phần tử nhỏ nhất trong top-k hiện tại, tức là ngưỡng để vào top: offer phần tử mới, heap vượt k thì poll đỉnh. Hết dữ liệu, heap chứa đúng top-k và đỉnh là phần tử lớn thứ k. Ngược lại, k nhỏ nhất / gần nhất thì dùng max-heap cỡ k.",
+            "",
+            "- Top K Frequent: đếm bằng HashMap rồi top-k theo tần suất (hoặc bucket sort theo tần suất, O(n))",
+            "- Mô phỏng (Last Stone Weight): max-heap chứa tất cả, poll hai, offer lại phần dư",
+            "- Task Scheduler: đáp án là `max(tasks.length, (maxFreq - 1) * (n + 1) + countMax)` với `countMax` là số task có tần suất `maxFreq`; hoặc mô phỏng bằng max-heap + hàng đợi cooldown",
+            "- Quickselect: partition như quicksort nhưng chỉ đi tiếp một phía; O(n) trung bình, O(n²) tệ nhất, làm tại chỗ nhưng cần cả mảng nên không dùng cho stream",
+            "",
+            "Độ phức tạp: O(n log k) thời gian, O(k) bộ nhớ."
+          ],
+          "en": [
+            "For the k **largest** elements keep a **min-heap** of size k. Its top is the smallest of the current top k, i.e. the bar to get in: offer each new element, poll the top when the heap exceeds k. At the end the heap holds exactly the top k and its top is the k-th largest. For the k smallest / closest use a max-heap of size k.",
+            "",
+            "- Top K Frequent: count with a HashMap, then top k by count (or bucket sort by count, O(n))",
+            "- Simulation (Last Stone Weight): a max-heap of everything, poll two, offer back the remainder",
+            "- Task Scheduler: the answer is `max(tasks.length, (maxFreq - 1) * (n + 1) + countMax)` where `countMax` is the number of tasks with frequency `maxFreq`; or simulate with a max-heap + a cooldown queue",
+            "- Quickselect: partition like quicksort but recurse into one side only; O(n) average, O(n²) worst case, in place but needs the whole array, so not for streams",
+            "",
+            "Complexity: O(n log k) time, O(k) space."
+          ]
+        },
+        "template": [
+          "```java",
+          "// k-th largest: min-heap of the k largest seen so far; its top is the answer",
+          "int findKthLargest(int[] nums, int k) {",
+          "    PriorityQueue<Integer> heap = new PriorityQueue<>();   // min-heap",
+          "    for (int x : nums) {",
+          "        heap.offer(x);",
+          "        if (heap.size() > k) heap.poll();       // the smallest cannot be in the top k",
+          "    }",
+          "    return heap.peek();",
+          "}",
+          "",
+          "// Top K Frequent Elements: count, then keep the k most frequent in a min-heap by count",
+          "int[] topKFrequent(int[] nums, int k) {",
+          "    Map<Integer, Integer> count = new HashMap<>();",
+          "    for (int x : nums) count.merge(x, 1, Integer::sum);",
+          "    PriorityQueue<Map.Entry<Integer, Integer>> heap =",
+          "        new PriorityQueue<>((a, b) -> Integer.compare(a.getValue(), b.getValue()));",
+          "    for (Map.Entry<Integer, Integer> e : count.entrySet()) {",
+          "        heap.offer(e);",
+          "        if (heap.size() > k) heap.poll();",
+          "    }",
+          "    return heap.stream().mapToInt(Map.Entry::getKey).toArray();",
+          "}",
+          "",
+          "// K Closest Points to Origin: k smallest, so a max-heap by distance (no sqrt needed)",
+          "int[][] kClosest(int[][] points, int k) {",
+          "    PriorityQueue<int[]> heap = new PriorityQueue<>(",
+          "        (a, b) -> Long.compare(dist(b), dist(a)));  // farthest on top",
+          "    for (int[] p : points) {",
+          "        heap.offer(p);",
+          "        if (heap.size() > k) heap.poll();",
+          "    }",
+          "    return heap.toArray(new int[0][]);",
+          "}",
+          "",
+          "long dist(int[] p) { return (long) p[0] * p[0] + (long) p[1] * p[1]; }",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Nhầm chiều heap: k phần tử lớn nhất cần **min-heap** cỡ k (đỉnh là phần tử sẽ bị loại), không phải max-heap (Kth Largest Element in an Array)",
+            "- Comparator `(a, b) -> a - b` tràn số khi giá trị âm hoặc tới 10⁹; dùng `Integer.compare` hoặc `Comparator.reverseOrder()` (QHEAP1)",
+            "- `PriorityQueue.remove(x)` là O(n): xoá phần tử bất kỳ nhiều lần thì dùng lazy deletion hoặc `TreeMap` đếm số lần (QHEAP1)",
+            "- Quên các task cùng tần suất lớn nhất (`countMax`), hoặc quên lấy max với `tasks.length` khi không cần idle (Task Scheduler)",
+            "- Quickselect với pivot cố định bị O(n²) trên mảng đã sort hoặc nhiều số trùng: chọn pivot ngẫu nhiên, partition ba phần (Kth Largest Element in an Array)"
+          ],
+          "en": [
+            "- Wrong heap direction: the k largest need a **min-heap** of size k (its top is the one to drop), not a max-heap (Kth Largest Element in an Array)",
+            "- The comparator `(a, b) -> a - b` overflows with negative values or values up to 10⁹; use `Integer.compare` or `Comparator.reverseOrder()` (QHEAP1)",
+            "- `PriorityQueue.remove(x)` is O(n): for many arbitrary deletions use lazy deletion or a `TreeMap` of counts (QHEAP1)",
+            "- Forgetting the tasks that share the top frequency (`countMax`), or the max with `tasks.length` for when no idle slot is needed (Task Scheduler)",
+            "- Quickselect with a fixed pivot degrades to O(n²) on sorted input or many duplicates: pick a random pivot, use a three-way partition (Kth Largest Element in an Array)"
+          ]
+        }
+      }
     },
     {
       "id": "p2-two-heaps",
@@ -169,7 +974,102 @@
         { "title": "Sliding Window Median", "url": "https://leetcode.com/problems/sliding-window-median/", "level": "Hard" },
         { "title": "IPO", "url": "https://leetcode.com/problems/ipo/", "level": "Hard" },
         { "title": "Find the Running Median", "url": "https://www.hackerrank.com/challenges/find-the-running-median/problem", "level": "Hard" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Cần **trung vị** của dữ liệu đang thêm vào liên tục, hỏi sau mỗi lần thêm (Find Median from Data Stream, Find the Running Median)",
+            "- Trung vị của mọi cửa sổ trượt cỡ k (Sliding Window Median)",
+            "- Tập được chia thành nửa \"nhỏ\" và nửa \"lớn\", và luôn cần phần tử ở ranh giới hai nửa",
+            "- Hai tiêu chí: một heap \"mở khoá\" lựa chọn theo điều kiện (vốn ≤ w), heap kia chọn lựa chọn tốt nhất trong số đã mở (IPO)",
+            "- Sort lại sau mỗi lần thêm tốn O(n log n) mỗi truy vấn, quá chậm với 10⁵ thao tác",
+            "- Khác với Top-K một heap: ranh giới ở vị trí n/2 dịch chuyển theo n, nên phải nhìn được cả hai phía của nó"
+          ],
+          "en": [
+            "- Needs the **median** of data that keeps arriving, after every insert (Find Median from Data Stream, Find the Running Median)",
+            "- The median of every sliding window of size k (Sliding Window Median)",
+            "- The set splits into a \"small\" half and a \"large\" half, and you always need the element at the boundary",
+            "- Two criteria: one heap \"unlocks\" choices by a condition (capital ≤ w), the other picks the best unlocked choice (IPO)",
+            "- Re-sorting after every insert costs O(n log n) per query, too slow for 10⁵ operations",
+            "- Unlike single-heap top-k: the boundary at position n/2 moves as n grows, so you need to see both sides of it"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Max-heap `low` giữ nửa nhỏ, min-heap `high` giữ nửa lớn. Invariant: mọi phần tử của `low` ≤ mọi phần tử của `high`, và `low.size()` bằng `high.size()` hoặc hơn đúng 1. Khi đó trung vị là `low.peek()` (n lẻ) hoặc trung bình hai đỉnh (n chẵn).",
+            "",
+            "Thêm x: offer vào `low`, chuyển đỉnh `low` sang `high` (giữ thứ tự hai nửa), rồi nếu `high` nhiều hơn thì chuyển đỉnh `high` về `low` (giữ cỡ).",
+            "",
+            "- Sliding Window Median: phải xoá phần tử rời cửa sổ. `PriorityQueue.remove(x)` là O(k), nên dùng lazy deletion (ghi số lần cần xoá vào HashMap, xoá thật khi nó lên đỉnh) hoặc hai `TreeSet` index sắp theo (giá trị, index) để xoá trong O(log k)",
+            "- IPO: sort dự án theo vốn (hoặc min-heap theo vốn); mỗi lượt đưa mọi dự án có vốn ≤ w vào max-heap lợi nhuận rồi làm dự án lãi nhất. Greedy đúng vì lợi nhuận không âm: vốn chỉ tăng, dự án đã mở khoá không bao giờ bị khoá lại",
+            "",
+            "Độ phức tạp: O(log n) mỗi lần thêm, O(1) lấy trung vị, O(n) bộ nhớ."
+          ],
+          "en": [
+            "Max-heap `low` holds the smaller half, min-heap `high` the larger half. Invariant: every element of `low` ≤ every element of `high`, and `low.size()` equals `high.size()` or is larger by exactly 1. Then the median is `low.peek()` (odd n) or the average of the two tops (even n).",
+            "",
+            "Add x: offer it to `low`, move the top of `low` to `high` (keeps the halves ordered), then if `high` is bigger move its top back to `low` (keeps the sizes).",
+            "",
+            "- Sliding Window Median: elements leaving the window must be removed. `PriorityQueue.remove(x)` is O(k), so use lazy deletion (count pending removals in a HashMap, really remove when one reaches the top) or two `TreeSet`s of indices ordered by (value, index) for O(log k) removal",
+            "- IPO: sort projects by capital (or a min-heap by capital); each round move every project with capital ≤ w into a max-heap of profits, then take the most profitable. The greedy is valid because profits are non-negative: capital only grows, and an unlocked project never gets locked again",
+            "",
+            "Complexity: O(log n) per insert, O(1) to read the median, O(n) space."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Find Median from Data Stream",
+          "class MedianFinder {",
+          "    // low: max-heap, smaller half; high: min-heap, larger half; low.size() >= high.size()",
+          "    private final PriorityQueue<Integer> low = new PriorityQueue<>(Comparator.reverseOrder());",
+          "    private final PriorityQueue<Integer> high = new PriorityQueue<>();",
+          "",
+          "    void addNum(int num) {",
+          "        low.offer(num);",
+          "        high.offer(low.poll());                 // keep every low <= every high",
+          "        if (high.size() > low.size()) low.offer(high.poll()); // keep the sizes balanced",
+          "    }",
+          "",
+          "    double findMedian() {",
+          "        if (low.size() > high.size()) return low.peek();",
+          "        return ((long) low.peek() + high.peek()) / 2.0;   // long: no int overflow",
+          "    }",
+          "}",
+          "",
+          "// IPO: unlock projects by capital (sorted), pick the best profit (max-heap)",
+          "int findMaximizedCapital(int k, int w, int[] profits, int[] capital) {",
+          "    int n = profits.length;",
+          "    Integer[] order = new Integer[n];",
+          "    for (int i = 0; i < n; i++) order[i] = i;",
+          "    Arrays.sort(order, (a, b) -> Integer.compare(capital[a], capital[b]));",
+          "    PriorityQueue<Integer> best = new PriorityQueue<>(Comparator.reverseOrder());",
+          "    int next = 0;",
+          "    for (int round = 0; round < k; round++) {",
+          "        while (next < n && capital[order[next]] <= w) best.offer(profits[order[next++]]);",
+          "        if (best.isEmpty()) break;              // nothing affordable: stop early",
+          "        w += best.poll();",
+          "    }",
+          "    return w;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Tràn số với giá trị gần 2³¹: trung bình hai đỉnh phải là `((long) a + b) / 2.0` (chia `/ 2` còn mất phần .5), max-heap dùng `Comparator.reverseOrder()` thay vì `(a, b) -> b - a` (Sliding Window Median)",
+            "- Thêm thẳng vào một heap chỉ dựa theo cỡ mà không đi qua heap kia: phá invariant `low ≤ high` (Find Median from Data Stream)",
+            "- Lazy deletion: `size()` vẫn tính phần tử đã đánh dấu xoá, phải tự đếm cỡ thật và dọn đỉnh sau mỗi lần chuyển phần tử giữa hai heap (Sliding Window Median)",
+            "- Dùng `TreeSet` lưu giá trị thì các giá trị trùng bị gộp làm một: lưu index và so theo (giá trị, index) (Sliding Window Median)",
+            "- Không dừng khi max-heap rỗng (không còn dự án đủ vốn): `poll()` trả `null` và `w += null` ném NullPointerException (IPO)"
+          ],
+          "en": [
+            "- Overflow near 2³¹: the average of the tops must be `((long) a + b) / 2.0` (`/ 2` also drops the .5), and the max-heap should use `Comparator.reverseOrder()` rather than `(a, b) -> b - a` (Sliding Window Median)",
+            "- Adding straight into one heap based on size alone, without passing through the other: breaks the `low ≤ high` invariant (Find Median from Data Stream)",
+            "- Lazy deletion: `size()` still counts elements marked as deleted, so track the real sizes yourself and clean the tops after every move between heaps (Sliding Window Median)",
+            "- Storing values in a `TreeSet` merges duplicates into one: store indices and order by (value, index) (Sliding Window Median)",
+            "- Not stopping when the max-heap is empty (no affordable project left): `poll()` returns `null` and `w += null` throws a NullPointerException (IPO)"
+          ]
+        }
+      }
     },
     {
       "id": "p2-kway",
@@ -179,7 +1079,103 @@
         { "title": "Kth Smallest Element in a Sorted Matrix", "url": "https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/", "level": "Medium" },
         { "title": "Find K Pairs with Smallest Sums", "url": "https://leetcode.com/problems/find-k-pairs-with-smallest-sums/", "level": "Medium" },
         { "title": "Smallest Range Covering Elements from K Lists", "url": "https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/", "level": "Hard" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Có k danh sách/mảng **đã sắp xếp**, cần gộp thành một hoặc lấy phần tử nhỏ thứ k trong tổng thể (Merge k Sorted Lists)",
+            "- Ma trận mà mỗi hàng đã sort: mỗi hàng là một danh sách (Kth Smallest Element in a Sorted Matrix)",
+            "- Cặp ghép từ hai mảng đã sort, cần k cặp có tổng nhỏ nhất: mỗi `nums1[i]` sinh một danh sách `(i, 0), (i, 1), ...` (Find K Pairs with Smallest Sums)",
+            "- Cần một khoảng chứa ít nhất một phần tử của mỗi danh sách (Smallest Range Covering Elements from K Lists)",
+            "- Tổng số phần tử N lớn, k nhỏ: O(N log k) thay vì gộp hết rồi sort O(N log N)",
+            "- Khác với Top-K: heap ở đây chứa **một con trỏ cho mỗi danh sách** (cỡ k), không phải k phần tử tốt nhất"
+          ],
+          "en": [
+            "- There are k **sorted** lists/arrays to merge into one, or you need the k-th smallest overall (Merge k Sorted Lists)",
+            "- A matrix whose rows are sorted: each row is a list (Kth Smallest Element in a Sorted Matrix)",
+            "- Pairs from two sorted arrays, the k pairs with the smallest sums: each `nums1[i]` produces a list `(i, 0), (i, 1), ...` (Find K Pairs with Smallest Sums)",
+            "- You need a range that contains at least one element from every list (Smallest Range Covering Elements from K Lists)",
+            "- The total N is large and k is small: O(N log k) instead of concatenating and sorting in O(N log N)",
+            "- Unlike top-k: the heap holds **one pointer per list** (size k), not the k best elements"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Min-heap chứa phần tử hiện tại của **mỗi** danh sách, kèm vị trí của nó (danh sách nào, index nào). Poll ra phần tử nhỏ nhất toàn cục, ghi vào kết quả, rồi offer phần tử kế tiếp **của cùng danh sách**. Invariant: heap luôn chứa phần tử nhỏ nhất chưa lấy của mỗi danh sách còn phần tử, nên đỉnh heap là phần tử nhỏ nhất còn lại.",
+            "",
+            "- Phần tử nhỏ thứ k: poll k - 1 lần, đỉnh là đáp án",
+            "- Find K Pairs: khởi tạo `(i, 0)` với `i < min(k, n1)`; poll `(i, j)` thì chỉ offer `(i, j + 1)`",
+            "- Smallest Range: heap giữ đúng một phần tử mỗi danh sách, theo dõi thêm `max`; `[đỉnh, max]` luôn phủ mọi danh sách. Poll đỉnh, offer phần tử kế, dừng khi một danh sách hết",
+            "- Merge k Sorted Lists cũng làm được bằng chia để trị (gộp từng cặp), cùng O(N log k)",
+            "",
+            "Độ phức tạp: O(N log k) thời gian với N là số phần tử được lấy ra, O(k) bộ nhớ cho heap."
+          ],
+          "en": [
+            "A min-heap holds the current element of **each** list with its position (which list, which index). Poll the global minimum, append it to the result, then offer the next element **from the same list**. Invariant: the heap always holds the smallest unused element of every non-empty list, so its top is the smallest element left.",
+            "",
+            "- k-th smallest: poll k - 1 times, the top is the answer",
+            "- Find K Pairs: start with `(i, 0)` for `i < min(k, n1)`; after polling `(i, j)` offer only `(i, j + 1)`",
+            "- Smallest Range: the heap holds exactly one element per list, and you also track `max`; `[top, max]` always covers every list. Poll the top, offer its successor, stop when any list runs out",
+            "- Merge k Sorted Lists also works by divide and conquer (merge pairs), same O(N log k)",
+            "",
+            "Complexity: O(N log k) time where N is the number of elements taken, O(k) space for the heap."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Merge k Sorted Lists: the heap holds the current head of each list",
+          "ListNode mergeKLists(ListNode[] lists) {",
+          "    PriorityQueue<ListNode> heap = new PriorityQueue<>((a, b) -> Integer.compare(a.val, b.val));",
+          "    for (ListNode head : lists) if (head != null) heap.offer(head);   // skip empty lists",
+          "    ListNode dummy = new ListNode(), tail = dummy;",
+          "    while (!heap.isEmpty()) {",
+          "        ListNode node = heap.poll();            // global minimum",
+          "        tail.next = node;",
+          "        tail = node;",
+          "        if (node.next != null) heap.offer(node.next);   // its successor takes its place",
+          "    }",
+          "    return dummy.next;",
+          "}",
+          "",
+          "// Arrays: heap entries are {value, list, index} (Smallest Range Covering Elements from K Lists)",
+          "int[] smallestRange(List<List<Integer>> nums) {",
+          "    PriorityQueue<int[]> heap = new PriorityQueue<>((a, b) -> Integer.compare(a[0], b[0]));",
+          "    int max = Integer.MIN_VALUE;",
+          "    for (int i = 0; i < nums.size(); i++) {",
+          "        int v = nums.get(i).get(0);",
+          "        heap.offer(new int[] {v, i, 0});",
+          "        max = Math.max(max, v);",
+          "    }",
+          "    int[] best = {heap.peek()[0], max};",
+          "    while (true) {",
+          "        int[] e = heap.poll();                  // [e[0], max] covers every list",
+          "        if (max - e[0] < best[1] - best[0]) best = new int[] {e[0], max};",
+          "        int i = e[1], j = e[2] + 1;",
+          "        if (j == nums.get(i).size()) return best;   // a list ran out: no more full cover",
+          "        int v = nums.get(i).get(j);",
+          "        heap.offer(new int[] {v, i, j});",
+          "        max = Math.max(max, v);",
+          "    }",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Đưa danh sách rỗng (`null`) vào heap: `PriorityQueue` không nhận `null`, ném NullPointerException (Merge k Sorted Lists)",
+            "- Chỉ lưu giá trị trong heap, không lưu vị trí (danh sách nào, index nào) nên không biết offer phần tử kế tiếp nào (Kth Smallest Element in a Sorted Matrix)",
+            "- Từ `(i, j)` offer cả `(i + 1, j)` lẫn `(i, j + 1)` thì một cặp được thêm nhiều lần; hoặc khởi tạo `(0, 0)` rồi dùng thêm `visited`, hoặc khởi tạo mọi `(i, 0)` và chỉ offer `(i, j + 1)` (Find K Pairs with Smallest Sums)",
+            "- Dừng khi heap rỗng thay vì khi **một** danh sách hết: từ lúc đó khoảng không còn phủ đủ k danh sách (Smallest Range Covering Elements from K Lists)",
+            "- Gộp lần lượt từng danh sách vào kết quả: O(N·k) thay vì O(N log k) (Merge k Sorted Lists)"
+          ],
+          "en": [
+            "- Offering an empty list (`null`) to the heap: `PriorityQueue` rejects `null` with a NullPointerException (Merge k Sorted Lists)",
+            "- Storing only values in the heap, not the position (which list, which index), so you cannot tell what to offer next (Kth Smallest Element in a Sorted Matrix)",
+            "- Offering both `(i + 1, j)` and `(i, j + 1)` from `(i, j)` adds the same pair several times; either start at `(0, 0)` and keep a `visited` set, or start with every `(i, 0)` and offer only `(i, j + 1)` (Find K Pairs with Smallest Sums)",
+            "- Stopping when the heap is empty instead of when **any** list runs out: from then on the range no longer covers all k lists (Smallest Range Covering Elements from K Lists)",
+            "- Merging the lists into the result one at a time: O(N·k) instead of O(N log k) (Merge k Sorted Lists)"
+          ]
+        }
+      }
     },
     {
       "id": "p2-contest",

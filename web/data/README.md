@@ -79,7 +79,10 @@ Nhiều module cùng gắn 1 chủ đề thì trang chủ đề hiện nhiều k
       ],
       "resources": [
         { "type": "docs", "title": "HashMap (Java SE 21)", "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/HashMap.html" }
-      ]
+      ],
+      "notes": {
+        "what": { "vi": ["Bảng băm: mảng các bucket, ..."], "en": ["A hash table: an array of buckets, ..."] }
+      }
     }
   ]
 }
@@ -92,13 +95,32 @@ Nhiều module cùng gắn 1 chủ đề thì trang chủ đề hiện nhiều k
 | `items`     | Các mục. Mỗi mục có `id`, `title` (thành tên pattern khi được thêm), và `problems`, `resources` nếu có                                                                                  |
 | `problems`  | Bài gợi ý: `{ "title", "url", "level", "guides" }`. `level`: `Easy` / `Medium` / `Hard` (HackerRank có thêm `Advanced`, `Expert`). Mục không có bài nào thành pattern "lý thuyết thuần" |
 | `resources` | Tài liệu gợi ý: `{ "type", "title", "url" }`. `type`: `article`, `video`, `course`, `docs`, `book`, `visual`, `practice`                                                                |
+| `notes`     | Lý thuyết gợi ý cho các mục ghi chú của pattern, xem phần dưới                                                                                                                          |
 
 Chỉ có các trường này, và trường nào cũng được app đọc. Gõ sai tên trường hay thêm trường lạ thì app báo lỗi, không bỏ qua.
-URL phải là http(s). Tên là văn bản thuần, không dùng Markdown.
+URL phải là http(s). Tên là văn bản thuần; chỉ `notes` dùng Markdown.
 
 Cùng 1 link bài ở nhiều mục (kể cả khác module) vẫn là 1 bài trong notebook (khớp theo link, bỏ qua `www.`, dấu `/` cuối và phần sau tên bài của LeetCode).
 
-Nội dung bài học của lộ trình cũ (mô tả, ý chính, ví dụ, code mẫu, độ phức tạp, bẫy, thời gian từng giai đoạn, checklist) không còn ở đây vì app đã thôi hiện chúng. Cần xem lại thì lấy trong git ở commit `52e11c1`.
+## Lý thuyết gợi ý (`notes`)
+
+Mỗi mục có thể kèm lý thuyết cho từng mục ghi chú của pattern. Trang pattern hiện chúng trong khung Gợi ý, phần **Lý thuyết**: bấm tên để đọc, bấm **Chép vào** thì nội dung được chép vào mục ghi chú cùng tên, bên dưới phần bạn đã viết. Ghi chú vẫn là của bạn: app không tự điền, và sửa `notes` ở đây không đổi gì trong notebook.
+
+Tên các mục theo loại chủ đề của module (`src/notebook/templates.ts`); dùng sai tên thì app báo lỗi:
+
+| Loại chủ đề                  | Các mục                                                        |
+| ---------------------------- | -------------------------------------------------------------- |
+| `dsa` (DSA)                  | `recognition`, `idea`, `template`, `pitfalls`                  |
+| `concept` (Java, DB, Spring) | `what`, `how`, `when`, `pitfalls`                              |
+| `design` (System Design)     | `requirements`, `estimates`, `design`, `deepDive`, `tradeoffs` |
+| `story` (Hành vi)            | `situation`, `task`, `action`, `result`, `questions`           |
+
+- Giá trị là Markdown, viết thành mảng các dòng (app nối bằng xuống dòng). App hiện được: đoạn văn, danh sách `- ` và `1. ` (không lồng nhau), `code`, **đậm**, link, khối code. Không có bảng.
+- Chữ thì viết `{ "vi": [...], "en": [...] }`. Code (`template`) viết một lần, không chia ngôn ngữ, comment tiếng Anh.
+- Template của DSA viết bằng Java. Bẫy (`pitfalls`) ở đây là bẫy hay gặp, ghi kèm tên bài trong ngoặc; bẫy của riêng bạn thì bạn tự ghi thêm.
+- Mục chỉ là bộ bài luyện (CSES, AtCoder, Codeforces, contest) thì không cần `notes`.
+
+Lý thuyết của lộ trình cũ đã được viết lại theo từng dạng bài trong `notes`. Bản cũ (mô tả, ý chính, ví dụ, code Python, độ phức tạp, checklist) còn trong git ở commit `52e11c1`.
 
 ## Thêm một module
 

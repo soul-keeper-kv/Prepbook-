@@ -25,7 +25,117 @@
         { "type": "article", "title": "cp-algorithms: Introduction to Dynamic Programming", "url": "https://cp-algorithms.com/dynamic_programming/intro-to-dp.html" },
         { "type": "practice", "title": "LeetCode study plan: Dynamic Programming", "url": "https://leetcode.com/studyplan/dynamic-programming/" },
         { "type": "practice", "title": "LeetCode tag: Dynamic Programming", "url": "https://leetcode.com/problem-list/dynamic-programming/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đề hỏi **số cách** (đếm), **lớn nhất / nhỏ nhất**, hoặc **có làm được không** (true/false), không bắt liệt kê từng cách",
+            "- Duyệt mảng / chuỗi theo một chiều, và lựa chọn tại vị trí i chỉ phụ thuộc vài vị trí trước đó (`i - 1`, `i - 2`, hoặc mọi `j < i`)",
+            "- Viết đệ quy brute force (\"lấy / bỏ\", \"bước 1 / bước 2\") thì thấy cùng một bài con bị gọi lại nhiều lần",
+            "- n tới 10³–10⁵: O(2ⁿ) không chạy nổi, O(n) hay O(n·k) thì được",
+            "- Khác với Greedy: chọn cái tốt nhất tại chỗ có thể sai (House Robber: lấy nhà giàu nhất trước không đúng), nên phải thử mọi lựa chọn và nhớ kết quả",
+            "- Khác với Backtracking: cần liệt kê mọi lời giải thì backtrack; chỉ cần đếm hoặc tối ưu thì DP"
+          ],
+          "en": [
+            "- Asks for the **number of ways**, a **max / min**, or **whether it is possible** (true/false), not a list of every way",
+            "- Walks an array / string in one direction, and the choice at position i depends only on a few earlier positions (`i - 1`, `i - 2`, or every `j < i`)",
+            "- The brute-force recursion (\"take / skip\", \"step 1 / step 2\") calls the same subproblem over and over",
+            "- n is 10³–10⁵: O(2ⁿ) cannot run, O(n) or O(n·k) can",
+            "- Unlike greedy: the locally best choice can be wrong (House Robber: robbing the richest house first fails), so try every choice and remember the results",
+            "- Unlike backtracking: listing every solution needs backtracking; counting or optimising needs DP"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "DP = đệ quy brute force + nhớ kết quả bài con. Viết 4 bước ra giấy trước khi code:",
+            "",
+            "1. **Trạng thái**: viết thành câu, ví dụ `dp[i]` = số tiền lớn nhất khi chỉ xét `i` nhà đầu tiên",
+            "2. **Chuyển trạng thái**: lựa chọn cuối cùng tại i là gì? House Robber: `dp[i] = max(dp[i-1], dp[i-2] + a[i-1])` (bỏ nhà i, hoặc lấy nó)",
+            "3. **Cơ sở**: giá trị của bài con nhỏ nhất, thường là input rỗng (`dp[0] = 1` khi đếm cách, `0` khi tính tổng)",
+            "4. **Đáp án**: thường là `dp[n]`, đôi khi là max của mọi `dp[i]`",
+            "",
+            "Top-down (đệ quy + memo) dễ nghĩ, chỉ tính trạng thái cần. Bottom-up (vòng lặp) điền theo thứ tự sao cho trạng thái cần dùng đã có trước, không lo stack overflow. Khi `dp[i]` chỉ cần `dp[i-1]`, `dp[i-2]` thì thay mảng bằng 2 biến.",
+            "",
+            "Độ phức tạp: O(số trạng thái × chi phí một lần chuyển) thời gian: O(n) cho Climbing Stairs, House Robber; O(n) bộ nhớ, O(1) khi rút về vài biến."
+          ],
+          "en": [
+            "DP = brute-force recursion + remembering subproblem results. Write the 4 steps on paper before coding:",
+            "",
+            "1. **State**: write it as a sentence, e.g. `dp[i]` = the most money using only the first `i` houses",
+            "2. **Transition**: what is the last choice at i? House Robber: `dp[i] = max(dp[i-1], dp[i-2] + a[i-1])` (skip house i, or rob it)",
+            "3. **Base**: the value of the smallest subproblem, usually the empty input (`dp[0] = 1` when counting ways, `0` for a sum)",
+            "4. **Answer**: usually `dp[n]`, sometimes the max over every `dp[i]`",
+            "",
+            "Top-down (recursion + memo) is easier to think about and computes only the states it needs. Bottom-up (a loop) fills states in an order where everything a state needs is already there, with no stack overflow risk. When `dp[i]` only needs `dp[i-1]`, `dp[i-2]`, replace the array with 2 variables.",
+            "",
+            "Complexity: O(states × cost of one transition) time: O(n) for Climbing Stairs, House Robber; O(n) space, O(1) when reduced to a few variables."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Bottom-up (Decode Ways): dp[i] = ways to decode the first i chars",
+          "int numDecodings(String s) {",
+          "    int n = s.length();",
+          "    int[] dp = new int[n + 1];",
+          "    dp[0] = 1;                                         // base: empty prefix, one way",
+          "    for (int i = 1; i <= n; i++) {",
+          "        int one = s.charAt(i - 1) - '0';               // last char alone",
+          "        if (one != 0) dp[i] += dp[i - 1];",
+          "        if (i >= 2) {                                  // last two chars together",
+          "            int two = (s.charAt(i - 2) - '0') * 10 + one;",
+          "            if (two >= 10 && two <= 26) dp[i] += dp[i - 2];",
+          "        }",
+          "    }",
+          "    return dp[n];                                      // answer: the whole string",
+          "}",
+          "",
+          "// Rolling variables (House Robber): dp[i] needs only dp[i-1] and dp[i-2]",
+          "int rob(int[] a, int from, int to) {                  // houses a[from..to]",
+          "    int prev2 = 0, prev1 = 0;                          // dp[i-2], dp[i-1]",
+          "    for (int i = from; i <= to; i++) {",
+          "        int cur = Math.max(prev1, prev2 + a[i]);       // skip i, or rob i",
+          "        prev2 = prev1;",
+          "        prev1 = cur;",
+          "    }",
+          "    return prev1;",
+          "}",
+          "",
+          "// House Robber II: first and last are neighbours, so take the best of two straight runs",
+          "int robCircle(int[] a) {",
+          "    if (a.length == 1) return a[0];",
+          "    return Math.max(rob(a, 0, a.length - 2), rob(a, 1, a.length - 1));",
+          "}",
+          "",
+          "// Top-down (Word Break): memo[i] = can s[i..] be split into dictionary words",
+          "boolean wordBreak(String s, List<String> words) {",
+          "    return canSplit(s, 0, new HashSet<>(words), new Boolean[s.length() + 1]);",
+          "}",
+          "boolean canSplit(String s, int i, Set<String> dict, Boolean[] memo) {",
+          "    if (i == s.length()) return true;",
+          "    if (memo[i] != null) return memo[i];               // null = not computed yet",
+          "    for (int j = i + 1; j <= s.length(); j++)",
+          "        if (dict.contains(s.substring(i, j)) && canSplit(s, j, dict, memo)) return memo[i] = true;",
+          "    return memo[i] = false;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Định nghĩa `dp[i]` mơ hồ (\"tốt nhất tới i\" mà không rõ có lấy i hay không) nên công thức chuyển sai; viết trạng thái thành câu trước (House Robber)",
+            "- `'0'` không đứng một mình được, và cặp hai chữ số phải nằm trong `[10, 26]`: \"06\" không hợp lệ, chỉ kiểm `<= 26` là sai (Decode Ways)",
+            "- Nhà đầu và nhà cuối kề nhau: chạy 2 lần trên `[0, n-2]` và `[1, n-1]`, nhớ xử lý riêng n = 1 (House Robber II)",
+            "- Đích là bậc `n`, nằm ngoài mảng `cost`; trả `dp[n-1]` là thiếu một bước (Min Cost Climbing Stairs)",
+            "- Memo bằng `int[]` mặc định 0 thì không phân biệt \"chưa tính\" với \"kết quả 0 / false\"; dùng `Boolean[]` hoặc fill -1 (Word Break)"
+          ],
+          "en": [
+            "- A vague `dp[i]` (\"best up to i\" without saying whether i is taken) leads to a wrong transition; write the state as a sentence first (House Robber)",
+            "- `'0'` cannot stand alone, and a two-digit pair must be in `[10, 26]`: \"06\" is invalid, so checking only `<= 26` is wrong (Decode Ways)",
+            "- The first and last houses are neighbours: run twice on `[0, n-2]` and `[1, n-1]`, and handle n = 1 separately (House Robber II)",
+            "- The goal is step `n`, past the end of `cost`; returning `dp[n-1]` is one step short (Min Cost Climbing Stairs)",
+            "- A memo of `int[]` defaults to 0, so \"not computed\" looks like \"result 0 / false\"; use `Boolean[]` or fill with -1 (Word Break)"
+          ]
+        }
+      }
     },
     {
       "id": "p4-dp",
@@ -43,7 +153,115 @@
       ],
       "resources": [
         { "type": "article", "title": "cp-algorithms: Knapsack problem", "url": "https://cp-algorithms.com/dynamic_programming/knapsack.html" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Có một tập món (đồng xu, số, hòn đá) và một **mục tiêu / sức chứa** là số nguyên không quá lớn (amount, target, sum / 2 cỡ 10⁴): mỗi món chọn hoặc không",
+            "- Hỏi có đạt **đúng tổng** được không, cần **ít món nhất** bao nhiêu, có **bao nhiêu cách**, hoặc giá trị lớn nhất trong giới hạn sức chứa",
+            "- Mỗi món dùng **tối đa một lần** là 0/1; dùng **bao nhiêu lần cũng được** (\"số đồng xu không giới hạn\") là unbounded",
+            "- Đề không giống knapsack nhưng quy về được \"tập con có tổng S\": chia 2 tập bằng nhau (Partition Equal Subset Sum), gán dấu +/- (Target Sum), đập đá còn nhỏ nhất (Last Stone Weight II)",
+            "- Khác với Backtracking: mục tiêu nhỏ thì DP trên tổng, O(n·target); chỉ backtrack khi phải liệt kê từng tổ hợp (Combination Sum)",
+            "- Mục tiêu tới 10⁹ thì bảng theo tổng không dùng được, phải tìm hướng khác"
+          ],
+          "en": [
+            "- There is a set of items (coins, numbers, stones) and a **target / capacity** that is a modest integer (amount, target, sum / 2 around 10⁴): each item is taken or not",
+            "- Asks whether an **exact sum** is reachable, the **fewest items**, the **number of ways**, or the best value within a capacity",
+            "- Each item used **at most once** is 0/1; used **any number of times** (\"an infinite number of each coin\") is unbounded",
+            "- Does not look like knapsack but reduces to \"a subset with sum S\": split into two equal halves (Partition Equal Subset Sum), assign +/- signs (Target Sum), smash stones down to the smallest rest (Last Stone Weight II)",
+            "- Unlike backtracking: with a small target, DP over the sum is O(n·target); backtrack only when you must list each combination (Combination Sum)",
+            "- A target up to 10⁹ rules out a table indexed by the sum, look for another approach"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Trạng thái là **tổng / sức chứa**: `dp[s]` = đáp án cho tổng `s` khi chỉ dùng các món đã xét (true/false, số cách, ít món nhất, giá trị lớn nhất). Với mỗi món nặng `w`: `dp[s] = best(dp[s], dp[s - w] + gain)`.",
+            "",
+            "- **0/1**: duyệt `s` **giảm dần**, nên `dp[s - w]` vẫn là giá trị trước khi xét món này",
+            "- **Unbounded**: duyệt `s` **tăng dần**, `dp[s - w]` có thể đã dùng món này, nên món được dùng lại",
+            "- **Đếm tổ hợp** (thứ tự không quan trọng, Coin Change II): vòng ngoài là món, vòng trong là tổng",
+            "- **Đếm hoán vị** (thứ tự khác là cách khác, Combination Sum IV): vòng ngoài là tổng, vòng trong là món",
+            "- **Ít món nhất** (Coin Change, Perfect Squares): `dp[0] = 0`, còn lại là vô cực; cuối cùng vẫn vô cực thì trả -1",
+            "",
+            "Target Sum: P - N = target và P + N = sum nên P = (sum + target) / 2, đếm tập con có tổng P. Last Stone Weight II: tìm tổng tập con lớn nhất `best ≤ sum / 2`, đáp án `sum - 2·best`.",
+            "",
+            "Độ phức tạp: O(n·W) thời gian, O(W) bộ nhớ (W = tổng mục tiêu). Đây là pseudo-polynomial: chậm khi W lớn."
+          ],
+          "en": [
+            "The state is the **sum / capacity**: `dp[s]` = the answer for sum `s` using only the items seen so far (true/false, number of ways, fewest items, best value). For each item of weight `w`: `dp[s] = best(dp[s], dp[s - w] + gain)`.",
+            "",
+            "- **0/1**: loop `s` **downward**, so `dp[s - w]` is still the value from before this item",
+            "- **Unbounded**: loop `s` **upward**, `dp[s - w]` may already use this item, so it can be reused",
+            "- **Count combinations** (order does not matter, Coin Change II): items in the outer loop, sums inside",
+            "- **Count permutations** (a different order is a different way, Combination Sum IV): sums in the outer loop, items inside",
+            "- **Fewest items** (Coin Change, Perfect Squares): `dp[0] = 0`, everything else infinity; still infinity at the end means -1",
+            "",
+            "Target Sum: P - N = target and P + N = sum, so P = (sum + target) / 2; count subsets summing to P. Last Stone Weight II: find the largest subset sum `best ≤ sum / 2`, the answer is `sum - 2·best`.",
+            "",
+            "Complexity: O(n·W) time, O(W) space (W = the target sum). This is pseudo-polynomial: slow when W is large."
+          ]
+        },
+        "template": [
+          "```java",
+          "// 0/1, feasibility (Partition Equal Subset Sum): each number used at most once",
+          "boolean canPartition(int[] nums) {",
+          "    int sum = Arrays.stream(nums).sum();",
+          "    if (sum % 2 != 0) return false;",
+          "    int target = sum / 2;",
+          "    boolean[] dp = new boolean[target + 1];        // dp[s] = some subset sums to s",
+          "    dp[0] = true;                                  // base: the empty subset",
+          "    for (int x : nums)",
+          "        for (int s = target; s >= x; s--)          // DOWNWARD: dp[s - x] is from before x",
+          "            dp[s] = dp[s] || dp[s - x];",
+          "    return dp[target];",
+          "}",
+          "",
+          "// Unbounded, fewest items (Coin Change): each coin can be reused",
+          "int coinChange(int[] coins, int amount) {",
+          "    int INF = Integer.MAX_VALUE / 2;               // sentinel that survives + 1",
+          "    int[] dp = new int[amount + 1];                // dp[s] = fewest coins summing to s",
+          "    Arrays.fill(dp, INF);",
+          "    dp[0] = 0;",
+          "    for (int c : coins)",
+          "        for (int s = c; s <= amount; s++)          // UPWARD: dp[s - c] may already use c",
+          "            dp[s] = Math.min(dp[s], dp[s - c] + 1);",
+          "    return dp[amount] >= INF ? -1 : dp[amount];",
+          "}",
+          "",
+          "// Counting: combinations (Coin Change II) vs permutations (Combination Sum IV)",
+          "int countCombinations(int[] coins, int amount) {",
+          "    int[] dp = new int[amount + 1];",
+          "    dp[0] = 1;                                     // one way to make 0: take nothing",
+          "    for (int c : coins)                            // items outside: {1,2} counted once",
+          "        for (int s = c; s <= amount; s++) dp[s] += dp[s - c];",
+          "    return dp[amount];",
+          "}",
+          "int countPermutations(int[] nums, int target) {",
+          "    int[] dp = new int[target + 1];",
+          "    dp[0] = 1;",
+          "    for (int s = 1; s <= target; s++)              // sums outside: (1,2) and (2,1) both count",
+          "        for (int x : nums) if (x <= s) dp[s] += dp[s - x];",
+          "    return dp[target];",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- 0/1 mà duyệt tổng tăng dần: một số bị dùng nhiều lần, `[1, 5]` cũng thành \"chia được\" (Partition Equal Subset Sum)",
+            "- Đảo nhầm thứ tự hai vòng lặp khi đếm: món ở ngoài là tổ hợp, tổng ở ngoài là hoán vị (Coin Change II, Combination Sum IV)",
+            "- Dùng `Integer.MAX_VALUE` làm vô cực rồi `+ 1` bị tràn thành số âm và thắng `min`; dùng `MAX_VALUE / 2` hoặc `amount + 1` (Coin Change)",
+            "- Greedy lấy đồng lớn nhất trước là sai: coins = [1, 3, 4], amount = 6 cho 4+1+1 (3 đồng), đúng là 3+3 (2 đồng) (Coin Change)",
+            "- Quên trường hợp `sum + target` lẻ hoặc `|target| > sum`: không có cách nào, và nếu không chặn thì index âm (Target Sum)"
+          ],
+          "en": [
+            "- Looping the sum upward in 0/1: one number is used several times, so `[1, 5]` also looks splittable (Partition Equal Subset Sum)",
+            "- Swapping the two loops when counting: items outside gives combinations, sums outside gives permutations (Coin Change II, Combination Sum IV)",
+            "- Using `Integer.MAX_VALUE` as infinity, then `+ 1` overflows to a negative number that wins the `min`; use `MAX_VALUE / 2` or `amount + 1` (Coin Change)",
+            "- Greedy biggest-coin-first is wrong: coins = [1, 3, 4], amount = 6 gives 4+1+1 (3 coins), the answer is 3+3 (2 coins) (Coin Change)",
+            "- Missing the case where `sum + target` is odd or `|target| > sum`: there are no ways, and without the check the index goes negative (Target Sum)"
+          ]
+        }
+      }
     },
     {
       "id": "p4-lis",
@@ -54,7 +272,114 @@
         { "title": "Largest Divisible Subset", "url": "https://leetcode.com/problems/largest-divisible-subset/", "level": "Medium" },
         { "title": "Russian Doll Envelopes", "url": "https://leetcode.com/problems/russian-doll-envelopes/", "level": "Hard" },
         { "title": "The Longest Increasing Subsequence", "url": "https://www.hackerrank.com/challenges/longest-increasing-subsequent/problem", "level": "Advanced" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đề hỏi **dãy con** (subsequence, được bỏ phần tử, giữ thứ tự) **tăng** dài nhất, hoặc số dãy như vậy",
+            "- Các phần tử phải xếp thành chuỗi theo một quan hệ \"đứng sau được\": chia hết (Largest Divisible Subset), lồng nhau theo cả rộng và cao (Russian Doll Envelopes), xếp hộp chồng lên nhau",
+            "- n ≤ ~2500 thì O(n²) chạy được; n tới 10⁵ (Russian Doll Envelopes) thì cần O(n log n)",
+            "- Cần in ra chính dãy, không chỉ độ dài: lưu thêm `parent[i]` để truy vết",
+            "- Khác với Sliding Window: window là đoạn liên tiếp, LIS được nhảy qua phần tử",
+            "- Khác với LCS: LIS chạy trên một dãy, LCS so hai chuỗi với nhau"
+          ],
+          "en": [
+            "- Asks for the longest **increasing subsequence** (elements may be skipped, order kept), or how many there are",
+            "- Elements must form a chain under some \"can follow\" relation: divisibility (Largest Divisible Subset), nesting in both width and height (Russian Doll Envelopes), stacking boxes",
+            "- n ≤ ~2500 allows O(n²); n up to 10⁵ (Russian Doll Envelopes) needs O(n log n)",
+            "- You must output the sequence itself, not only its length: also store `parent[i]` to walk back",
+            "- Unlike sliding window: a window is contiguous, an LIS may skip elements",
+            "- Unlike LCS: LIS works on one sequence, LCS compares two strings"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "**O(n²)**: `dp[i]` = độ dài dãy tăng dài nhất **kết thúc tại i**. `dp[i] = 1 + max(dp[j])` với mọi `j < i` mà `a[j] < a[i]`. Đáp án là max của mọi `dp[i]`.",
+            "",
+            "**O(n log n)** (patience sorting): `tails[k]` = phần tử cuối nhỏ nhất của một dãy tăng dài `k + 1`. `tails` luôn tăng, nên với mỗi `x` binary search vị trí đầu tiên `>= x` rồi ghi `x` vào đó (nối thêm nếu `x` lớn hơn tất cả). Đuôi càng nhỏ càng dễ nối tiếp, nên thay vào không bao giờ làm hỏng. Độ dài `tails` là đáp án, nhưng bản thân `tails` không phải một LIS.",
+            "",
+            "- Number of LIS: thêm `cnt[i]` = số dãy dài nhất kết thúc tại i, cập nhật cùng `dp[i]`",
+            "- Largest Divisible Subset: sort trước, điều kiện là `a[i] % a[j] == 0`, truy vết bằng `parent`",
+            "- Russian Doll Envelopes: sort rộng tăng, **cao giảm** khi rộng bằng nhau, rồi LIS O(n log n) trên chiều cao",
+            "",
+            "Độ phức tạp: O(n²) hoặc O(n log n) thời gian, O(n) bộ nhớ."
+          ],
+          "en": [
+            "**O(n²)**: `dp[i]` = length of the longest increasing subsequence **ending at i**. `dp[i] = 1 + max(dp[j])` over every `j < i` with `a[j] < a[i]`. The answer is the max over every `dp[i]`.",
+            "",
+            "**O(n log n)** (patience sorting): `tails[k]` = the smallest last element of an increasing subsequence of length `k + 1`. `tails` stays sorted, so for each `x` binary search the first position `>= x` and write `x` there (append if `x` is bigger than all). A smaller tail is easier to extend, so the replacement never hurts. The length of `tails` is the answer, but `tails` itself is not an LIS.",
+            "",
+            "- Number of LIS: add `cnt[i]` = number of longest subsequences ending at i, updated together with `dp[i]`",
+            "- Largest Divisible Subset: sort first, the test is `a[i] % a[j] == 0`, walk back with `parent`",
+            "- Russian Doll Envelopes: sort by width ascending, **height descending** on equal width, then O(n log n) LIS on the heights",
+            "",
+            "Complexity: O(n²) or O(n log n) time, O(n) space."
+          ]
+        },
+        "template": [
+          "```java",
+          "// O(n^2) with reconstruction: dp[i] = longest chain ending at i, parent[i] = previous index",
+          "List<Integer> longestChain(int[] a) {",
+          "    int n = a.length, end = 0;",
+          "    int[] dp = new int[n], parent = new int[n];",
+          "    for (int i = 0; i < n; i++) {",
+          "        dp[i] = 1;                                   // a[i] alone",
+          "        parent[i] = -1;",
+          "        for (int j = 0; j < i; j++)",
+          "            if (a[j] < a[i] && dp[j] + 1 > dp[i]) {  // the \"can follow\" test changes",
+          "                dp[i] = dp[j] + 1;",
+          "                parent[i] = j;",
+          "            }",
+          "        if (dp[i] > dp[end]) end = i;                // answer: best over all i",
+          "    }",
+          "    List<Integer> chain = new ArrayList<>();",
+          "    for (int i = end; i != -1; i = parent[i]) chain.add(a[i]);",
+          "    Collections.reverse(chain);",
+          "    return chain;",
+          "}",
+          "",
+          "// O(n log n): tails[k] = smallest tail of an increasing subsequence of length k + 1",
+          "int lengthOfLIS(int[] a) {",
+          "    int[] tails = new int[a.length];",
+          "    int size = 0;",
+          "    for (int x : a) {",
+          "        int lo = 0, hi = size;                       // first index with tails[i] >= x",
+          "        while (lo < hi) {",
+          "            int mid = (lo + hi) >>> 1;",
+          "            if (tails[mid] < x) lo = mid + 1;        // use <= for non-decreasing",
+          "            else hi = mid;",
+          "        }",
+          "        tails[lo] = x;",
+          "        if (lo == size) size++;",
+          "    }",
+          "    return size;",
+          "}",
+          "",
+          "// Russian Doll Envelopes: width up, height DOWN on ties, then LIS on heights",
+          "int maxEnvelopes(int[][] env) {",
+          "    Arrays.sort(env, (p, q) -> p[0] != q[0] ? Integer.compare(p[0], q[0])",
+          "                                            : Integer.compare(q[1], p[1]));",
+          "    return lengthOfLIS(Arrays.stream(env).mapToInt(e -> e[1]).toArray());",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Trả `dp[n-1]` thay vì max của mọi `dp[i]`: dãy dài nhất không nhất thiết kết thúc ở phần tử cuối (Longest Increasing Subsequence)",
+            "- Sort chiều cao **tăng** khi rộng bằng nhau thì hai phong bì cùng rộng bị tính là lồng nhau; phải sort cao giảm (Russian Doll Envelopes)",
+            "- Nhầm `<` với `<=` trong binary search: tăng ngặt tìm vị trí đầu tiên `>= x`, không giảm thì tìm vị trí đầu tiên `> x` (Longest Increasing Subsequence)",
+            "- Gặp độ dài mới lớn hơn mà vẫn cộng dồn `cnt[i] += cnt[j]`: phải **gán** `cnt[i] = cnt[j]`, chỉ cộng khi độ dài bằng; đáp án cộng `cnt` của mọi i có `dp[i]` bằng max (Number of Longest Increasing Subsequence)",
+            "- Quên sort trước: chia hết chỉ bắc cầu khi số nhỏ đứng trước số lớn (Largest Divisible Subset)"
+          ],
+          "en": [
+            "- Returning `dp[n-1]` instead of the max over every `dp[i]`: the longest subsequence need not end at the last element (Longest Increasing Subsequence)",
+            "- Sorting height **ascending** on equal width lets two envelopes of the same width nest; sort height descending (Russian Doll Envelopes)",
+            "- Mixing up `<` and `<=` in the binary search: strictly increasing looks for the first position `>= x`, non-decreasing for the first `> x` (Longest Increasing Subsequence)",
+            "- On a new longer length still adding `cnt[i] += cnt[j]`: you must **assign** `cnt[i] = cnt[j]`, add only on an equal length; the answer sums `cnt` over every i whose `dp[i]` equals the max (Number of Longest Increasing Subsequence)",
+            "- Forgetting to sort first: divisibility only chains when smaller numbers come before larger ones (Largest Divisible Subset)"
+          ]
+        }
+      }
     },
     {
       "id": "p4-dp-strings",
@@ -69,7 +394,113 @@
         { "title": "The Longest Common Subsequence", "url": "https://www.hackerrank.com/challenges/dynamic-programming-classics-the-longest-common-subsequence/problem", "level": "Medium" },
         { "title": "Common Child", "url": "https://www.hackerrank.com/challenges/common-child/problem", "level": "Medium" },
         { "title": "Abbreviation", "url": "https://www.hackerrank.com/challenges/abbr/problem", "level": "Medium" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đầu vào là **hai chuỗi** (hoặc hai mảng), hỏi phần chung dài nhất, số thao tác ít nhất để biến chuỗi này thành chuỗi kia, hoặc hai chuỗi có khớp nhau không",
+            "- Có thao tác chèn / xoá / thay ký tự, hoặc \"xoá ít nhất để hai chuỗi bằng nhau\" (Edit Distance, Delete Operation for Two Strings)",
+            "- Đếm số lần một chuỗi xuất hiện như dãy con của chuỗi kia (Distinct Subsequences), hoặc chuỗi thứ ba có ghép xen kẽ từ hai chuỗi không (Interleaving String)",
+            "- Pattern có ký tự đại diện `.`, `*`, `?` (Regular Expression Matching)",
+            "- Độ dài mỗi chuỗi tới ~1000–5000: bảng m × n chạy được",
+            "- Khác với LIS: LIS chạy trên một dãy; ở đây trạng thái là một cặp (tiền tố của a, tiền tố của b)"
+          ],
+          "en": [
+            "- The input is **two strings** (or two arrays), asking for the longest common part, the fewest operations to turn one into the other, or whether they match",
+            "- Insert / delete / replace operations, or \"fewest deletions to make the strings equal\" (Edit Distance, Delete Operation for Two Strings)",
+            "- Counting how many times one string occurs as a subsequence of another (Distinct Subsequences), or whether a third string interleaves the two (Interleaving String)",
+            "- A pattern with wildcards `.`, `*`, `?` (Regular Expression Matching)",
+            "- Each string is up to ~1000–5000 long: an m × n table fits",
+            "- Unlike LIS: LIS works on one sequence; here the state is a pair (prefix of a, prefix of b)"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "`dp[i][j]` = đáp án cho **tiền tố** `a[0..i)` và `b[0..j)`. Bảng `(m+1) × (n+1)`: hàng 0 và cột 0 là tiền tố rỗng, chính là trường hợp cơ sở. Tại `(i, j)` chỉ xét ký tự cuối `a[i-1]` và `b[j-1]`:",
+            "",
+            "- Bằng nhau: dùng ô chéo `dp[i-1][j-1]` (LCS thì cộng 1)",
+            "- Khác nhau: chọn tốt nhất trong ba ô kề: `dp[i-1][j]` (bỏ ký tự của a), `dp[i][j-1]` (bỏ ký tự của b), `dp[i-1][j-1]` (thay)",
+            "- LCS: `max(trên, trái)`; Edit Distance: `1 + min(trên, trái, chéo)`; Delete Operation: `m + n - 2·LCS`",
+            "- Distinct Subsequences: bằng nhau thì `dp[i-1][j-1] + dp[i-1][j]` (dùng hoặc bỏ `a[i-1]`), cơ sở `dp[i][0] = 1`",
+            "- Regex, `p[j-1] == '*'`: dùng `x*` 0 lần là `dp[i][j-2]`, hoặc nếu `a[i-1]` khớp `x` thì ăn thêm một ký tự: `dp[i-1][j]`",
+            "",
+            "Điền từng hàng từ trên xuống, mỗi hàng từ trái sang phải: ô trên, ô trái, ô chéo luôn có trước.",
+            "",
+            "Độ phức tạp: O(m·n) thời gian, O(m·n) bộ nhớ (O(n) nếu chỉ giữ hàng trước)."
+          ],
+          "en": [
+            "`dp[i][j]` = the answer for the **prefixes** `a[0..i)` and `b[0..j)`. The table is `(m+1) × (n+1)`: row 0 and column 0 are the empty prefix, which is the base case. At `(i, j)` look only at the last characters `a[i-1]` and `b[j-1]`:",
+            "",
+            "- Equal: use the diagonal `dp[i-1][j-1]` (plus 1 for LCS)",
+            "- Different: take the best of three neighbours: `dp[i-1][j]` (drop a's char), `dp[i][j-1]` (drop b's char), `dp[i-1][j-1]` (replace)",
+            "- LCS: `max(up, left)`; Edit Distance: `1 + min(up, left, diagonal)`; Delete Operation: `m + n - 2·LCS`",
+            "- Distinct Subsequences: on equal, `dp[i-1][j-1] + dp[i-1][j]` (use or skip `a[i-1]`), base `dp[i][0] = 1`",
+            "- Regex, `p[j-1] == '*'`: use `x*` zero times is `dp[i][j-2]`, or if `a[i-1]` matches `x`, eat one more char: `dp[i-1][j]`",
+            "",
+            "Fill row by row from the top, each row left to right: up, left and diagonal are always ready.",
+            "",
+            "Complexity: O(m·n) time, O(m·n) space (O(n) keeping only the previous row)."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Edit Distance: dp[i][j] = fewest operations to turn a[0..i) into b[0..j)",
+          "int minDistance(String a, String b) {",
+          "    int m = a.length(), n = b.length();",
+          "    int[][] dp = new int[m + 1][n + 1];",
+          "    for (int i = 0; i <= m; i++) dp[i][0] = i;       // base: delete all of a[0..i)",
+          "    for (int j = 0; j <= n; j++) dp[0][j] = j;       // base: insert all of b[0..j)",
+          "    for (int i = 1; i <= m; i++)",
+          "        for (int j = 1; j <= n; j++) {",
+          "            if (a.charAt(i - 1) == b.charAt(j - 1)) {",
+          "                dp[i][j] = dp[i - 1][j - 1];         // LCS: dp[i-1][j-1] + 1",
+          "            } else {                                 // LCS: max(up, left)",
+          "                dp[i][j] = 1 + Math.min(dp[i - 1][j - 1],      // replace",
+          "                        Math.min(dp[i - 1][j],                 // delete a[i-1]",
+          "                                 dp[i][j - 1]));               // insert b[j-1]",
+          "            }",
+          "        }",
+          "    return dp[m][n];",
+          "}",
+          "",
+          "// Regular Expression Matching: dp[i][j] = s[0..i) matches p[0..j)",
+          "boolean isMatch(String s, String p) {",
+          "    int m = s.length(), n = p.length();",
+          "    boolean[][] dp = new boolean[m + 1][n + 1];",
+          "    dp[0][0] = true;",
+          "    for (int i = 0; i <= m; i++)                     // i = 0 too: a*b* matches empty",
+          "        for (int j = 1; j <= n; j++) {",
+          "            char pc = p.charAt(j - 1);",
+          "            if (pc == '*') {",
+          "                dp[i][j] = dp[i][j - 2]              // x* used zero times",
+          "                        || (i > 0 && matches(s.charAt(i - 1), p.charAt(j - 2))",
+          "                                  && dp[i - 1][j]);  // x* eats one more char",
+          "            } else {",
+          "                dp[i][j] = i > 0 && matches(s.charAt(i - 1), pc) && dp[i - 1][j - 1];",
+          "            }",
+          "        }",
+          "    return dp[m][n];",
+          "}",
+          "boolean matches(char c, char pc) { return pc == '.' || pc == c; }",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Lệch index: bảng có `m + 1` hàng nhưng ký tự là `a.charAt(i - 1)`; quên `- 1` là sai cả bảng (Edit Distance)",
+            "- Quên khởi tạo hàng / cột 0: Edit Distance cần `dp[i][0] = i`, Distinct Subsequences cần `dp[i][0] = 1` vì chuỗi rỗng là dãy con của mọi chuỗi (Distinct Subsequences)",
+            "- `*` đi cùng ký tự **đứng trước nó**, không đứng một mình; và phải tính cả hàng `i = 0` vì `a*b*` khớp chuỗi rỗng (Regular Expression Matching)",
+            "- Không kiểm tra `len(s1) + len(s2) == len(s3)` trước, index `i + j - 1` chạy ra ngoài `s3` (Interleaving String)",
+            "- Rút còn một hàng: ô chéo `dp[i-1][j-1]` là giá trị cũ của `dp[j-1]`, đã bị ghi đè ở bước trước; giữ nó trong biến tạm `prev` trước khi ghi đè (Longest Common Subsequence)"
+          ],
+          "en": [
+            "- Off-by-one: the table has `m + 1` rows but the char is `a.charAt(i - 1)`; forgetting the `- 1` breaks the whole table (Edit Distance)",
+            "- Forgetting row / column 0: Edit Distance needs `dp[i][0] = i`, Distinct Subsequences needs `dp[i][0] = 1` because the empty string is a subsequence of every string (Distinct Subsequences)",
+            "- `*` belongs to the character **before it**, it never stands alone; and row `i = 0` must be filled because `a*b*` matches the empty string (Regular Expression Matching)",
+            "- Not checking `len(s1) + len(s2) == len(s3)` first, so index `i + j - 1` runs past `s3` (Interleaving String)",
+            "- Reducing to one row: the diagonal `dp[i-1][j-1]` is the old value of `dp[j-1]`, already overwritten in the previous step; keep it in a temp `prev` before overwriting (Longest Common Subsequence)"
+          ]
+        }
+      }
     },
     {
       "id": "p4-palindrome",
@@ -80,7 +511,116 @@
         { "title": "Longest Palindromic Subsequence", "url": "https://leetcode.com/problems/longest-palindromic-subsequence/", "level": "Medium" },
         { "title": "Palindrome Partitioning II", "url": "https://leetcode.com/problems/palindrome-partitioning-ii/", "level": "Hard" },
         { "title": "Special String Again", "url": "https://www.hackerrank.com/challenges/special-palindrome-again/problem", "level": "Medium" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đề hỏi **chuỗi con** đối xứng dài nhất, hoặc đếm số chuỗi con đối xứng (Longest Palindromic Substring, Palindromic Substrings)",
+            "- Hỏi **dãy con** đối xứng dài nhất, được bỏ ký tự (Longest Palindromic Subsequence)",
+            "- Cắt chuỗi thành các mảnh đều đối xứng với ít lát cắt nhất: cần tra nhanh \"`s[i..j]` có đối xứng không\" (Palindrome Partitioning II)",
+            "- n tới ~1000–2000: O(n²) chạy được; n tới 10⁶ thì cần Manacher O(n)",
+            "- Khác nhau giữa substring và subsequence: liên tiếp thì mở rộng từ tâm hoặc bảng `isPal`; được bỏ ký tự thì interval DP hoặc LCS với chuỗi đảo"
+          ],
+          "en": [
+            "- Asks for the longest palindromic **substring**, or the number of palindromic substrings (Longest Palindromic Substring, Palindromic Substrings)",
+            "- Asks for the longest palindromic **subsequence**, where characters may be skipped (Longest Palindromic Subsequence)",
+            "- Cut a string into palindromic pieces with the fewest cuts: needs a fast \"is `s[i..j]` a palindrome\" lookup (Palindrome Partitioning II)",
+            "- n up to ~1000–2000: O(n²) fits; n up to 10⁶ needs Manacher's O(n)",
+            "- Substring versus subsequence: contiguous means expand around the center or an `isPal` table; skipping characters means interval DP or LCS with the reverse"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "**Mở rộng từ tâm**: mỗi palindrome đối xứng quanh một tâm. Có `2n - 1` tâm: n tâm là một ký tự (độ dài lẻ), n - 1 tâm nằm giữa hai ký tự (độ dài chẵn). Từ mỗi tâm, mở rộng ra hai bên khi `s[l] == s[r]`. Mỗi bước mở rộng thành công là thêm một palindrome, nên đếm được luôn.",
+            "",
+            "**Bảng `isPal[i][j]`** = `s[i] == s[j]` và (`j - i < 2` hoặc `isPal[i+1][j-1]`). Điền sao cho `isPal[i+1][j-1]` có trước: theo độ dài tăng dần, hoặc theo `j` tăng dần. Dùng khi phải tra nhiều lần, như Palindrome Partitioning II: `cuts[j] = min(cuts[i-1] + 1)` với mọi `i` mà `s[i..j]` đối xứng.",
+            "",
+            "**Dãy con**: `lps[i][j] = lps[i+1][j-1] + 2` nếu `s[i] == s[j]`, ngược lại `max(lps[i+1][j], lps[i][j-1])`. Kết quả bằng LCS của `s` và chuỗi đảo của `s`.",
+            "",
+            "Manacher giải chuỗi con đối xứng dài nhất trong O(n), ít khi phải viết trong phỏng vấn.",
+            "",
+            "Độ phức tạp: O(n²) thời gian; mở rộng từ tâm O(1) bộ nhớ, bảng DP O(n²)."
+          ],
+          "en": [
+            "**Expand around the center**: every palindrome mirrors around a center. There are `2n - 1` centers: n on a character (odd length), n - 1 between two characters (even length). From each center, grow both ways while `s[l] == s[r]`. Every successful step is one more palindrome, so counting comes for free.",
+            "",
+            "**Table `isPal[i][j]`** = `s[i] == s[j]` and (`j - i < 2` or `isPal[i+1][j-1]`). Fill it so `isPal[i+1][j-1]` is ready first: by increasing length, or by increasing `j`. Use it when you look up many ranges, as in Palindrome Partitioning II: `cuts[j] = min(cuts[i-1] + 1)` over every `i` where `s[i..j]` is a palindrome.",
+            "",
+            "**Subsequence**: `lps[i][j] = lps[i+1][j-1] + 2` if `s[i] == s[j]`, otherwise `max(lps[i+1][j], lps[i][j-1])`. It equals the LCS of `s` and its reverse.",
+            "",
+            "Manacher's algorithm finds the longest palindromic substring in O(n); you rarely have to write it in an interview.",
+            "",
+            "Complexity: O(n²) time; expanding around the center uses O(1) space, the DP tables O(n²)."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Expand around all 2n - 1 centers: odd (c, c) and even (c, c + 1)",
+          "String longestPalindrome(String s) {",
+          "    int start = 0, len = 0;",
+          "    for (int c = 0; c < s.length(); c++) {",
+          "        for (int r0 = c; r0 <= c + 1; r0++) {",
+          "            int l = c, r = r0;",
+          "            while (l >= 0 && r < s.length() && s.charAt(l) == s.charAt(r)) {",
+          "                l--;                                 // count++ here for Palindromic Substrings",
+          "                r++;",
+          "            }",
+          "            if (r - l - 1 > len) {                   // went one step too far: [l+1, r-1]",
+          "                start = l + 1;",
+          "                len = r - l - 1;",
+          "            }",
+          "        }",
+          "    }",
+          "    return s.substring(start, start + len);",
+          "}",
+          "",
+          "// isPal table + fewest cuts (Palindrome Partitioning II)",
+          "int minCut(String s) {",
+          "    int n = s.length();",
+          "    boolean[][] isPal = new boolean[n][n];",
+          "    int[] cuts = new int[n];                         // cuts[j] = fewest cuts for s[0..j]",
+          "    for (int j = 0; j < n; j++) {",
+          "        cuts[j] = j;                                 // worst case: every char alone",
+          "        for (int i = 0; i <= j; i++)",
+          "            if (s.charAt(i) == s.charAt(j) && (j - i < 2 || isPal[i + 1][j - 1])) {",
+          "                isPal[i][j] = true;                  // isPal[i+1][j-1] is from column j-1",
+          "                cuts[j] = i == 0 ? 0 : Math.min(cuts[j], cuts[i - 1] + 1);",
+          "            }",
+          "    }",
+          "    return cuts[n - 1];",
+          "}",
+          "",
+          "// Longest Palindromic Subsequence: i goes down so row i + 1 is ready",
+          "int longestPalindromeSubseq(String s) {",
+          "    int n = s.length();",
+          "    int[][] dp = new int[n][n];",
+          "    for (int i = n - 1; i >= 0; i--) {",
+          "        dp[i][i] = 1;",
+          "        for (int j = i + 1; j < n; j++)",
+          "            dp[i][j] = s.charAt(i) == s.charAt(j) ? dp[i + 1][j - 1] + 2",
+          "                                                  : Math.max(dp[i + 1][j], dp[i][j - 1]);",
+          "    }",
+          "    return dp[0][n - 1];",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Chỉ mở rộng từ tâm lẻ, quên tâm chẵn nên \"abba\" không được tìm ra (Longest Palindromic Substring)",
+            "- Sau vòng `while`, `l` và `r` đã đi quá một bước: palindrome là `[l + 1, r - 1]`, dài `r - l - 1` (Longest Palindromic Substring)",
+            "- Điền `isPal[i][j]` với vòng ngoài là `i` tăng dần thì hàng `i + 1` chưa có; vòng ngoài phải là độ dài, `j` tăng dần, hoặc `i` giảm dần (Palindrome Partitioning II)",
+            "- Kiểm tra palindrome bằng hai con trỏ bên trong vòng DP thành O(n³); dựng bảng `isPal` cùng lúc (Palindrome Partitioning II)",
+            "- Bỏ trùng bằng `Set<String>` khi đếm: đề đếm theo vị trí, hai chuỗi con giống nhau ở chỗ khác vẫn là hai (Palindromic Substrings)"
+          ],
+          "en": [
+            "- Expanding only odd centers and forgetting even ones, so \"abba\" is never found (Longest Palindromic Substring)",
+            "- After the `while`, `l` and `r` are one step too far: the palindrome is `[l + 1, r - 1]`, of length `r - l - 1` (Longest Palindromic Substring)",
+            "- Filling `isPal[i][j]` with `i` increasing in the outer loop, so row `i + 1` is not ready; the outer loop must be the length, `j` increasing, or `i` decreasing (Palindrome Partitioning II)",
+            "- Checking each range with two pointers inside the DP loop makes it O(n³); build the `isPal` table alongside (Palindrome Partitioning II)",
+            "- Removing duplicates with a `Set<String>` when counting: substrings are counted by position, two equal ones at different places count twice (Palindromic Substrings)"
+          ]
+        }
+      }
     },
     {
       "id": "p4-dp-adv",
@@ -92,7 +632,118 @@
         { "title": "Maximal Square", "url": "https://leetcode.com/problems/maximal-square/", "level": "Medium" },
         { "title": "Longest Increasing Path in a Matrix", "url": "https://leetcode.com/problems/longest-increasing-path-in-a-matrix/", "level": "Hard" },
         { "title": "Dungeon Game", "url": "https://leetcode.com/problems/dungeon-game/", "level": "Hard" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đầu vào là **lưới** m × n, chỉ được đi **phải / xuống**, hỏi số đường đi hoặc tổng nhỏ nhất / lớn nhất (Unique Paths, Minimum Path Sum)",
+            "- Tìm hình vuông lớn nhất toàn số 1 (Maximal Square)",
+            "- Hỏi máu tối thiểu lúc xuất phát để đi tới đích mà không chết giữa đường (Dungeon Game): ràng buộc phụ thuộc phần đường phía sau, nên DP ngược từ đích",
+            "- Được đi 4 hướng nhưng giá trị phải tăng ngặt (Longest Increasing Path in a Matrix): không có chu trình, nên DFS + memo",
+            "- Khác với BFS trên lưới: BFS cho đường ngắn nhất theo số bước khi đi 4 hướng tự do; DP lưới dùng khi hướng đi không tạo chu trình (chỉ phải / xuống, hoặc giá trị tăng ngặt)"
+          ],
+          "en": [
+            "- The input is an m × n **grid**, moves are only **right / down**, and it asks for the number of paths or the min / max sum (Unique Paths, Minimum Path Sum)",
+            "- Find the largest square of all 1s (Maximal Square)",
+            "- Asks for the minimum starting health to reach the goal without dying on the way (Dungeon Game): the constraint depends on the rest of the path, so do the DP backwards from the goal",
+            "- Moves go 4 ways but values must strictly increase (Longest Increasing Path in a Matrix): there are no cycles, so DFS + memo",
+            "- Unlike BFS on a grid: BFS gives the shortest path in steps when moves go freely in 4 directions; grid DP fits when moves cannot form a cycle (only right / down, or strictly increasing values)"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "`dp[i][j]` = đáp án cho bài con kết thúc (hoặc bắt đầu) ở ô `(i, j)`. Chỉ đi phải / xuống nên ô `(i, j)` chỉ tới từ ô trên và ô trái: điền theo hàng, mỗi hàng trái sang phải.",
+            "",
+            "- Unique Paths: `dp[i][j] = trên + trái`; ô chướng ngại thì `dp = 0` (Unique Paths II)",
+            "- Minimum Path Sum: `grid[i][j] + min(trên, trái)`; hàng đầu và cột đầu chỉ có một hướng tới",
+            "- Maximal Square: `dp[i][j]` = cạnh hình vuông lớn nhất có góc dưới phải ở `(i, j)` = `min(trên, trái, chéo) + 1` nếu ô là '1'",
+            "- Dungeon Game: điền **ngược** từ đích, `need[i][j] = max(1, min(need dưới, need phải) - dungeon[i][j])`. Đi xuôi không được vì máu cần lúc đầu phụ thuộc phần đường phía sau",
+            "- Longest Increasing Path: DFS 4 hướng + memo; tăng ngặt nên không thể quay lại ô cũ, không cần `visited`",
+            "",
+            "Chỉ cần hàng trên thì giữ một mảng `dp[j]`: trước khi ghi, `dp[j]` là ô trên, `dp[j-1]` là ô trái.",
+            "",
+            "Độ phức tạp: O(m·n) thời gian, O(m·n) bộ nhớ (O(n) với một hàng)."
+          ],
+          "en": [
+            "`dp[i][j]` = the answer for the subproblem ending (or starting) at cell `(i, j)`. Moves are only right / down, so `(i, j)` is reached only from above and from the left: fill row by row, each row left to right.",
+            "",
+            "- Unique Paths: `dp[i][j] = up + left`; an obstacle cell has `dp = 0` (Unique Paths II)",
+            "- Minimum Path Sum: `grid[i][j] + min(up, left)`; the first row and column have only one way in",
+            "- Maximal Square: `dp[i][j]` = side of the largest square with its bottom-right corner at `(i, j)` = `min(up, left, diagonal) + 1` if the cell is '1'",
+            "- Dungeon Game: fill **backwards** from the goal, `need[i][j] = max(1, min(need below, need right) - dungeon[i][j])`. Forwards fails because the health needed at the start depends on the rest of the path",
+            "- Longest Increasing Path: 4-way DFS + memo; strictly increasing values can never lead back to a visited cell, so no `visited` set",
+            "",
+            "If only the row above is needed, keep one array `dp[j]`: before writing, `dp[j]` is the cell above and `dp[j-1]` the cell to the left.",
+            "",
+            "Complexity: O(m·n) time, O(m·n) space (O(n) with one row)."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Minimum Path Sum with one row: dp[j] = best sum to reach (i, j). Unique Paths: + not min",
+          "int minPathSum(int[][] g) {",
+          "    int m = g.length, n = g[0].length;",
+          "    int[] dp = new int[n];",
+          "    for (int i = 0; i < m; i++)",
+          "        for (int j = 0; j < n; j++) {",
+          "            if (i == 0 && j == 0) dp[j] = g[0][0];",
+          "            else if (i == 0) dp[j] = dp[j - 1] + g[i][j];        // first row: from the left",
+          "            else if (j == 0) dp[j] += g[i][j];                   // first column: from above",
+          "            else dp[j] = Math.min(dp[j], dp[j - 1]) + g[i][j];   // dp[j] = up, dp[j-1] = left",
+          "        }",
+          "    return dp[n - 1];",
+          "}",
+          "",
+          "// Dungeon Game: backwards, need[i][j] = least health when stepping onto (i, j)",
+          "int calculateMinimumHP(int[][] d) {",
+          "    int m = d.length, n = d[0].length;",
+          "    int[][] need = new int[m + 1][n + 1];",
+          "    for (int[] row : need) Arrays.fill(row, Integer.MAX_VALUE);  // outside the grid",
+          "    need[m][n - 1] = need[m - 1][n] = 1;                         // sentinels next to the goal",
+          "    for (int i = m - 1; i >= 0; i--)",
+          "        for (int j = n - 1; j >= 0; j--)",
+          "            need[i][j] = Math.max(1, Math.min(need[i + 1][j], need[i][j + 1]) - d[i][j]);",
+          "    return need[0][0];",
+          "}",
+          "",
+          "// Longest Increasing Path in a Matrix: DFS + memo, no visited set (strictly increasing)",
+          "static final int[][] DIRS = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};",
+          "int longestIncreasingPath(int[][] g) {",
+          "    int[][] memo = new int[g.length][g[0].length];               // 0 = not computed yet",
+          "    int best = 0;",
+          "    for (int i = 0; i < g.length; i++)",
+          "        for (int j = 0; j < g[0].length; j++) best = Math.max(best, dfs(g, i, j, memo));",
+          "    return best;",
+          "}",
+          "int dfs(int[][] g, int i, int j, int[][] memo) {",
+          "    if (memo[i][j] != 0) return memo[i][j];",
+          "    int best = 1;",
+          "    for (int[] d : DIRS) {",
+          "        int r = i + d[0], c = j + d[1];",
+          "        if (r >= 0 && r < g.length && c >= 0 && c < g[0].length && g[r][c] > g[i][j])",
+          "            best = Math.max(best, 1 + dfs(g, r, c, memo));",
+          "    }",
+          "    return memo[i][j] = best;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Khởi tạo cả hàng đầu / cột đầu bằng 1, quên rằng sau một chướng ngại thì phần còn lại của hàng đó là 0; ô xuất phát là chướng ngại thì đáp án 0 (Unique Paths II)",
+            "- Làm xuôi từ ô đầu (giữ tổng lớn nhất) là sai, vì máu không được về ≤ 0 ở bất kỳ ô nào giữa đường; phải đi ngược và kẹp `max(1, ...)` (Dungeon Game)",
+            "- Trả `dp[m-1][n-1]` hoặc trả cạnh thay vì **diện tích**: đáp án là `max cạnh²` trên mọi ô; và ô là `char '1'`, không phải `int 1` (Maximal Square)",
+            "- DFS từ mọi ô mà không memo là hàm mũ, TLE; còn thêm `visited` + bỏ đánh dấu như backtracking là thừa vì tăng ngặt đã chặn chu trình (Longest Increasing Path in a Matrix)",
+            "- Rút còn một hàng mà duyệt `j` từ phải sang trái: `dp[j-1]` lúc đó vẫn là hàng trên, không phải ô trái (Minimum Path Sum)"
+          ],
+          "en": [
+            "- Setting the whole first row / column to 1, forgetting that past an obstacle the rest of that row is 0; an obstacle on the start cell means the answer is 0 (Unique Paths II)",
+            "- Going forwards from the start (keeping the best sum) is wrong, because health must stay above 0 at every cell on the way; go backwards and clamp with `max(1, ...)` (Dungeon Game)",
+            "- Returning `dp[m-1][n-1]`, or the side instead of the **area**: the answer is `max side²` over every cell; and cells are `char '1'`, not `int 1` (Maximal Square)",
+            "- DFS from every cell without a memo is exponential and times out; adding `visited` and unmarking like backtracking is unnecessary, strict increase already rules out cycles (Longest Increasing Path in a Matrix)",
+            "- Reducing to one row but looping `j` from right to left: `dp[j-1]` is then still the row above, not the cell to the left (Minimum Path Sum)"
+          ]
+        }
+      }
     },
     {
       "id": "p4-dp-state",
@@ -104,7 +755,110 @@
         { "title": "Best Time to Buy and Sell Stock III", "url": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/", "level": "Hard" },
         { "title": "Best Time to Buy and Sell Stock IV", "url": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/", "level": "Hard" },
         { "title": "Stock Maximize", "url": "https://www.hackerrank.com/challenges/stockmax/problem", "level": "Medium" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Mỗi ngày (mỗi bước) bạn ở một trong vài **trạng thái** rời rạc: đang giữ cổ phiếu / không giữ / đang cooldown, đã dùng bao nhiêu giao dịch",
+            "- Đề có luật chuyển giữa các trạng thái: phí mỗi lần giao dịch, phải nghỉ 1 ngày sau khi bán, tối đa k giao dịch, chỉ giữ một cổ phiếu mỗi lúc",
+            "- Hỏi lợi nhuận lớn nhất sau n ngày; n tới 10⁵ nên chỉ được O(n) hoặc O(n·k)",
+            "- Khác với 1-D DP thường: một số `dp[i]` không đủ, cần `dp[i][state]` vì cùng ngày i nhưng đang giữ hay không giữ cổ phiếu là hai tình huống khác hẳn nhau",
+            "- Không có ràng buộc gì (Best Time to Buy and Sell Stock II): greedy cộng mọi đoạn tăng `max(0, p[i] - p[i-1])` cũng đúng, nhưng state machine mở rộng được cho mọi biến thể"
+          ],
+          "en": [
+            "- Each day (each step) you are in one of a few discrete **states**: holding a share / not holding / cooling down, how many transactions are used",
+            "- The statement gives rules between states: a fee per transaction, a one-day rest after selling, at most k transactions, at most one share at a time",
+            "- Asks for the best profit after n days; n up to 10⁵ allows only O(n) or O(n·k)",
+            "- Unlike plain 1-D DP: one number `dp[i]` is not enough, you need `dp[i][state]` because on the same day holding and not holding a share are completely different situations",
+            "- With no restriction at all (Best Time to Buy and Sell Stock II), greedy summing every rise `max(0, p[i] - p[i-1])` also works, but the state machine extends to every variant"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Vẽ trạng thái thành node, hành động (mua, bán, nghỉ) thành cạnh. Mỗi trạng thái là một biến = lợi nhuận lớn nhất khi **kết thúc ngày đó** ở trạng thái này. Mỗi ngày tính lại mọi biến từ giá trị của hôm trước:",
+            "",
+            "- `hold` (đang giữ) = max(giữ tiếp `hold`, mua hôm nay `free - price`)",
+            "- `free` (không giữ) = max(nghỉ tiếp `free`, bán hôm nay `hold + price`)",
+            "- Transaction Fee: trừ `fee` lúc bán",
+            "- Cooldown: tách `free` thành `sold` (vừa bán hôm nay) và `rest`; chỉ được mua từ `rest`, và `rest` hôm sau = max(`rest`, `sold`)",
+            "- Tối đa k giao dịch: `hold[t]`, `free[t]` với t = 1..k; lần mua thứ t đi từ `free[t-1]`. Bài III là k = 2",
+            "",
+            "Khởi tạo: `hold = -∞` (chưa thể đang giữ trước ngày đầu), `free = 0`. Đáp án là trạng thái không giữ cổ phiếu, vì cuối cùng còn giữ thì chỉ lỗ.",
+            "",
+            "Độ phức tạp: O(n) thời gian (O(n·k) với k giao dịch), O(1) bộ nhớ (O(k))."
+          ],
+          "en": [
+            "Draw the states as nodes and the actions (buy, sell, rest) as edges. Each state is one variable = the best profit when **ending that day** in this state. Every day recompute all variables from yesterday's values:",
+            "",
+            "- `hold` (holding) = max(keep holding `hold`, buy today `free - price`)",
+            "- `free` (not holding) = max(keep resting `free`, sell today `hold + price`)",
+            "- Transaction Fee: subtract `fee` when selling",
+            "- Cooldown: split `free` into `sold` (sold today) and `rest`; you may only buy from `rest`, and tomorrow's `rest` = max(`rest`, `sold`)",
+            "- At most k transactions: `hold[t]`, `free[t]` for t = 1..k; the t-th buy comes from `free[t-1]`. Problem III is k = 2",
+            "",
+            "Start with `hold = -∞` (you cannot hold before the first day), `free = 0`. The answer is a not-holding state, since still holding at the end only loses money.",
+            "",
+            "Complexity: O(n) time (O(n·k) for k transactions), O(1) space (O(k))."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Two states per day: hold (own one share) / free (own none). Transaction Fee variant",
+          "int maxProfitFee(int[] prices, int fee) {",
+          "    int hold = Integer.MIN_VALUE / 2, free = 0;           // cannot hold before day 0",
+          "    for (int p : prices) {",
+          "        int newHold = Math.max(hold, free - p);           // keep, or buy today",
+          "        int newFree = Math.max(free, hold + p - fee);     // keep, or sell today (pay fee)",
+          "        hold = newHold;                                   // assign only after both are computed",
+          "        free = newFree;",
+          "    }",
+          "    return free;",
+          "}",
+          "",
+          "// Cooldown: three states, buying only from rest (never from yesterday's sale)",
+          "int maxProfitCooldown(int[] prices) {",
+          "    int hold = Integer.MIN_VALUE / 2, sold = 0, rest = 0;",
+          "    for (int p : prices) {",
+          "        int newHold = Math.max(hold, rest - p);",
+          "        int newSold = hold + p;                           // sell today",
+          "        int newRest = Math.max(rest, sold);               // yesterday's sale cools down",
+          "        hold = newHold;",
+          "        sold = newSold;",
+          "        rest = newRest;",
+          "    }",
+          "    return Math.max(sold, rest);",
+          "}",
+          "",
+          "// At most k transactions (III: k = 2): hold[t] / free[t] after the t-th buy",
+          "int maxProfitK(int k, int[] prices) {",
+          "    int[] hold = new int[k + 1], free = new int[k + 1];",
+          "    Arrays.fill(hold, Integer.MIN_VALUE / 2);",
+          "    for (int p : prices)",
+          "        for (int t = 1; t <= k; t++) {",
+          "            hold[t] = Math.max(hold[t], free[t - 1] - p);  // t-th buy needs t - 1 closed trades",
+          "            free[t] = Math.max(free[t], hold[t] + p);",
+          "        }",
+          "    return free[k];",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Gán trạng thái mới rồi dùng ngay trong cùng ngày: với cooldown, `rest` tính từ `sold` **hôm nay** nghĩa là bán xong mua lại ngay hôm sau; tính hết giá trị mới từ giá trị cũ rồi mới gán (Best Time to Buy and Sell Stock with Cooldown)",
+            "- Khởi tạo `hold = 0`, coi như được giữ cổ phiếu miễn phí; phải là -∞ hoặc `-prices[0]` (Best Time to Buy and Sell Stock III)",
+            "- Lần mua thứ t lấy từ `free[t]` thay vì `free[t-1]`: số giao dịch không còn bị giới hạn (Best Time to Buy and Sell Stock IV)",
+            "- Dùng `Integer.MIN_VALUE` làm -∞ rồi trừ thêm giá hoặc phí: tràn thành số dương rất lớn; dùng `MIN_VALUE / 2` (Best Time to Buy and Sell Stock with Transaction Fee)",
+            "- Stock Maximize không phải state machine: mỗi ngày mua tối đa một cổ phiếu, bán bao nhiêu cũng được; duyệt từ phải sang giữ giá lớn nhất phía sau, cộng `max - price`, và tổng phải là `long` (Stock Maximize)"
+          ],
+          "en": [
+            "- Assigning a new state and using it the same day: with cooldown, computing `rest` from **today's** `sold` lets you buy again the day after selling; compute every new value from the old ones, then assign (Best Time to Buy and Sell Stock with Cooldown)",
+            "- Starting with `hold = 0`, as if you got a share for free; it must be -∞ or `-prices[0]` (Best Time to Buy and Sell Stock III)",
+            "- Taking the t-th buy from `free[t]` instead of `free[t-1]`: the number of transactions is no longer limited (Best Time to Buy and Sell Stock IV)",
+            "- Using `Integer.MIN_VALUE` as -∞ and then subtracting a price or a fee: it overflows to a huge positive number; use `MIN_VALUE / 2` (Best Time to Buy and Sell Stock with Transaction Fee)",
+            "- Stock Maximize is not a state machine: buy at most one share a day, sell any number; scan from the right keeping the highest later price, add `max - price`, and the total must be a `long` (Stock Maximize)"
+          ]
+        }
+      }
     },
     {
       "id": "p4-dp-interval",
@@ -117,7 +871,99 @@
       ],
       "resources": [
         { "type": "article", "title": "USACO Guide: Range DP", "url": "https://usaco.guide/gold/dp-ranges" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Bài trên một dãy mà mỗi bước gộp, cắt, hoặc xoá một phần tử, và chi phí phụ thuộc **hai đầu còn lại** của đoạn (Burst Balloons, Minimum Cost to Cut a Stick)",
+            "- Đáp án của đoạn `[i, j]` ghép từ hai đoạn con `[i, k]` và `[k, j]` qua một điểm chia `k`: chia đa giác thành tam giác, nhân chuỗi ma trận, gộp đá",
+            "- Minimax trên một khoảng số: đoán số sao cho trường hợp xấu nhất tốn ít nhất (Guess Number Higher or Lower II)",
+            "- n ≤ ~100–500: O(n³) chạy được, đây là gợi ý mạnh",
+            "- Khác với 1-D DP: đáp án không xây từ tiền tố mà từ hai nửa trái phải, nên trạng thái phải giữ cả hai đầu `i` và `j`"
+          ],
+          "en": [
+            "- A problem on a sequence where each step merges, cuts or removes an element, and the cost depends on the **two remaining ends** of the range (Burst Balloons, Minimum Cost to Cut a Stick)",
+            "- The answer for `[i, j]` combines two sub-ranges `[i, k]` and `[k, j]` through a split point `k`: polygon triangulation, matrix chain multiplication, merging stones",
+            "- Minimax over a range of numbers: guess so the worst case costs the least (Guess Number Higher or Lower II)",
+            "- n ≤ ~100–500: O(n³) fits, which is a strong hint",
+            "- Unlike 1-D DP: the answer is not built from a prefix but from a left and a right half, so the state needs both ends `i` and `j`"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "`dp[i][j]` = đáp án tốt nhất cho đoạn từ `i` tới `j`. Thử mọi điểm chia `k` trong đoạn: `dp[i][j] = best(dp[i][k] + dp[k][j] + cost(i, k, j))`. Điền theo **độ dài tăng dần** để mọi đoạn con ngắn hơn đã có.",
+            "",
+            "Mấu chốt là chọn ý nghĩa của `k` sao cho hai nửa **độc lập** với nhau:",
+            "",
+            "- Burst Balloons: thêm 1 vào hai đầu; `k` là quả nổ **cuối cùng** trong khoảng mở `(i, j)`, lúc đó hàng xóm của nó chắc chắn là `a[i]` và `a[j]`",
+            "- Minimum Cost to Cut a Stick: sort `cuts`, thêm 0 và n vào hai đầu; `k` là nhát cắt **đầu tiên** trong `(i, j)`, tốn `cuts[j] - cuts[i]`",
+            "- Minimum Score Triangulation: cạnh `(i, j)` nằm trong đúng một tam giác `(i, k, j)`, tốn `v[i]·v[k]·v[j]`",
+            "- Guess Number Higher or Lower II: đoán `k` tốn `k + max(dp[i][k-1], dp[k+1][j])` (phía xấu hơn), rồi lấy min theo `k`",
+            "",
+            "Độ phức tạp: O(n³) thời gian, O(n²) bộ nhớ."
+          ],
+          "en": [
+            "`dp[i][j]` = the best answer for the range from `i` to `j`. Try every split `k` inside it: `dp[i][j] = best(dp[i][k] + dp[k][j] + cost(i, k, j))`. Fill by **increasing length** so every shorter range is ready.",
+            "",
+            "The key is choosing what `k` means so the two halves are **independent**:",
+            "",
+            "- Burst Balloons: pad both ends with 1; `k` is the **last** balloon to burst in the open range `(i, j)`, so at that moment its neighbours are surely `a[i]` and `a[j]`",
+            "- Minimum Cost to Cut a Stick: sort `cuts`, add 0 and n at the ends; `k` is the **first** cut inside `(i, j)`, costing `cuts[j] - cuts[i]`",
+            "- Minimum Score Triangulation: edge `(i, j)` belongs to exactly one triangle `(i, k, j)`, costing `v[i]·v[k]·v[j]`",
+            "- Guess Number Higher or Lower II: guessing `k` costs `k + max(dp[i][k-1], dp[k+1][j])` (the worse side), then take the min over `k`",
+            "",
+            "Complexity: O(n³) time, O(n²) space."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Burst Balloons: open range (i, j), k = LAST balloon to burst inside it",
+          "int maxCoins(int[] nums) {",
+          "    int n = nums.length + 2;",
+          "    int[] a = new int[n];",
+          "    a[0] = a[n - 1] = 1;                                 // pad both ends",
+          "    for (int i = 0; i < nums.length; i++) a[i + 1] = nums[i];",
+          "    int[][] dp = new int[n][n];                          // 0 when (i, j) is empty",
+          "    for (int len = 2; len < n; len++)                    // by increasing length",
+          "        for (int i = 0; i + len < n; i++) {",
+          "            int j = i + len;",
+          "            for (int k = i + 1; k < j; k++)              // try every split",
+          "                dp[i][j] = Math.max(dp[i][j], dp[i][k] + dp[k][j] + a[i] * a[k] * a[j]);",
+          "        }",
+          "    return dp[0][n - 1];",
+          "}",
+          "",
+          "// Guess Number Higher or Lower II: closed range [i, j], minimise the worst case",
+          "int getMoneyAmount(int n) {",
+          "    int[][] dp = new int[n + 2][n + 2];                  // 0 when i >= j: nothing to pay",
+          "    for (int len = 2; len <= n; len++)",
+          "        for (int i = 1; i + len - 1 <= n; i++) {",
+          "            int j = i + len - 1;",
+          "            dp[i][j] = Integer.MAX_VALUE;",
+          "            for (int k = i; k <= j; k++)                 // guess k, the worse side follows",
+          "                dp[i][j] = Math.min(dp[i][j], k + Math.max(dp[i][k - 1], dp[k + 1][j]));",
+          "        }",
+          "    return dp[1][n];",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Chọn `k` là quả nổ **đầu tiên**: sau khi nổ, hai nửa thành hàng xóm của nhau nên không còn độc lập; phải là quả nổ cuối cùng (Burst Balloons)",
+            "- Điền với vòng ngoài là `i` tăng dần như bảng thường: `dp[k][j]` với `k > i` chưa được tính. Vòng ngoài phải là độ dài, hoặc `i` giảm dần (Minimum Score Triangulation of Polygon)",
+            "- Quên sort `cuts` và thêm 0, n vào hai đầu; và DP theo chỉ số nhát cắt (≤ 100) chứ không theo độ dài que (tới 10⁶) (Minimum Cost to Cut a Stick)",
+            "- Lấy `min` cho cả hai phía thay vì `max`: phải trả cho phía xấu hơn rồi mới lấy min theo `k`; đoán ở giữa như binary search không tối ưu (Guess Number Higher or Lower II)",
+            "- Nhầm khoảng mở với khoảng đóng: khoảng mở `(i, j)` thì `k` chạy `i+1..j-1` và đoạn rỗng khi `j - i < 2`; khoảng đóng thì `k` chạy `i..j` (Burst Balloons)"
+          ],
+          "en": [
+            "- Choosing `k` as the **first** balloon to burst: afterwards the two halves become neighbours, so they are no longer independent; it must be the last one (Burst Balloons)",
+            "- Filling with `i` increasing in the outer loop like an ordinary table: `dp[k][j]` with `k > i` is not computed yet. The outer loop must be the length, or `i` decreasing (Minimum Score Triangulation of Polygon)",
+            "- Forgetting to sort `cuts` and add 0 and n at the ends; and running the DP over cut indices (≤ 100), not over stick length (up to 10⁶) (Minimum Cost to Cut a Stick)",
+            "- Taking `min` of both sides instead of `max`: you pay for the worse side, then take the min over `k`; guessing the middle like binary search is not optimal (Guess Number Higher or Lower II)",
+            "- Mixing open and closed ranges: for an open range `(i, j)`, `k` runs over `i+1..j-1` and the range is empty when `j - i < 2`; for a closed range `k` runs over `i..j` (Burst Balloons)"
+          ]
+        }
+      }
     },
     {
       "id": "p4-dp-tree",
@@ -130,7 +976,118 @@
       ],
       "resources": [
         { "type": "article", "title": "USACO Guide: DP on Trees", "url": "https://usaco.guide/gold/dp-trees" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Input là **cây** (nhị phân, hoặc n node với n - 1 cạnh), hỏi lớn nhất / nhỏ nhất khi chọn một tập node có ràng buộc giữa cha và con: không lấy hai node kề nhau, mọi node phải được \"phủ\"",
+            "- Đáp án của một node ghép từ đáp án các cây con, nhưng còn phụ thuộc \"node này có được chọn / có camera không\": một giá trị trả về không đủ",
+            "- Hỏi một giá trị **cho mọi node làm gốc** (tổng khoảng cách từ mỗi node tới mọi node khác): rerooting, hai lần DFS",
+            "- n tới 10⁴–10⁵: mỗi node chỉ được xử lý O(1) lần, không DFS lại từ từng node",
+            "- Khác với House Robber 1-D: các con của một node độc lập với nhau, nên mỗi cây con trả về một tuple rồi cha ghép lại"
+          ],
+          "en": [
+            "- The input is a **tree** (binary, or n nodes with n - 1 edges), asking for a max / min when choosing a set of nodes with a parent-child rule: no two adjacent nodes, every node must be \"covered\"",
+            "- A node's answer combines its subtrees' answers but also depends on \"is this node taken / does it have a camera\": one return value is not enough",
+            "- Asks for a value **with every node as the root** (sum of distances from each node to all others): rerooting, two DFS passes",
+            "- n up to 10⁴–10⁵: each node may be processed O(1) times, no fresh DFS from every node",
+            "- Unlike the 1-D House Robber: a node's children are independent of each other, so each subtree returns a tuple and the parent combines them"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Post-order DFS: xử lý hai con trước, mỗi con trả về một **tuple nhỏ** = đáp án tốt nhất của cây con ứng với từng trạng thái của gốc cây con. Node cha ghép các tuple đó theo luật cha-con.",
+            "",
+            "- House Robber III: trả `{rob, skip}`. `rob = val + left.skip + right.skip`, `skip = max(left) + max(right)`",
+            "- Binary Tree Cameras: 3 trạng thái: chưa được phủ, đã được phủ (không camera), có camera. Con nào chưa được phủ thì cha phải đặt camera; `null` coi như đã được phủ; cuối cùng gốc chưa phủ thì thêm một camera",
+            "- Sum of Distances in Tree (rerooting): DFS 1 tính `size[v]` và đáp án cho gốc 0. DFS 2 đi từ cha `p` xuống con `c`: `ans[c] = ans[p] - size[c] + (n - size[c])`, vì `size[c]` node trong cây con của `c` gần thêm 1, còn lại xa thêm 1",
+            "",
+            "Mỗi node được thăm số lần cố định nên tổng là tuyến tính.",
+            "",
+            "Độ phức tạp: O(n) thời gian, O(h) bộ nhớ cho đệ quy (h = chiều cao cây, tới O(n) khi cây lệch), cộng O(n) cho mảng khi rerooting."
+          ],
+          "en": [
+            "Post-order DFS: handle the children first; each returns a **small tuple** = its subtree's best answer for each state of the subtree's root. The parent combines those tuples under the parent-child rule.",
+            "",
+            "- House Robber III: return `{rob, skip}`. `rob = val + left.skip + right.skip`, `skip = max(left) + max(right)`",
+            "- Binary Tree Cameras: 3 states: not covered, covered (no camera), has a camera. If any child is not covered the parent must hold a camera; `null` counts as covered; if the root ends uncovered, add one camera",
+            "- Sum of Distances in Tree (rerooting): DFS 1 computes `size[v]` and the answer for root 0. DFS 2 goes from parent `p` to child `c`: `ans[c] = ans[p] - size[c] + (n - size[c])`, because the `size[c]` nodes in c's subtree get 1 closer and the rest 1 further",
+            "",
+            "Each node is visited a fixed number of times, so the total is linear.",
+            "",
+            "Complexity: O(n) time, O(h) space for the recursion (h = tree height, up to O(n) for a skewed tree), plus O(n) for the arrays when rerooting."
+          ]
+        },
+        "template": [
+          "```java",
+          "// House Robber III: post-order DFS returns {best if node robbed, best if node skipped}",
+          "int rob(TreeNode root) { int[] r = robDfs(root); return Math.max(r[0], r[1]); }",
+          "int[] robDfs(TreeNode node) {",
+          "    if (node == null) return new int[]{0, 0};",
+          "    int[] l = robDfs(node.left), r = robDfs(node.right);   // children first",
+          "    int robbed = node.val + l[1] + r[1];                    // children must be skipped",
+          "    int skipped = Math.max(l[0], l[1]) + Math.max(r[0], r[1]);",
+          "    return new int[]{robbed, skipped};",
+          "}",
+          "",
+          "// Binary Tree Cameras: 0 = not covered, 1 = covered (no camera), 2 = has a camera",
+          "int cameras;",
+          "int minCameraCover(TreeNode root) {",
+          "    cameras = 0;",
+          "    return camState(root) == 0 ? cameras + 1 : cameras;    // uncovered root needs one",
+          "}",
+          "int camState(TreeNode node) {",
+          "    if (node == null) return 1;                             // null counts as covered",
+          "    int l = camState(node.left), r = camState(node.right);",
+          "    if (l == 0 || r == 0) { cameras++; return 2; }          // a child needs us",
+          "    return (l == 2 || r == 2) ? 1 : 0;                      // covered by a child, or not",
+          "}",
+          "",
+          "// Sum of Distances in Tree: rerooting, two DFS passes over an adjacency list",
+          "List<List<Integer>> adj;                                    // adjacency list, n - 1 edges",
+          "int[] size, ans;                                            // subtree sizes, answers",
+          "int[] sumOfDistancesInTree(int n, int[][] edges) {",
+          "    adj = new ArrayList<>();",
+          "    for (int i = 0; i < n; i++) adj.add(new ArrayList<>());",
+          "    for (int[] e : edges) { adj.get(e[0]).add(e[1]); adj.get(e[1]).add(e[0]); }",
+          "    size = new int[n]; ans = new int[n];",
+          "    down(0, -1);                                            // size[] and ans[0]",
+          "    up(0, -1, n);                                           // ans[child] from ans[parent]",
+          "    return ans;",
+          "}",
+          "void down(int v, int parent) {",
+          "    size[v] = 1;",
+          "    for (int c : adj.get(v)) if (c != parent) {",
+          "        down(c, v);",
+          "        size[v] += size[c];",
+          "        ans[v] += ans[c] + size[c];                         // every node under c: one step more",
+          "    }",
+          "}",
+          "void up(int v, int parent, int n) {",
+          "    for (int c : adj.get(v)) if (c != parent) {",
+          "        ans[c] = ans[v] - size[c] + (n - size[c]);          // move the root from v to c",
+          "        up(c, v, n);",
+          "    }",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- DFS trả về một số rồi ở cha gọi lại cho các cháu (`rob(node.left.left)`...): bài con bị tính lặp, chậm hẳn; trả tuple để mỗi node chỉ tính một lần (House Robber III)",
+            "- Coi `null` là \"chưa được phủ\" nên đặt camera ở mọi lá; và quên kiểm tra gốc sau DFS, gốc chưa được phủ thì cần thêm một camera (Binary Tree Cameras)",
+            "- Chạy BFS / DFS từ từng node làm gốc là O(n²), TLE với n = 3·10⁴; công thức đổi gốc chỉ tốn O(1) mỗi cạnh (Sum of Distances in Tree)",
+            "- Cây cho dạng danh sách cạnh là đồ thị vô hướng: phải truyền `parent` để không đi ngược lên cha (Sum of Distances in Tree)",
+            "- Đệ quy sâu 10⁵ tầng dễ `StackOverflowError` trong Java; chạy trong `Thread` có stack lớn hoặc DFS bằng stack tự quản lý, và nhớ lấy mod khi đếm (Kingdom Division)"
+          ],
+          "en": [
+            "- Returning one number from the DFS, then calling it again on the grandchildren (`rob(node.left.left)`...): subproblems repeat and it gets much slower; return a tuple so each node is computed once (House Robber III)",
+            "- Treating `null` as \"not covered\" puts a camera on every leaf; and forgetting to check the root after the DFS, an uncovered root needs one more camera (Binary Tree Cameras)",
+            "- Running a BFS / DFS from every node as the root is O(n²) and times out at n = 3·10⁴; the rerooting formula costs O(1) per edge (Sum of Distances in Tree)",
+            "- A tree given as an edge list is an undirected graph: pass `parent` so the DFS does not walk back up (Sum of Distances in Tree)",
+            "- Recursion 10⁵ levels deep easily throws `StackOverflowError` in Java; run it in a `Thread` with a big stack or use an explicit stack, and remember the modulo when counting (Kingdom Division)"
+          ]
+        }
+      }
     },
     {
       "id": "p4-sp",
@@ -151,7 +1108,112 @@
         { "type": "article", "title": "cp-algorithms: Floyd-Warshall", "url": "https://cp-algorithms.com/graph/all-pair-shortest-path-floyd-warshall.html" },
         { "type": "visual", "title": "VisuAlgo: Single-Source Shortest Paths", "url": "https://visualgo.net/en/sssp" },
         { "type": "practice", "title": "LeetCode tag: Shortest Path", "url": "https://leetcode.com/problem-list/shortest-path/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đồ thị có **trọng số trên cạnh**, hỏi chi phí / thời gian nhỏ nhất từ một đỉnh nguồn tới các đỉnh khác (Network Delay Time)",
+            "- Trọng số không âm: Dijkstra với PriorityQueue. Mọi cạnh cùng trọng số thì BFS thường là đủ; trọng số chỉ 0 hoặc 1 thì 0-1 BFS với deque",
+            "- Chi phí của đường là **cạnh lớn nhất trên đường** (độ chênh độ cao, mực nước) thay vì tổng: vẫn là Dijkstra, chỉ đổi `d + w` thành `max(d, w)` (Path With Minimum Effort, Swim in Rising Water)",
+            "- Giới hạn **tối đa K cạnh / K điểm dừng**, hoặc có cạnh âm (Dijkstra sẽ sai): Bellman-Ford chạy theo từng vòng (Cheapest Flights Within K Stops)",
+            "- Cần khoảng cách **giữa mọi cặp đỉnh** và n nhỏ (khoảng ≤ 400): Floyd-Warshall O(n³) (Find the City With the Smallest Number of Neighbors at a Threshold Distance)",
+            "- Khác với MST: MST chọn tập cạnh có tổng nhỏ nhất để nối mọi đỉnh, còn ở đây tối thiểu từng đường đi từ nguồn"
+          ],
+          "en": [
+            "- A graph with **weighted edges**, asking for the minimum cost / time from one source to the other nodes (Network Delay Time)",
+            "- Non-negative weights: Dijkstra with a PriorityQueue. All weights equal: plain BFS is enough; weights only 0 or 1: 0-1 BFS with a deque",
+            "- The cost of a path is its **largest edge** (height difference, water level) instead of the sum: still Dijkstra, just replace `d + w` with `max(d, w)` (Path With Minimum Effort, Swim in Rising Water)",
+            "- A limit of **at most K edges / K stops**, or negative edges (Dijkstra breaks): Bellman-Ford run round by round (Cheapest Flights Within K Stops)",
+            "- Distances **between every pair** of nodes with small n (about ≤ 400): Floyd-Warshall in O(n³) (Find the City With the Smallest Number of Neighbors at a Threshold Distance)",
+            "- Unlike MST: an MST picks the cheapest set of edges connecting all nodes; here each path from the source is minimised"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Dijkstra: `dist[src] = 0`, heap sắp theo `dist`. Mỗi lần lấy ra đỉnh có `dist` nhỏ nhất: vì trọng số không âm, mọi đường khác tới nó phải đi qua một đỉnh còn trong heap với `dist` không nhỏ hơn, nên `dist` của nó đã chốt. Từ đó relax các cạnh kề và đẩy `(dist mới, v)` vào heap. `PriorityQueue` không có decrease-key nên heap giữ cả bản ghi cũ: lấy ra mà `d > dist[u]` thì bỏ qua.",
+            "",
+            "- **Minimax** (cực tiểu cạnh lớn nhất): chi phí mới `max(d, w)` không giảm dọc theo đường, nên lập luận chốt đỉnh của Dijkstra vẫn đúng",
+            "- **Bellman-Ford**: mỗi vòng relax mọi cạnh, đường tốt nhất dài thêm được 1 cạnh. V - 1 vòng là đủ; vòng thứ V còn giảm được thì có chu trình âm. Tối đa K điểm dừng: chạy đúng K + 1 vòng, mỗi vòng đọc từ bản sao `dist` của vòng trước",
+            "- **Floyd-Warshall**: `d[i][j] = min(d[i][j], d[i][k] + d[k][j])` với `k` là vòng ngoài cùng (sau vòng k, các đường chỉ dùng đỉnh trung gian 0..k)",
+            "",
+            "Độ phức tạp: Dijkstra O((V + E) log V) thời gian, O(V + E) bộ nhớ; Bellman-Ford O(K·E); Floyd-Warshall O(V³) thời gian, O(V²) bộ nhớ."
+          ],
+          "en": [
+            "Dijkstra: `dist[src] = 0`, a heap ordered by `dist`. Each time you poll the node with the smallest `dist`: since weights are non-negative, any other path to it must pass through a node still in the heap with a `dist` at least as large, so its `dist` is final. Relax its edges and push `(new dist, v)`. `PriorityQueue` has no decrease-key, so the heap keeps stale entries: skip a polled entry when `d > dist[u]`.",
+            "",
+            "- **Minimax** (minimise the largest edge): the new cost `max(d, w)` never decreases along a path, so Dijkstra's settling argument still holds",
+            "- **Bellman-Ford**: each round relaxes every edge, so the best paths can grow by one edge. V - 1 rounds are enough; if round V still improves something there is a negative cycle. At most K stops: run exactly K + 1 rounds, each reading from a copy of the previous round's `dist`",
+            "- **Floyd-Warshall**: `d[i][j] = min(d[i][j], d[i][k] + d[k][j])` with `k` as the outermost loop (after round k, paths use only intermediate nodes 0..k)",
+            "",
+            "Complexity: Dijkstra O((V + E) log V) time, O(V + E) space; Bellman-Ford O(K·E); Floyd-Warshall O(V³) time, O(V²) space."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Dijkstra (Network Delay Time): times[i] = {u, v, w}, nodes 1..n, every w >= 0",
+          "int networkDelayTime(int[][] times, int n, int k) {",
+          "    List<List<int[]>> g = new ArrayList<>();",
+          "    for (int i = 0; i <= n; i++) g.add(new ArrayList<>());",
+          "    for (int[] t : times) g.get(t[0]).add(new int[]{t[1], t[2]});   // undirected: add both",
+          "    int[] dist = new int[n + 1];",
+          "    Arrays.fill(dist, Integer.MAX_VALUE);",
+          "    dist[k] = 0;",
+          "    PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> Integer.compare(a[0], b[0]));",
+          "    pq.offer(new int[]{0, k});                       // {distance, node}",
+          "    while (!pq.isEmpty()) {",
+          "        int[] cur = pq.poll();",
+          "        int d = cur[0], u = cur[1];",
+          "        if (d > dist[u]) continue;                   // stale entry: u already settled",
+          "        for (int[] e : g.get(u)) {",
+          "            int nd = d + e[1];                       // minimax variant: Math.max(d, e[1])",
+          "            if (nd < dist[e[0]]) { dist[e[0]] = nd; pq.offer(new int[]{nd, e[0]}); }",
+          "        }",
+          "    }",
+          "    int worst = Arrays.stream(dist, 1, n + 1).max().getAsInt();",
+          "    return worst == Integer.MAX_VALUE ? -1 : worst;",
+          "}",
+          "",
+          "// Bellman-Ford limited to k + 1 edges (Cheapest Flights Within K Stops)",
+          "int findCheapestPrice(int n, int[][] flights, int src, int dst, int k) {",
+          "    int[] dist = new int[n];",
+          "    Arrays.fill(dist, Integer.MAX_VALUE);",
+          "    dist[src] = 0;",
+          "    for (int round = 0; round <= k; round++) {       // after round r: paths of <= r + 1 edges",
+          "        int[] next = dist.clone();                   // read only last round's values",
+          "        for (int[] f : flights)",
+          "            if (dist[f[0]] != Integer.MAX_VALUE && dist[f[0]] + f[2] < next[f[1]])",
+          "                next[f[1]] = dist[f[0]] + f[2];",
+          "        dist = next;",
+          "    }",
+          "    return dist[dst] == Integer.MAX_VALUE ? -1 : dist[dst];",
+          "}",
+          "",
+          "// Floyd-Warshall: d[i][j] = edge weight, INF = 1e9 if none (INF + INF fits in int), 0 on i == j",
+          "void floydWarshall(int[][] d) {",
+          "    for (int k = 0; k < d.length; k++)               // k (the middle node) must be outermost",
+          "        for (int i = 0; i < d.length; i++)",
+          "            for (int j = 0; j < d.length; j++)",
+          "                d[i][j] = Math.min(d[i][j], d[i][k] + d[k][j]);",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Đánh dấu visited lúc **push** thay vì lúc **pop**: đỉnh bị chốt khi chưa chắc đã có đường ngắn nhất (Path With Minimum Effort)",
+            "- Thiếu dòng bỏ qua bản ghi cũ `if (d > dist[u]) continue`: vẫn ra đúng nhưng một đỉnh bị duyệt cạnh lại nhiều lần, dễ TLE trên đồ thị dày (Dijkstra: Shortest Reach 2)",
+            "- Bellman-Ford relax thẳng trên `dist` thay vì bản sao: trong một vòng đường có thể đi thêm nhiều cạnh, vượt quá K điểm dừng. K điểm dừng là K + 1 cạnh (Cheapest Flights Within K Stops)",
+            "- `Integer.MAX_VALUE + w` tràn thành số âm: kiểm tra `dist[u] != INF` trước khi cộng, hoặc lấy INF = 1e9 để INF + INF vẫn vừa `int` (Find the City With the Smallest Number of Neighbors at a Threshold Distance)",
+            "- Floyd-Warshall đặt vòng `k` vào trong `i`, `j`: sai mà không báo lỗi gì; đồ thị vô hướng thì gán cả `d[u][v]` lẫn `d[v][u]`"
+          ],
+          "en": [
+            "- Marking visited on **push** instead of on **poll**: a node gets settled before its shortest path is known (Path With Minimum Effort)",
+            "- Missing the stale-entry skip `if (d > dist[u]) continue`: still correct, but a node's edges are scanned again and again, which can time out on dense graphs (Dijkstra: Shortest Reach 2)",
+            "- Bellman-Ford relaxing `dist` in place instead of a copy: within one round a path can grow by several edges and exceed K stops. K stops means K + 1 edges (Cheapest Flights Within K Stops)",
+            "- `Integer.MAX_VALUE + w` overflows to a negative number: check `dist[u] != INF` before adding, or use INF = 1e9 so INF + INF still fits in `int` (Find the City With the Smallest Number of Neighbors at a Threshold Distance)",
+            "- Floyd-Warshall with the `k` loop inside `i`, `j`: wrong, with no error to warn you; for undirected graphs set both `d[u][v]` and `d[v][u]`"
+          ]
+        }
+      }
     },
     {
       "id": "p4-dsu",
@@ -169,7 +1231,113 @@
         { "type": "article", "title": "cp-algorithms: Disjoint Set Union", "url": "https://cp-algorithms.com/data_structures/disjoint_set_union.html" },
         { "type": "visual", "title": "VisuAlgo: Union-Find", "url": "https://visualgo.net/en/ufds" },
         { "type": "practice", "title": "LeetCode tag: Union-Find", "url": "https://leetcode.com/problem-list/union-find/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Hỏi hai phần tử có **cùng nhóm / cùng thành phần liên thông** không, hoặc đếm số nhóm (Number of Provinces, Number of Connected Components in an Undirected Graph)",
+            "- Các quan hệ được **gộp dần** (thêm cạnh, kết bạn, sáp nhập), sau mỗi lần gộp hỏi kích thước nhóm hoặc nhóm lớn nhất (Friend Circle Queries, Merging Communities)",
+            "- Tìm cạnh làm **xuất hiện chu trình** trong đồ thị vô hướng (Redundant Connection)",
+            "- Gộp các bản ghi có chung một khoá (email, số điện thoại) rồi xuất từng nhóm (Accounts Merge)",
+            "- Phần tử không phải số 0..n-1 (chuỗi, toạ độ): map mỗi khoá sang một id trước khi dùng DSU",
+            "- Khác với BFS/DFS: trên đồ thị cố định DFS cũng đếm được thành phần, nhưng DSU nhận cạnh đến dần mà không phải duyệt lại; DSU không tách nhóm được (không hỗ trợ xoá cạnh)"
+          ],
+          "en": [
+            "- Asks whether two elements are in **the same group / connected component**, or for the number of groups (Number of Provinces, Number of Connected Components in an Undirected Graph)",
+            "- Relations are **merged over time** (add an edge, become friends, merge communities), and after each merge you need a group's size or the largest group (Friend Circle Queries, Merging Communities)",
+            "- Find the edge that **creates a cycle** in an undirected graph (Redundant Connection)",
+            "- Merge records that share a key (email, phone number) and output each group (Accounts Merge)",
+            "- Elements are not numbers 0..n-1 (strings, coordinates): map each key to an id first",
+            "- Unlike BFS/DFS: on a fixed graph DFS counts components too, but DSU takes edges as they arrive without re-traversing; DSU cannot split a group (no edge deletion)"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Mỗi nhóm là một cây, gốc là đại diện. `parent[x]` trỏ lên cha, `find(x)` đi lên tới gốc; hai phần tử cùng nhóm khi `find` của chúng bằng nhau. `union(a, b)` gắn gốc nhóm này vào gốc nhóm kia.",
+            "",
+            "- **Path compression**: trong `find`, cho các node trên đường đi trỏ thẳng về gốc, lần sau đi ngắn",
+            "- **Union by size / rank**: gắn cây nhỏ dưới cây lớn, nên cây không cao quá log n",
+            "",
+            "Có cả hai thì mỗi thao tác gần như O(1). Đếm nhóm: bắt đầu bằng n, mỗi `union` thành công thì giảm 1. `union` trả về `false` nghĩa là hai đầu đã cùng nhóm: cạnh đó tạo chu trình, chính là đáp án của Redundant Connection.",
+            "",
+            "Độ phức tạp: O(α(n)) khấu hao mỗi thao tác (α là hàm Ackermann ngược, coi như hằng số), O(n) bộ nhớ."
+          ],
+          "en": [
+            "Each group is a tree whose root is its representative. `parent[x]` points up, `find(x)` walks up to the root; two elements share a group when their `find` results are equal. `union(a, b)` hangs one group's root under the other's.",
+            "",
+            "- **Path compression**: during `find`, point the nodes on the path straight at the root so later walks are short",
+            "- **Union by size / rank**: hang the smaller tree under the larger one, so no tree gets taller than log n",
+            "",
+            "With both, each operation is almost O(1). Counting groups: start at n and subtract 1 on every successful `union`. `union` returning `false` means both ends were already in one group: that edge closes a cycle, which is exactly the answer to Redundant Connection.",
+            "",
+            "Complexity: O(α(n)) amortised per operation (α is the inverse Ackermann function, effectively constant), O(n) space."
+          ]
+        },
+        "template": [
+          "```java",
+          "// DSU: path compression + union by size; count = number of groups",
+          "static class DSU {",
+          "    final int[] parent, size;",
+          "    int count;",
+          "    DSU(int n) {",
+          "        parent = new int[n];",
+          "        size = new int[n];",
+          "        count = n;",
+          "        for (int i = 0; i < n; i++) { parent[i] = i; size[i] = 1; }",
+          "    }",
+          "    int find(int x) { return parent[x] == x ? x : (parent[x] = find(parent[x])); }",
+          "    boolean union(int a, int b) {                    // false: already one group (a cycle)",
+          "        int ra = find(a), rb = find(b);",
+          "        if (ra == rb) return false;",
+          "        if (size[ra] < size[rb]) { int t = ra; ra = rb; rb = t; }",
+          "        parent[rb] = ra;                             // small tree under the big one",
+          "        size[ra] += size[rb];",
+          "        count--;",
+          "        return true;",
+          "    }",
+          "}",
+          "",
+          "// Accounts Merge: email -> first account id, union accounts that share an email",
+          "List<List<String>> accountsMerge(List<List<String>> accounts) {",
+          "    DSU dsu = new DSU(accounts.size());",
+          "    Map<String, Integer> owner = new HashMap<>();",
+          "    for (int i = 0; i < accounts.size(); i++) {",
+          "        List<String> acc = accounts.get(i);",
+          "        for (String email : acc.subList(1, acc.size())) {",
+          "            Integer j = owner.putIfAbsent(email, i);",
+          "            if (j != null) dsu.union(i, j);          // email seen before: same person",
+          "        }",
+          "    }",
+          "    Map<Integer, TreeSet<String>> groups = new HashMap<>();   // root id -> sorted emails",
+          "    for (var e : owner.entrySet())",
+          "        groups.computeIfAbsent(dsu.find(e.getValue()), r -> new TreeSet<>()).add(e.getKey());",
+          "    List<List<String>> res = new ArrayList<>();",
+          "    for (var g : groups.entrySet()) {",
+          "        List<String> row = new ArrayList<>(g.getValue());",
+          "        row.add(0, accounts.get(g.getKey()).get(0));  // the name goes first",
+          "        res.add(row);",
+          "    }",
+          "    return res;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- So `parent[a] == parent[b]` thay vì `find(a) == find(b)`: cha trực tiếp chưa chắc là gốc (Number of Provinces)",
+            "- `union` gán `parent[a] = b` thay vì nối hai **gốc** `parent[find(a)] = find(b)`: một phần nhóm cũ bị tách ra (Number of Connected Components in an Undirected Graph)",
+            "- Đỉnh đánh số 1..n mà tạo DSU cỡ n: ArrayIndexOutOfBounds ở đỉnh n (Redundant Connection)",
+            "- Đọc kích thước nhóm ở `size[x]` thay vì `size[find(x)]`: chỉ gốc giữ kích thước đúng (Merging Communities)",
+            "- `find` đệ quy chỉ có path compression, không union by size: cây có thể thành chuỗi 10⁵ node và StackOverflowError ở lần `find` đầu tiên; thêm union by size hoặc viết `find` bằng vòng lặp (Components in a graph)"
+          ],
+          "en": [
+            "- Comparing `parent[a] == parent[b]` instead of `find(a) == find(b)`: the direct parent is not necessarily the root (Number of Provinces)",
+            "- `union` setting `parent[a] = b` instead of linking the two **roots** `parent[find(a)] = find(b)`: part of the old group gets split off (Number of Connected Components in an Undirected Graph)",
+            "- Nodes numbered 1..n but a DSU of size n: ArrayIndexOutOfBounds at node n (Redundant Connection)",
+            "- Reading a group's size from `size[x]` instead of `size[find(x)]`: only the root holds the right size (Merging Communities)",
+            "- Recursive `find` with path compression but no union by size: the tree can become a chain of 10⁵ nodes and the first `find` throws StackOverflowError; add union by size or write `find` as a loop (Components in a graph)"
+          ]
+        }
+      }
     },
     {
       "id": "p4-mst",
@@ -185,7 +1353,112 @@
       "resources": [
         { "type": "article", "title": "cp-algorithms: Kruskal with DSU", "url": "https://cp-algorithms.com/graph/mst_kruskal_with_dsu.html" },
         { "type": "practice", "title": "LeetCode tag: Minimum Spanning Tree", "url": "https://leetcode.com/problem-list/minimum-spanning-tree/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đề yêu cầu **nối tất cả các điểm / thành phố** với tổng chi phí nhỏ nhất, mỗi cặp có một chi phí nối (Min Cost to Connect All Points)",
+            "- Kết quả là một **cây**: đúng n - 1 cạnh, liên thông, không chu trình, trên đồ thị vô hướng có trọng số",
+            "- Cạnh cho sẵn dạng danh sách, đồ thị thưa: Kruskal. Đồ thị đầy đủ (mọi cặp điểm đều nối được, chi phí tính từ toạ độ): Prim",
+            "- Hỏi cạnh nào **bắt buộc** có trong mọi MST, cạnh nào **có thể** có trong một MST nào đó (Find Critical and Pseudo-Critical Edges in Minimum Spanning Tree)",
+            "- Khác với Dijkstra: Dijkstra tối thiểu đường đi từ một nguồn tới từng đỉnh; MST tối thiểu tổng các cạnh được chọn, đường giữa hai đỉnh trong MST không nhất thiết là ngắn nhất"
+          ],
+          "en": [
+            "- Asks to **connect all points / cities** at minimum total cost, with a cost for each pair (Min Cost to Connect All Points)",
+            "- The result is a **tree**: exactly n - 1 edges, connected, no cycle, on an undirected weighted graph",
+            "- Edges given as a list, sparse graph: Kruskal. Complete graph (every pair can be joined, cost computed from coordinates): Prim",
+            "- Asks which edges are **in every** MST and which **can be in some** MST (Find Critical and Pseudo-Critical Edges in Minimum Spanning Tree)",
+            "- Unlike Dijkstra: Dijkstra minimises the path from one source to each node; an MST minimises the total of the chosen edges, and the path between two nodes inside it is not necessarily the shortest"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Tính chất cắt: chia các đỉnh thành hai phần bất kỳ, cạnh nhẹ nhất nối hai phần luôn nằm trong một MST nào đó. Cả hai thuật toán đều tham lam dựa trên tính chất này.",
+            "",
+            "- **Kruskal**: sort cạnh tăng dần, lấy cạnh nếu hai đầu đang ở hai nhóm DSU khác nhau (không tạo chu trình), dừng khi đủ n - 1 cạnh",
+            "- **Prim**: mọc cây từ một đỉnh, mỗi bước thêm đỉnh ngoài cây có cạnh nối vào cây rẻ nhất. Giống Dijkstra nhưng khoá trong heap là trọng số cạnh, không phải tổng đường. Với đồ thị đầy đủ, bản mảng `minEdge[]` O(V²) không cần heap là nhanh nhất",
+            "- **Critical / pseudo-critical**: tính trọng số MST gốc. Với từng cạnh e: bỏ e mà MST nặng hơn (hoặc không còn liên thông) thì e critical; nếu không, ép lấy e trước rồi chạy Kruskal, tổng không đổi thì e pseudo-critical",
+            "- **Kruskal ngược**: cắt các cạnh rẻ nhất để tách mọi điểm đặc biệt khỏi nhau thì duyệt cạnh từ nặng tới nhẹ, giữ cạnh trừ khi hai nhóm ở hai đầu đều đã chứa điểm đặc biệt; cạnh bị bỏ cộng vào đáp án (Matrix)",
+            "",
+            "Độ phức tạp: Kruskal O(E log E) thời gian, O(V) bộ nhớ cho DSU; Prim với heap O(E log V); Prim bản mảng O(V²)."
+          ],
+          "en": [
+            "Cut property: split the nodes into any two parts, and the lightest edge crossing between them belongs to some MST. Both algorithms are greedy on top of this fact.",
+            "",
+            "- **Kruskal**: sort edges ascending, take an edge if its ends are in different DSU groups (no cycle), stop at n - 1 edges",
+            "- **Prim**: grow a tree from one node; each step adds the outside node with the cheapest edge into the tree. Like Dijkstra, but the heap key is the edge weight, not the path length. On a complete graph, the array version with `minEdge[]` in O(V²), no heap, is the fastest",
+            "- **Critical / pseudo-critical**: compute the MST weight. For each edge e: if dropping e makes the MST heavier (or disconnected), e is critical; otherwise force e in first and run Kruskal, and if the total is unchanged, e is pseudo-critical",
+            "- **Reverse Kruskal**: to cut the cheapest edges that separate all special nodes from each other, scan edges from heaviest to lightest and keep an edge unless the groups at both ends already contain a special node; dropped edges add to the answer (Matrix)",
+            "",
+            "Complexity: Kruskal O(E log E) time, O(V) space for the DSU; Prim with a heap O(E log V); array Prim O(V²)."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Kruskal: edges {u, v, w}; MST weight, or -1 if the graph is not connected",
+          "long kruskal(int n, int[][] edges) {",
+          "    int[] parent = new int[n];",
+          "    for (int i = 0; i < n; i++) parent[i] = i;",
+          "    int[][] sorted = edges.clone();",
+          "    Arrays.sort(sorted, (a, b) -> Integer.compare(a[2], b[2]));   // lightest first",
+          "    long total = 0;",
+          "    int used = 0;",
+          "    for (int[] e : sorted) {",
+          "        int ru = find(parent, e[0]), rv = find(parent, e[1]);",
+          "        if (ru == rv) continue;                      // would close a cycle",
+          "        parent[ru] = rv;",
+          "        total += e[2];",
+          "        if (++used == n - 1) break;",
+          "    }",
+          "    return used == n - 1 ? total : -1;",
+          "}",
+          "",
+          "int find(int[] parent, int x) {",
+          "    while (parent[x] != x) x = parent[x] = parent[parent[x]];   // path halving",
+          "    return x;",
+          "}",
+          "",
+          "// Prim from node 0 on a complete graph (Min Cost to Connect All Points)",
+          "int minCostConnectPoints(int[][] points) {",
+          "    int n = points.length, total = 0, added = 0;",
+          "    boolean[] inTree = new boolean[n];",
+          "    PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> Integer.compare(a[0], b[0]));",
+          "    pq.offer(new int[]{0, 0});                       // {edge weight, node}",
+          "    while (added < n) {",
+          "        int[] cur = pq.poll();",
+          "        int u = cur[1];",
+          "        if (inTree[u]) continue;                     // stale: u joined via a cheaper edge",
+          "        inTree[u] = true;                            // mark on poll, not on push",
+          "        total += cur[0];",
+          "        added++;",
+          "        for (int v = 0; v < n; v++) {",
+          "            if (inTree[v]) continue;",
+          "            int w = Math.abs(points[u][0] - points[v][0])",
+          "                    + Math.abs(points[u][1] - points[v][1]);",
+          "            pq.offer(new int[]{w, v});               // key = edge weight, not path length",
+          "        }",
+          "    }",
+          "    return total;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Prim đánh dấu đỉnh vào cây lúc **push** thay vì lúc **pop**: cạnh rẻ hơn tới đỉnh đó tìm thấy sau bị bỏ qua (Prim's (MST) : Special Subtree)",
+            "- Không kiểm tra đã đủ n - 1 cạnh: đồ thị không liên thông thì không có cây khung, nhưng Kruskal vẫn trả về một tổng (của một rừng)",
+            "- Sort cạnh làm mất chỉ số gốc: gắn index vào từng cạnh trước khi sort vì đáp án trả về index (Find Critical and Pseudo-Critical Edges in Minimum Spanning Tree)",
+            "- Bỏ một cạnh làm đồ thị mất liên thông mà vẫn so tổng như bình thường: phải coi tổng là vô cực, tức cạnh đó critical (Find Critical and Pseudo-Critical Edges in Minimum Spanning Tree)",
+            "- Mỗi cạnh MST nằm trên đường của `sub * (n - sub)` cặp đỉnh; với trọng số 2^c thì tổng vượt mọi kiểu số, phải cộng dồn vào mảng bit có nhớ (Roads in HackerLand)"
+          ],
+          "en": [
+            "- Prim marking a node as in the tree on **push** instead of on **poll**: a cheaper edge to it found later gets ignored (Prim's (MST) : Special Subtree)",
+            "- Not checking that n - 1 edges were taken: a disconnected graph has no spanning tree, yet Kruskal still returns a total (of a forest)",
+            "- Sorting edges loses their original index: attach the index to each edge before sorting, because the answer is a list of indices (Find Critical and Pseudo-Critical Edges in Minimum Spanning Tree)",
+            "- Dropping an edge that disconnects the graph and comparing totals as usual: treat the total as infinite, i.e. the edge is critical (Find Critical and Pseudo-Critical Edges in Minimum Spanning Tree)",
+            "- Each MST edge lies on the path of `sub * (n - sub)` node pairs; with weights 2^c the sum outgrows every numeric type, so add into a bit array with carries (Roads in HackerLand)"
+          ]
+        }
+      }
     },
     {
       "id": "p4-adv-graph",
@@ -200,7 +1473,110 @@
         { "type": "article", "title": "cp-algorithms: Eulerian path", "url": "https://cp-algorithms.com/graph/euler_path.html" },
         { "type": "article", "title": "cp-algorithms: Finding bridges", "url": "https://cp-algorithms.com/graph/bridge-searching.html" },
         { "type": "practice", "title": "LeetCode tag: Eulerian Circuit", "url": "https://leetcode.com/problem-list/eulerian-circuit/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Phải dùng **mỗi cạnh đúng một lần** (vé máy bay, quân domino, cặp nối đuôi) để tạo một đường đi liền: đường Euler (Reconstruct Itinerary)",
+            "- Sắp các cặp `[a, b]` sao cho `end` của cặp trước bằng `start` của cặp sau: mỗi cặp là một cạnh có hướng a → b, đáp án là đường Euler (Valid Arrangement of Pairs)",
+            "- Hỏi cạnh / đỉnh nào mà **bỏ đi thì đồ thị mất liên thông** (critical connection, single point of failure): cầu và khớp (Critical Connections in a Network)",
+            "- n, E tới 10⁵ nên thử bỏ từng cạnh rồi DFS lại, O(E·(V + E)), sẽ TLE; Tarjan làm xong trong một lần DFS",
+            "- Khác với Hamiltonian path (qua mỗi **đỉnh** một lần, chỉ giải được với n nhỏ bằng bitmask / backtracking): Euler là mỗi **cạnh** một lần và giải được trong O(E)"
+          ],
+          "en": [
+            "- Every **edge must be used exactly once** (plane tickets, dominoes, pairs chained end to start) to form one continuous path: an Euler path (Reconstruct Itinerary)",
+            "- Arrange pairs `[a, b]` so each pair's `end` equals the next pair's `start`: each pair is a directed edge a → b and the answer is an Euler path (Valid Arrangement of Pairs)",
+            "- Asks which edges / nodes **disconnect the graph when removed** (critical connection, single point of failure): bridges and articulation points (Critical Connections in a Network)",
+            "- n and E up to 10⁵, so removing each edge and running DFS again, O(E·(V + E)), times out; Tarjan does it in one DFS",
+            "- Unlike a Hamiltonian path (each **node** once, only solvable for small n with bitmask / backtracking): an Euler path uses each **edge** once and runs in O(E)"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "**Đường Euler** (có hướng) tồn tại khi các cạnh liên thông và mọi đỉnh có in = out, trừ tối đa một đỉnh đầu (out - in = 1) và một đỉnh cuối (in - out = 1). Không có đỉnh lệch thì là chu trình, bắt đầu ở đỉnh nào có cạnh cũng được. Vô hướng: 0 hoặc 2 đỉnh bậc lẻ.",
+            "",
+            "**Hierholzer**: từ đỉnh đầu cứ đi theo cạnh chưa dùng, dùng xong thì xoá cạnh. Đỉnh nào hết cạnh thì ghi vào route (post-order), cuối cùng đảo route. Bị kẹt chỉ có thể xảy ra ở đỉnh cuối; các vòng phụ đi lạc vào được post-order chèn đúng chỗ. Muốn thứ tự từ điển nhỏ nhất: danh sách kề là PriorityQueue, luôn đi đỉnh nhỏ nhất trước.",
+            "",
+            "**Cầu / khớp (Tarjan)**: DFS gán `tin[v]` (thời điểm thăm) và `low[v]` = `tin` nhỏ nhất với tới được từ cây con của v qua tối đa một back edge. Cạnh cây (u, v) là cầu khi `low[v] > tin[u]`: cây con của v không có đường vòng lên u hay cao hơn. u (không phải gốc) là khớp khi có con v với `low[v] >= tin[u]`; gốc DFS là khớp khi có từ 2 con trở lên.",
+            "",
+            "Độ phức tạp: Hierholzer O(E), O(E log E) khi cần thứ tự từ điển; Tarjan O(V + E) thời gian, O(V + E) bộ nhớ."
+          ],
+          "en": [
+            "A (directed) **Euler path** exists when the edges are connected and every node has in = out, except at most one start node (out - in = 1) and one end node (in - out = 1). With no unbalanced node it is a circuit and can start at any node that has edges. Undirected: 0 or 2 nodes of odd degree.",
+            "",
+            "**Hierholzer**: from the start node keep walking unused edges, deleting each one you use. When a node has no edges left, append it to the route (post-order), then reverse the route at the end. You can only get stuck at the end node; side loops you wander into are spliced in at the right place by the post-order. For the smallest lexical order, keep each adjacency list in a PriorityQueue and always take the smallest node first.",
+            "",
+            "**Bridges / articulation points (Tarjan)**: DFS assigns `tin[v]` (visit time) and `low[v]` = the smallest `tin` reachable from v's subtree using at most one back edge. Tree edge (u, v) is a bridge when `low[v] > tin[u]`: nothing in v's subtree loops back to u or above. u (not the root) is an articulation point when some child v has `low[v] >= tin[u]`; the DFS root is one when it has 2 or more children.",
+            "",
+            "Complexity: Hierholzer O(E), O(E log E) when lexical order is needed; Tarjan O(V + E) time, O(V + E) space."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Hierholzer (Reconstruct Itinerary): walk unused edges, emit a node once it has none left",
+          "List<String> findItinerary(List<List<String>> tickets) {",
+          "    Map<String, PriorityQueue<String>> g = new HashMap<>();   // PQ: smallest lexical first",
+          "    for (List<String> t : tickets)",
+          "        g.computeIfAbsent(t.get(0), x -> new PriorityQueue<>()).offer(t.get(1));",
+          "    LinkedList<String> route = new LinkedList<>();",
+          "    Deque<String> stack = new ArrayDeque<>();",
+          "    stack.push(\"JFK\");                              // start: the node with out - in = 1, if any",
+          "    while (!stack.isEmpty()) {",
+          "        PriorityQueue<String> out = g.get(stack.peek());",
+          "        if (out != null && !out.isEmpty()) stack.push(out.poll());   // use the edge once",
+          "        else route.addFirst(stack.pop());            // post-order, so prepend",
+          "    }",
+          "    return route;",
+          "}",
+          "",
+          "// Tarjan bridges (Critical Connections in a Network)",
+          "List<List<Integer>> adj = new ArrayList<>(), bridges = new ArrayList<>();",
+          "int[] tin, low;",
+          "int timer = 0;",
+          "",
+          "List<List<Integer>> criticalConnections(int n, List<List<Integer>> connections) {",
+          "    for (int i = 0; i < n; i++) adj.add(new ArrayList<>());",
+          "    for (List<Integer> c : connections) {",
+          "        adj.get(c.get(0)).add(c.get(1));",
+          "        adj.get(c.get(1)).add(c.get(0));",
+          "    }",
+          "    tin = new int[n];",
+          "    low = new int[n];",
+          "    Arrays.fill(tin, -1);                            // -1 = not visited",
+          "    dfs(0, -1);                                      // disconnected graph: loop over all nodes",
+          "    return bridges;",
+          "}",
+          "",
+          "void dfs(int u, int parent) {",
+          "    tin[u] = low[u] = timer++;",
+          "    for (int v : adj.get(u)) {",
+          "        if (v == parent) continue;                   // skip the edge we came by",
+          "        if (tin[v] == -1) {                          // tree edge",
+          "            dfs(v, u);",
+          "            low[u] = Math.min(low[u], low[v]);",
+          "            if (low[v] > tin[u]) bridges.add(List.of(u, v));   // cut vertex: low[v] >= tin[u]",
+          "        } else low[u] = Math.min(low[u], tin[v]);    // back edge",
+          "    }",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Ghi đỉnh vào route ngay khi tới (pre-order): đi tham lam theo thứ tự từ điển có thể vào ngõ cụt trước khi dùng hết vé; phải ghi khi đỉnh đã hết cạnh (Reconstruct Itinerary)",
+            "- Bắt đầu từ đỉnh tuỳ ý thay vì đỉnh có out - in = 1: đường bị đứt giữa chừng (Valid Arrangement of Pairs)",
+            "- Hierholzer đệ quy với 10⁵ cạnh: StackOverflowError, dùng stack tường minh như template; giá trị đỉnh tới 10⁹ nên dùng HashMap thay cho mảng (Valid Arrangement of Pairs)",
+            "- Bỏ qua cạnh về cha bằng `v == parent`: sai khi có cạnh song song giữa hai đỉnh (cạnh đôi không bao giờ là cầu); khi đó bỏ qua theo id cạnh",
+            "- Nhầm điều kiện: cầu dùng `low[v] > tin[u]` (lớn hơn hẳn), khớp dùng `>=`, và gốc DFS phải xét riêng theo số con (Critical Connections in a Network)"
+          ],
+          "en": [
+            "- Adding a node to the route as soon as you reach it (pre-order): greedy lexical order can walk into a dead end before all tickets are used; add it once it has no edges left (Reconstruct Itinerary)",
+            "- Starting from an arbitrary node instead of the one with out - in = 1: the path breaks off halfway (Valid Arrangement of Pairs)",
+            "- Recursive Hierholzer on 10⁵ edges: StackOverflowError, use an explicit stack as in the template; node values go up to 10⁹, so use a HashMap instead of arrays (Valid Arrangement of Pairs)",
+            "- Skipping the edge back with `v == parent`: wrong with parallel edges between two nodes (a doubled edge is never a bridge); skip by edge id instead",
+            "- Mixing up the conditions: a bridge needs `low[v] > tin[u]` (strictly greater), an articulation point `>=`, and the DFS root is judged by its number of children (Critical Connections in a Network)"
+          ]
+        }
+      }
     },
     {
       "id": "p4-atcoder",

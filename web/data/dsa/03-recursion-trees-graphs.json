@@ -20,7 +20,98 @@
         { "type": "article", "title": "Tech Interview Handbook: Recursion", "url": "https://www.techinterviewhandbook.org/algorithms/recursion/" },
         { "type": "practice", "title": "LeetCode tag: Recursion", "url": "https://leetcode.com/problem-list/recursion/" },
         { "type": "practice", "title": "LeetCode tag: Divide and Conquer", "url": "https://leetcode.com/problem-list/divide-and-conquer/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Bài lớn viết được qua **bài nhỏ hơn cùng dạng**: f(n) theo f(n - 1), cây theo cây con, mảng theo hai nửa",
+            "- Đề cho sẵn công thức truy hồi (Fibonacci, số cách leo cầu thang) hoặc cấu trúc tự lặp (số → tổng chữ số → tổng chữ số...)",
+            "- Cây lời gọi gặp lại **cùng tham số** nhiều lần: thêm memo, đây là cửa vào DP",
+            "- Đếm cặp `i < j` thoả một so sánh giữa `a[i]` và `a[j]` (nghịch thế, `a[i] > 2·a[j]`, số nhỏ hơn bên phải), n tới 10⁵ nên O(n²) TLE",
+            "- Chia đôi được và gộp hai nửa đã giải trong O(n): khung merge sort",
+            "- Khác với Backtracking: mỗi lời gọi **trả về một giá trị** để gộp, không liệt kê mọi lựa chọn rồi hoàn tác"
+          ],
+          "en": [
+            "- The big problem can be written in terms of a **smaller problem of the same shape**: f(n) from f(n - 1), a tree from its subtrees, an array from its two halves",
+            "- The statement gives a recurrence (Fibonacci, ways to climb stairs) or a self-similar process (number → digit sum → digit sum...)",
+            "- The call tree hits the **same arguments** again and again: add a memo, this is the doorway to DP",
+            "- Counting pairs `i < j` with some comparison between `a[i]` and `a[j]` (inversions, `a[i] > 2·a[j]`, smaller numbers to the right), n up to 10⁵ so O(n²) times out",
+            "- The input splits in half and two solved halves combine in O(n): the merge sort skeleton",
+            "- Unlike backtracking: each call **returns a value** to combine, it does not list every choice and undo it"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Nói rõ hàm trả về gì, viết trường hợp cơ sở trước, rồi **tin** lời gọi đệ quy trên input nhỏ hơn trả về đúng và chỉ lo phần gộp. Đừng lần theo từng tầng.",
+            "",
+            "- Lời gọi trùng tham số: lưu kết quả vào mảng/`HashMap`, số lời gọi từ hàm mũ xuống bằng số trạng thái",
+            "- Chia để trị: chia đôi, giải hai nửa, gộp trong O(n), nên T(n) = 2T(n/2) + O(n) = O(n log n)",
+            "- Đếm cặp kiểu merge sort: cặp nằm gọn trong một nửa đã được lời gọi con đếm; còn lại các cặp chéo (i bên trái, j bên phải, nên luôn i < j theo vị trí gốc). Hai nửa đã sort nên đếm cặp chéo bằng hai con trỏ trong O(n)",
+            "",
+            "Độ phức tạp: chia để trị O(n log n) thời gian, O(n) bộ nhớ cho mảng tạm. Có memo: O(số trạng thái × việc mỗi trạng thái)."
+          ],
+          "en": [
+            "State what the function returns, write the base case first, then **trust** that the recursive call on a smaller input is right and only work out how to combine. Do not trace every level.",
+            "",
+            "- Calls repeat with the same arguments: cache results in an array or `HashMap`, the call count drops from exponential to the number of states",
+            "- Divide and conquer: split in half, solve both halves, combine in O(n), so T(n) = 2T(n/2) + O(n) = O(n log n)",
+            "- Merge sort counting: pairs inside one half were counted by the child call; what is left are cross pairs (i on the left, j on the right, so always i < j in the original order). Both halves are sorted, so two pointers count the cross pairs in O(n)",
+            "",
+            "Complexity: divide and conquer O(n log n) time, O(n) space for the buffer. With a memo: O(states × work per state)."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Divide and conquer: count pairs i < j with a[i] > 2 * a[j] (Reverse Pairs)",
+          "// Sorts a[lo..hi) as a side effect; tmp is a buffer with a.length cells",
+          "long countPairs(int[] a, int lo, int hi, int[] tmp) {",
+          "    if (hi - lo <= 1) return 0;                          // base case",
+          "    int mid = (lo + hi) >>> 1;",
+          "    long count = countPairs(a, lo, mid, tmp) + countPairs(a, mid, hi, tmp); // trust it",
+          "    // Cross pairs on two sorted halves: this loop is what changes per problem",
+          "    for (int i = lo, j = mid; i < mid; i++) {",
+          "        while (j < hi && a[i] > 2L * a[j]) j++;            // 2L: 2 * a[j] overflows int",
+          "        count += j - mid;",
+          "    }",
+          "    // Plain inversions: skip the loop, add mid - i when the merge takes a[j]",
+          "    int i = lo, j = mid, k = lo;",
+          "    while (i < mid && j < hi) tmp[k++] = a[i] <= a[j] ? a[i++] : a[j++];",
+          "    while (i < mid) tmp[k++] = a[i++];",
+          "    while (j < hi) tmp[k++] = a[j++];",
+          "    System.arraycopy(tmp, lo, a, lo, hi - lo);",
+          "    return count;",
+          "}",
+          "",
+          "// Recursion + memo: ways to climb n stairs with steps of 1, 2 or 3",
+          "Map<Integer, Long> memo = new HashMap<>();",
+          "long ways(int n) {",
+          "    if (n < 0) return 0;                                 // base cases first",
+          "    if (n == 0) return 1;",
+          "    Long cached = memo.get(n);",
+          "    if (cached != null) return cached;",
+          "    long res = ways(n - 1) + ways(n - 2) + ways(n - 3);",
+          "    memo.put(n, res);                                    // not computeIfAbsent: see pitfalls",
+          "    return res;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Không memo khi cùng tham số bị gọi lại: số lời gọi tăng theo hàm mũ, TLE (Recursion: Davis' Staircase)",
+            "- Viết memo bằng `memo.computeIfAbsent(n, k -> f(k - 1) + f(k - 2))`: lời gọi đệ quy bên trong sửa chính `HashMap` đó, Java 9+ ném `ConcurrentModificationException` (Fibonacci Number)",
+            "- Tràn `int`: `2 * a[j]` phải tính bằng `long`, và số nghịch thế tới n²/2 nên biến đếm là `long` (Reverse Pairs, Merge Sort: Counting Inversions)",
+            "- Đếm cặp chéo lồng trong bước merge khi điều kiện đếm khác điều kiện so sánh của merge: `a[i] > 2·a[j]` cần một vòng hai con trỏ riêng trước khi merge (Reverse Pairs)",
+            "- Sort giá trị rồi không biết cộng kết quả về vị trí nào: sort **mảng chỉ số** theo giá trị; khi lấy phần tử bên trái thì cộng số phần tử bên phải đã lấy (`j - mid`) vào `count[index]` (Count of Smaller Numbers After Self)"
+          ],
+          "en": [
+            "- No memo while the same arguments come back: the call count grows exponentially and times out (Recursion: Davis' Staircase)",
+            "- Writing the memo as `memo.computeIfAbsent(n, k -> f(k - 1) + f(k - 2))`: the recursive call inside modifies the same `HashMap`, and Java 9+ throws `ConcurrentModificationException` (Fibonacci Number)",
+            "- `int` overflow: compute `2 * a[j]` as a `long`, and the inversion count reaches n²/2, so the counter must be a `long` (Reverse Pairs, Merge Sort: Counting Inversions)",
+            "- Counting cross pairs inside the merge when the counting condition differs from the merge comparison: `a[i] > 2·a[j]` needs its own two-pointer pass before the merge (Reverse Pairs)",
+            "- Sorting values and losing track of where each result belongs: sort an **index array** by value; when the merge takes a left element, add the number of right elements already taken (`j - mid`) to `count[index]` (Count of Smaller Numbers After Self)"
+          ]
+        }
+      }
     },
     {
       "id": "p3-backtrack",
@@ -42,7 +133,108 @@
       "resources": [
         { "type": "article", "title": "USACO Guide: Complete Search with Recursion", "url": "https://usaco.guide/bronze/complete-rec" },
         { "type": "practice", "title": "LeetCode tag: Backtracking", "url": "https://leetcode.com/problem-list/backtracking/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đề bắt **liệt kê tất cả**: mọi tập con, hoán vị, tổ hợp, cách chia chuỗi, cách đặt quân",
+            "- n nhỏ (khoảng ≤ 15 với 2ⁿ, ≤ 9 với n!) vì chính output đã có kích thước hàm mũ",
+            "- Mỗi bước là một lựa chọn trong vài khả năng, có ràng buộc để cắt nhánh sớm: tổng vượt target, ngoặc đóng nhiều hơn mở, hai hậu ăn nhau",
+            "- Tìm một đường đi trên lưới mà mỗi ô chỉ dùng một lần (Word Search)",
+            "- Input có phần tử trùng nhưng đề cấm kết quả trùng: sort rồi bỏ qua giá trị lặp trong cùng một tầng",
+            "- Khác với DP: đề chỉ hỏi **số cách** hay min/max thì thường là DP; backtrack khi phải sinh ra từng cấu hình"
+          ],
+          "en": [
+            "- The problem asks to **list all**: every subset, permutation, combination, way to split a string, way to place pieces",
+            "- n is small (around ≤ 15 for 2ⁿ, ≤ 9 for n!) because the output itself is exponential",
+            "- Each step picks one of a few options, with a constraint that prunes early: sum over target, more closing than opening brackets, two queens attacking",
+            "- Find a path on a grid where each cell is used at most once (Word Search)",
+            "- The input has duplicates but the answer must not: sort, then skip repeated values within one level",
+            "- Unlike DP: if the problem only asks for the **number of ways** or a min/max, it is usually DP; backtrack when you must produce each configuration"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "DFS trên cây quyết định với một `path` dùng chung: **chọn** (thêm vào path), **đi tiếp** (đệ quy), **bỏ chọn** (xoá đúng phần tử vừa thêm). Lời gọi con trả về thì trạng thái y như trước khi chọn, nên vòng `for` thử lựa chọn kế tiếp trên trạng thái sạch.",
+            "",
+            "- Tập con / tổ hợp: truyền `start`, chỉ chọn từ `start` trở đi để không sinh lại cùng tập theo thứ tự khác. Được dùng lại (Combination Sum) thì gọi tiếp với `i`, không thì `i + 1`",
+            "- Tập con: ghi kết quả ở **mọi** node; tổ hợp/hoán vị: chỉ ghi khi đạt đích",
+            "- Hoán vị: mỗi tầng duyệt mọi `i`, dùng mảng `used`",
+            "- Có phần tử trùng: sort, rồi `if (i > start && a[i] == a[i - 1]) continue;`",
+            "- Lưới, N-Queens: đánh dấu ô/cột/đường chéo khi chọn, gỡ đánh dấu khi quay lui (đường chéo: `r - c + n` và `r + c`)",
+            "",
+            "Độ phức tạp: tập con O(2ⁿ · n), hoán vị O(n! · n) (tính cả chi phí copy mỗi kết quả); bộ nhớ O(n) cho path và stack, chưa tính output."
+          ],
+          "en": [
+            "DFS over the decision tree with one shared `path`: **choose** (add to path), **explore** (recurse), **un-choose** (remove exactly what was added). When the child call returns, the state is exactly as before the choice, so the `for` loop tries the next option on a clean state.",
+            "",
+            "- Subsets / combinations: pass `start` and only pick from `start` on, so the same set is not produced in another order. Reuse allowed (Combination Sum): recurse with `i`, otherwise `i + 1`",
+            "- Subsets: record at **every** node; combinations/permutations: record only at the goal",
+            "- Permutations: every level loops over all `i`, with a `used` array",
+            "- Duplicates in the input: sort, then `if (i > start && a[i] == a[i - 1]) continue;`",
+            "- Grids, N-Queens: mark the cell/column/diagonals when choosing, unmark when backing out (diagonals: `r - c + n` and `r + c`)",
+            "",
+            "Complexity: subsets O(2ⁿ · n), permutations O(n! · n) (including copying each result); O(n) space for the path and the stack, not counting the output."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Combinations summing to target, each number used once, input may repeat (Combination Sum II)",
+          "List<List<Integer>> combinationSum2(int[] nums, int target) {",
+          "    Arrays.sort(nums);                                    // needed for the skip and the break",
+          "    List<List<Integer>> res = new ArrayList<>();",
+          "    dfs(nums, 0, target, new ArrayList<>(), res);",
+          "    return res;",
+          "}",
+          "",
+          "void dfs(int[] nums, int start, int remain, List<Integer> path, List<List<Integer>> res) {",
+          "    if (remain == 0) {                                    // goal (subsets: record at every node)",
+          "        res.add(new ArrayList<>(path));                   // record a COPY",
+          "        return;",
+          "    }",
+          "    for (int i = start; i < nums.length; i++) {",
+          "        if (i > start && nums[i] == nums[i - 1]) continue; // same value already tried here",
+          "        if (nums[i] > remain) break;                      // sorted: the rest is too big",
+          "        path.add(nums[i]);                                // choose",
+          "        dfs(nums, i + 1, remain - nums[i], path, res);    // explore (i instead: reuse allowed)",
+          "        path.remove(path.size() - 1);                     // un-choose",
+          "    }",
+          "}",
+          "",
+          "// Permutations: every index at every level, used[] instead of start",
+          "void permute(int[] nums, boolean[] used, List<Integer> path, List<List<Integer>> res) {",
+          "    if (path.size() == nums.length) {",
+          "        res.add(new ArrayList<>(path));",
+          "        return;",
+          "    }",
+          "    for (int i = 0; i < nums.length; i++) {",
+          "        if (used[i]) continue;",
+          "        used[i] = true;",
+          "        path.add(nums[i]);",
+          "        permute(nums, used, path, res);",
+          "        path.remove(path.size() - 1);",
+          "        used[i] = false;",
+          "    }",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- `res.add(path)` không copy: mọi phần tử của `res` là cùng một list, cuối cùng toàn list rỗng (Subsets)",
+            "- Bỏ qua phần tử trùng bằng `i > 0` thay vì `i > start`: mất cả kết quả hợp lệ như `[1, 1, 6]` vì chặn luôn việc chọn số 1 thứ hai ở tầng sâu hơn (Combination Sum II)",
+            "- Gọi tiếp với `0` thay vì `i` khi được dùng lại: sinh cùng một tổ hợp theo nhiều thứ tự, `[2, 2, 3]` và `[2, 3, 2]` (Combination Sum)",
+            "- Đánh dấu ô đã đi (`board[r][c] = '#'`) mà quên khôi phục khi quay lui: các nhánh và điểm xuất phát sau thấy lưới bị hỏng (Word Search)",
+            "- `path.remove(x)` với `x` là `int` sẽ xoá theo **index**, không theo giá trị; luôn dùng `path.remove(path.size() - 1)` (Permutations)"
+          ],
+          "en": [
+            "- `res.add(path)` without a copy: every entry of `res` is the same list, which ends up empty (Subsets)",
+            "- Skipping duplicates with `i > 0` instead of `i > start`: loses valid answers such as `[1, 1, 6]`, because it also blocks taking the second 1 one level deeper (Combination Sum II)",
+            "- Recursing with `0` instead of `i` when reuse is allowed: the same combination comes out in several orders, `[2, 2, 3]` and `[2, 3, 2]` (Combination Sum)",
+            "- Marking a visited cell (`board[r][c] = '#'`) and not restoring it on the way back: later branches and later start cells see a broken grid (Word Search)",
+            "- `path.remove(x)` with an `int` `x` removes by **index**, not by value; always use `path.remove(path.size() - 1)` (Permutations)"
+          ]
+        }
+      }
     },
     {
       "id": "p3-tree",
@@ -63,7 +255,114 @@
         { "type": "article", "title": "Tech Interview Handbook: Tree", "url": "https://www.techinterviewhandbook.org/algorithms/tree/" },
         { "type": "video", "title": "freeCodeCamp: Binary Tree Algorithms for Technical Interviews", "url": "https://www.youtube.com/watch?v=fAAZixBzIAI" },
         { "type": "practice", "title": "LeetCode tag: Tree", "url": "https://leetcode.com/problem-list/tree/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đề bắt trả về các node theo thứ tự pre-order / in-order / post-order, thường kèm \"làm bằng vòng lặp được không?\"",
+            "- Dựng lại cây từ hai dãy duyệt (preorder + inorder, postorder + inorder)",
+            "- Biến cây thành chuỗi và dựng lại (serialize, gửi cây qua mạng, copy cây)",
+            "- Chọn thứ tự theo việc cần làm: cha xử lý trước con (copy, serialize) là pre-order; cần thứ tự tăng dần của BST là in-order; cha cần kết quả của con là post-order",
+            "- Cây có thể lệch thành một đường dài: đệ quy sâu dễ `StackOverflowError`, dùng stack tường minh",
+            "- Khác với BFS trên cây: đề không nói gì tới \"tầng\", \"level\", \"từ trái sang phải trên từng hàng\""
+          ],
+          "en": [
+            "- Asks for the nodes in pre-order / in-order / post-order, often with \"can you do it iteratively?\"",
+            "- Rebuild a tree from two traversals (preorder + inorder, postorder + inorder)",
+            "- Turn a tree into a string and back (serialize, send a tree over the wire, copy a tree)",
+            "- Pick the order by the job: parent before children (copy, serialize) is pre-order; sorted order of a BST is in-order; parent needs its children's results is post-order",
+            "- The tree can degenerate into a long chain: deep recursion risks `StackOverflowError`, use an explicit stack",
+            "- Unlike tree BFS: nothing about \"levels\" or \"row by row, left to right\""
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Ba thứ tự chỉ khác ở chỗ xử lý node so với hai lời gọi con: pre (node, trái, phải), in (trái, node, phải), post (trái, phải, node). Bản lặp dùng `ArrayDeque` làm stack để thay call stack.",
+            "",
+            "- In-order lặp: đi trái hết cỡ và push từng node; pop ra thì xử lý, rồi chuyển sang con phải",
+            "- Pre-order lặp: pop, xử lý, push con **phải trước** rồi con trái (để con trái ra trước)",
+            "- Post-order lặp: làm kiểu (node, phải, trái) rồi đảo ngược kết quả",
+            "- Dựng cây: `preorder` cho gốc theo thứ tự lần lượt; vị trí gốc trong `inorder` (tra bằng `HashMap`) chia đoạn trái/phải",
+            "- Serialize: pre-order kèm dấu `#` cho null và dấu phân cách, nên chuỗi xác định duy nhất một cây; deserialize đọc token theo đúng thứ tự đó",
+            "",
+            "Độ phức tạp: O(n) thời gian, O(h) bộ nhớ (h = chiều cao, tệ nhất O(n) khi cây lệch)."
+          ],
+          "en": [
+            "The three orders differ only in where the node is handled relative to the two child calls: pre (node, left, right), in (left, node, right), post (left, right, node). The iterative versions use an `ArrayDeque` as the stack instead of the call stack.",
+            "",
+            "- Iterative in-order: go left as far as possible, pushing each node; on pop, visit it, then move to its right child",
+            "- Iterative pre-order: pop, visit, push the **right child first**, then the left (so the left pops first)",
+            "- Iterative post-order: produce (node, right, left), then reverse the result",
+            "- Build: `preorder` hands out roots one by one; the root's position in `inorder` (looked up in a `HashMap`) splits the left and right ranges",
+            "- Serialize: pre-order with `#` for null and a separator, so the string fixes exactly one tree; deserialize reads the tokens back in the same order",
+            "",
+            "Complexity: O(n) time, O(h) space (h = height, O(n) in the worst case for a skewed tree)."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Iterative in-order: go left as far as possible, pop and visit, then go right",
+          "List<Integer> inorder(TreeNode root) {",
+          "    List<Integer> res = new ArrayList<>();",
+          "    Deque<TreeNode> stack = new ArrayDeque<>();",
+          "    TreeNode cur = root;",
+          "    while (cur != null || !stack.isEmpty()) {",
+          "        while (cur != null) { stack.push(cur); cur = cur.left; }",
+          "        cur = stack.pop();",
+          "        res.add(cur.val);                                // visit",
+          "        cur = cur.right;",
+          "    }",
+          "    return res;",
+          "}",
+          "",
+          "// Build from preorder + inorder (unique values): call build(preorder, 0, n - 1)",
+          "int pre = 0;                                             // next root in preorder",
+          "Map<Integer, Integer> inIndex = new HashMap<>();         // value -> index in inorder, fill first",
+          "TreeNode build(int[] preorder, int lo, int hi) {         // this subtree is inorder[lo..hi]",
+          "    if (lo > hi) return null;",
+          "    TreeNode root = new TreeNode(preorder[pre++]);",
+          "    int mid = inIndex.get(root.val);",
+          "    root.left = build(preorder, lo, mid - 1);            // left first: preorder's order",
+          "    root.right = build(preorder, mid + 1, hi);",
+          "    return root;",
+          "}",
+          "",
+          "// Serialize: preorder, \"#\" for null, \",\" between tokens",
+          "void write(TreeNode node, StringBuilder sb) {",
+          "    if (node == null) { sb.append(\"#,\"); return; }",
+          "    sb.append(node.val).append(',');",
+          "    write(node.left, sb);",
+          "    write(node.right, sb);",
+          "}",
+          "",
+          "// Deserialize: read(new ArrayDeque<>(Arrays.asList(data.split(\",\"))))",
+          "TreeNode read(Deque<String> tokens) {",
+          "    String t = tokens.poll();",
+          "    if (t.equals(\"#\")) return null;",
+          "    TreeNode node = new TreeNode(Integer.parseInt(t));",
+          "    node.left = read(tokens);                            // same order as write",
+          "    node.right = read(tokens);",
+          "    return node;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- In-order lặp với điều kiện `while (!stack.isEmpty())`: stack rỗng ngay từ đầu, hoặc dừng sớm khi vẫn còn nhánh phải; phải là `cur != null || !stack.isEmpty()` (Binary Tree Inorder Traversal)",
+            "- Pre-order lặp push con trái trước con phải: ra thứ tự (node, phải, trái) (Binary Tree Preorder Traversal)",
+            "- Tìm gốc trong inorder bằng vòng lặp hoặc cắt mảng bằng `Arrays.copyOfRange` ở mỗi tầng: O(n²); dùng `HashMap` và chỉ số. Dựng con phải trước con trái thì `pre++` lấy sai gốc (Construct Binary Tree from Preorder and Inorder Traversal)",
+            "- Serialize không ghi null hoặc không có dấu phân cách: nhiều cây cho cùng một chuỗi, số nhiều chữ số và số âm bị dính nhau (Serialize and Deserialize Binary Tree)",
+            "- Chiều cao trên HackerRank tính theo **số cạnh** (cây một node cao 0), không theo số node như Maximum Depth (Tree: Height of a Binary Tree)"
+          ],
+          "en": [
+            "- Iterative in-order with `while (!stack.isEmpty())`: the stack starts empty, or the loop stops while a right branch is still left; it must be `cur != null || !stack.isEmpty()` (Binary Tree Inorder Traversal)",
+            "- Iterative pre-order pushing the left child before the right: the output comes out as (node, right, left) (Binary Tree Preorder Traversal)",
+            "- Finding the root in inorder with a loop, or slicing with `Arrays.copyOfRange` at every level: O(n²); use a `HashMap` and indices. Building the right child before the left makes `pre++` hand out the wrong root (Construct Binary Tree from Preorder and Inorder Traversal)",
+            "- Serializing without null markers or without a separator: several trees give the same string, and multi-digit or negative numbers run together (Serialize and Deserialize Binary Tree)",
+            "- HackerRank's height counts **edges** (a single node has height 0), not nodes as in Maximum Depth (Tree: Height of a Binary Tree)"
+          ]
+        }
+      }
     },
     {
       "id": "p3-trees",
@@ -85,7 +384,108 @@
       ],
       "resources": [
         { "type": "practice", "title": "LeetCode tag: Binary Tree", "url": "https://leetcode.com/problem-list/binary-tree/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đáp án ở một node tính được từ đáp án của hai cây con: chiều cao, cân bằng, đường kính, tổng đường đi lớn nhất (bottom-up)",
+            "- Điều kiện ở một node phụ thuộc đường đi từ gốc xuống nó: max trên đường đi, tổng từ gốc tới lá (top-down, truyền tham số xuống)",
+            "- Đáp án là một đường đi có thể \"bẻ cong\" qua một node (đường kính, max path sum): cần thêm biến `best` toàn cục ngoài giá trị trả về",
+            "- Đệ quy song song trên hai cây hoặc hai nhánh: Same Tree, Subtree of Another Tree, Invert Binary Tree",
+            "- Tổ tiên chung thấp nhất của hai node trong cây thường (không có thứ tự giá trị)",
+            "- Khác với BST: cây thường không cho bỏ nhánh nhờ so giá trị, phải đi cả hai con; khác với BFS: đề không hỏi theo tầng"
+          ],
+          "en": [
+            "- A node's answer follows from its two subtrees' answers: height, balanced, diameter, maximum path sum (bottom-up)",
+            "- A node's condition depends on the path from the root down to it: max along the path, root-to-leaf sum (top-down, pass parameters down)",
+            "- The answer is a path that can \"bend\" at a node (diameter, max path sum): you need a global `best` besides the return value",
+            "- Recursion over two trees or two branches at once: Same Tree, Subtree of Another Tree, Invert Binary Tree",
+            "- Lowest common ancestor of two nodes in a plain binary tree (no value order)",
+            "- Unlike a BST: a plain tree gives no value order to skip a branch, so both children are visited; unlike BFS: nothing is asked per level"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Hỏi một câu: **node này cần gì từ hai con** (bottom-up, trả về giá trị), hay **con cần gì từ cha** (top-down, truyền tham số)?",
+            "",
+            "- Bottom-up (post-order): trả về cho cha một giá trị (chiều cao, nhánh tốt nhất). Khi đáp án là đường đi qua node, trả về nhánh tốt nhất **một phía** và cập nhật `best` bằng đường **hai phía** tại node",
+            "- Balanced: trả về chiều cao, hoặc `-1` nghĩa là đã lệch, để không tính lại chiều cao ở mỗi node",
+            "- Top-down (pre-order): truyền trạng thái xuống qua tham số (max trên đường đi, tổng còn lại) và kết luận ở node hoặc ở lá",
+            "- LCA: node là null, p hoặc q thì trả về chính nó; hai bên đều trả về khác null thì node hiện tại là LCA; không thì trả về bên khác null",
+            "",
+            "Độ phức tạp: O(n) thời gian, O(h) bộ nhớ cho stack đệ quy (h = chiều cao)."
+          ],
+          "en": [
+            "Ask one question: **what does this node need from its two children** (bottom-up, return a value), or **what does a child need from its parent** (top-down, pass a parameter)?",
+            "",
+            "- Bottom-up (post-order): return one value to the parent (height, best branch). When the answer is a path through the node, return the best **one-sided** branch and update `best` with the **two-sided** path at the node",
+            "- Balanced: return the height, or `-1` meaning already unbalanced, so heights are not recomputed at every node",
+            "- Top-down (pre-order): pass state down as parameters (max along the path, remaining sum) and decide at the node or at a leaf",
+            "- LCA: if the node is null, p or q, return it; if both sides return non-null, this node is the LCA; otherwise return the non-null side",
+            "",
+            "Complexity: O(n) time, O(h) space for the recursion stack (h = height)."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Bottom-up: return one value to the parent, keep the real answer in a field",
+          "int best;",
+          "int maxPathSum(TreeNode root) {",
+          "    best = Integer.MIN_VALUE;                            // not 0: all values may be negative",
+          "    gain(root);",
+          "    return best;",
+          "}",
+          "int gain(TreeNode node) {                                // best downward path starting here",
+          "    if (node == null) return 0;",
+          "    int left = Math.max(0, gain(node.left));             // drop a negative branch",
+          "    int right = Math.max(0, gain(node.right));",
+          "    best = Math.max(best, node.val + left + right);      // path bending at this node",
+          "    return node.val + Math.max(left, right);             // the parent extends one side only",
+          "}",
+          "",
+          "// Bottom-up with a sentinel: height, or -1 if some subtree is unbalanced",
+          "int height(TreeNode node) {",
+          "    if (node == null) return 0;",
+          "    int l = height(node.left), r = height(node.right);",
+          "    if (l < 0 || r < 0 || Math.abs(l - r) > 1) return -1;",
+          "    return 1 + Math.max(l, r);",
+          "}",
+          "",
+          "// Top-down: pass state from the root down; call goodNodes(root, Integer.MIN_VALUE)",
+          "int goodNodes(TreeNode node, int maxSoFar) {",
+          "    if (node == null) return 0;",
+          "    int good = node.val >= maxSoFar ? 1 : 0;",
+          "    int max = Math.max(maxSoFar, node.val);",
+          "    return good + goodNodes(node.left, max) + goodNodes(node.right, max);",
+          "}",
+          "",
+          "// LCA of a binary tree (p and q are both in the tree)",
+          "TreeNode lca(TreeNode node, TreeNode p, TreeNode q) {",
+          "    if (node == null || node == p || node == q) return node;",
+          "    TreeNode left = lca(node.left, p, q);",
+          "    TreeNode right = lca(node.right, p, q);",
+          "    if (left != null && right != null) return node;      // p and q split here",
+          "    return left != null ? left : right;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Trả về cho cha cả hai nhánh `node.val + left + right`: đường đi bị rẽ đôi, không còn là một đường (Binary Tree Maximum Path Sum)",
+            "- Khởi tạo `best = 0` hoặc không bỏ nhánh âm bằng `Math.max(0, ...)`: sai khi cây toàn số âm, hoặc kéo nhánh âm vào tổng (Binary Tree Maximum Path Sum)",
+            "- Chỉ tính đường kính đi qua gốc: đường dài nhất có thể nằm gọn trong một cây con; đường kính tính theo **số cạnh** = `left + right` với height theo số node (Diameter of Binary Tree)",
+            "- Gọi `height()` riêng tại mỗi node rồi so sánh: chiều cao của cùng một cây con bị tính lại nhiều lần, không còn O(n); dùng sentinel `-1` để làm trong một lần duyệt (Balanced Binary Tree)",
+            "- Kết luận ở node null thay vì ở lá: cây `[1, 2]` với target 1 trả `true` sai vì con phải null của gốc \"khớp\" (Path Sum)"
+          ],
+          "en": [
+            "- Returning both branches `node.val + left + right` to the parent: the path forks and is no longer a single path (Binary Tree Maximum Path Sum)",
+            "- Starting with `best = 0`, or not dropping negative branches with `Math.max(0, ...)`: wrong when every value is negative, or a negative branch drags the sum down (Binary Tree Maximum Path Sum)",
+            "- Only counting the diameter through the root: the longest path can sit inside one subtree; the diameter counts **edges**, which is `left + right` when heights count nodes (Diameter of Binary Tree)",
+            "- Calling a separate `height()` at every node and comparing: the same subtree's height is computed again and again, so it is no longer O(n); use the `-1` sentinel to do it in one pass (Balanced Binary Tree)",
+            "- Deciding at a null node instead of at a leaf: tree `[1, 2]` with target 1 wrongly returns `true` because the root's null right child \"matches\" (Path Sum)"
+          ]
+        }
+      }
     },
     {
       "id": "p3-tree-bfs",
@@ -97,7 +497,105 @@
         { "title": "Binary Tree Zigzag Level Order Traversal", "url": "https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/", "level": "Medium" },
         { "title": "Maximum Width of Binary Tree", "url": "https://leetcode.com/problems/maximum-width-of-binary-tree/", "level": "Medium" },
         { "title": "Tree: Level Order Traversal", "url": "https://www.hackerrank.com/challenges/tree-level-order-traversal/problem", "level": "Easy" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đề nói \"level\", \"tầng\", \"từng hàng từ trái sang phải\", \"theo độ sâu\"",
+            "- Kết quả gom theo tầng: danh sách mỗi tầng, trung bình/max mỗi tầng, node đầu hoặc cuối mỗi tầng (nhìn cây từ bên phải)",
+            "- Đổi chiều xen kẽ giữa các tầng (zigzag)",
+            "- Độ rộng của một tầng tính cả chỗ trống ở giữa: đánh chỉ số kiểu heap `2i`, `2i + 1`",
+            "- Tìm node gần gốc nhất thoả điều kiện (độ sâu nhỏ nhất): BFS dừng ngay ở tầng đầu tiên gặp",
+            "- Khác với DFS trên cây: DFS kèm tham số `depth` cũng gom được theo tầng, nhưng BFS tự nhiên hơn khi phải xử lý trọn một tầng rồi mới sang tầng sau"
+          ],
+          "en": [
+            "- The statement says \"level\", \"row by row, left to right\", \"by depth\"",
+            "- Results grouped per level: a list per level, average/max per level, first or last node of each level (the view from the right)",
+            "- Direction alternates between levels (zigzag)",
+            "- The width of a level counts the gaps in between: number nodes like a heap, `2i`, `2i + 1`",
+            "- Find the node closest to the root that meets a condition (smallest depth): BFS stops at the first level where it appears",
+            "- Unlike tree DFS: DFS with a `depth` parameter can also group by level, but BFS is more natural when one level must be finished before the next"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Ở đầu mỗi vòng `while`, queue chứa **đúng một tầng**. Chụp `size = queue.size()` trước, poll đúng `size` node (tầng hiện tại) và offer con của chúng (tầng sau). Nhờ vậy biết chính xác node nào thuộc tầng nào mà không phải lưu độ sâu.",
+            "",
+            "- Right Side View: lấy node cuối của mỗi tầng (`i == size - 1`)",
+            "- Zigzag: duyệt queue như bình thường, chỉ đảo thứ tự **kết quả** của tầng lẻ (hoặc `addFirst` vào `Deque` của tầng)",
+            "- Maximum Width: lưu kèm chỉ số, con trái `2i`, con phải `2i + 1`; độ rộng = chỉ số cuối - chỉ số đầu + 1; trừ chỉ số đầu tầng trước khi nhân đôi để số không phình theo độ sâu",
+            "",
+            "Độ phức tạp: O(n) thời gian, O(w) bộ nhớ (w = số node nhiều nhất trên một tầng, có thể tới n/2)."
+          ],
+          "en": [
+            "At the top of each `while` round the queue holds **exactly one level**. Snapshot `size = queue.size()` first, poll exactly `size` nodes (this level) and offer their children (the next level). So you know exactly which level each node belongs to without storing depths.",
+            "",
+            "- Right Side View: take the last node of each level (`i == size - 1`)",
+            "- Zigzag: walk the queue as usual and only reverse the **result** of odd levels (or `addFirst` into the level's `Deque`)",
+            "- Maximum Width: carry an index, left child `2i`, right child `2i + 1`; width = last index - first index + 1; subtract the level's first index before doubling so the numbers do not grow with depth",
+            "",
+            "Complexity: O(n) time, O(w) space (w = the most nodes on one level, up to n/2)."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Level by level: snapshot the size, then poll exactly that many nodes",
+          "List<List<Integer>> levelOrder(TreeNode root) {",
+          "    List<List<Integer>> res = new ArrayList<>();",
+          "    Deque<TreeNode> queue = new ArrayDeque<>();",
+          "    if (root != null) queue.offer(root);                 // ArrayDeque rejects null",
+          "    while (!queue.isEmpty()) {",
+          "        int size = queue.size();                          // nodes of this level only",
+          "        List<Integer> level = new ArrayList<>();",
+          "        for (int i = 0; i < size; i++) {",
+          "            TreeNode node = queue.poll();",
+          "            level.add(node.val);                          // per-level work goes here",
+          "            if (node.left != null) queue.offer(node.left);",
+          "            if (node.right != null) queue.offer(node.right);",
+          "        }",
+          "        res.add(level);                                   // zigzag: reverse odd levels",
+          "    }",
+          "    return res;",
+          "}",
+          "",
+          "// Maximum Width: carry a heap index, rebased to 0 at the start of each level",
+          "record Item(TreeNode node, long idx) {}",
+          "int widthOfBinaryTree(TreeNode root) {                   // root != null",
+          "    Deque<Item> queue = new ArrayDeque<>(List.of(new Item(root, 0)));",
+          "    long best = 0;",
+          "    while (!queue.isEmpty()) {",
+          "        int size = queue.size();",
+          "        long first = queue.peek().idx(), last = 0;",
+          "        for (int i = 0; i < size; i++) {",
+          "            Item it = queue.poll();",
+          "            last = it.idx() - first;                      // rebase: no overflow on deep trees",
+          "            TreeNode n = it.node();",
+          "            if (n.left != null) queue.offer(new Item(n.left, 2 * last));",
+          "            if (n.right != null) queue.offer(new Item(n.right, 2 * last + 1));",
+          "        }",
+          "        best = Math.max(best, last + 1);",
+          "    }",
+          "    return (int) best;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Viết `for (int i = 0; i < queue.size(); i++)`: size đổi khi offer con nên các tầng trộn vào nhau; phải chụp `size` trước vòng `for` (Binary Tree Level Order Traversal)",
+            "- Cộng tổng một tầng bằng `int`: giá trị tới 2³¹ - 1 nên tràn; dùng `long` hoặc `double` (Average of Levels in Binary Tree)",
+            "- Chỉ số `2i` nhân đôi mỗi tầng, cây lệch sâu vài nghìn tầng thì tràn cả `long`; phải trừ chỉ số đầu tầng trước (Maximum Width of Binary Tree)",
+            "- Zigzag bằng cách đảo thứ tự **offer** con: tầng sau bị sai thứ tự; giữ nguyên queue, chỉ đảo kết quả (Binary Tree Zigzag Level Order Traversal)",
+            "- Lấy con phải của mỗi node thay vì node cuối của tầng: node nhìn thấy từ bên phải có thể nằm ở nhánh trái (Binary Tree Right Side View)"
+          ],
+          "en": [
+            "- Writing `for (int i = 0; i < queue.size(); i++)`: the size changes as children are offered, so levels mix; snapshot `size` before the `for` (Binary Tree Level Order Traversal)",
+            "- Summing a level in an `int`: values reach 2³¹ - 1, so it overflows; use `long` or `double` (Average of Levels in Binary Tree)",
+            "- The `2i` index doubles every level, so a skewed tree a few thousand levels deep overflows even `long`; subtract the level's first index first (Maximum Width of Binary Tree)",
+            "- Zigzag by reversing the order children are **offered**: the next level comes out in the wrong order; keep the queue as is and reverse only the result (Binary Tree Zigzag Level Order Traversal)",
+            "- Taking each node's right child instead of the last node of the level: the node visible from the right can sit in the left subtree (Binary Tree Right Side View)"
+          ]
+        }
+      }
     },
     {
       "id": "p3-bst",
@@ -116,7 +614,112 @@
       "resources": [
         { "type": "visual", "title": "VisuAlgo: Binary Search Tree", "url": "https://visualgo.net/en/bst" },
         { "type": "practice", "title": "LeetCode tag: Binary Search Tree", "url": "https://leetcode.com/problem-list/binary-search-tree/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Input là BST: mọi node cây con trái < node < mọi node cây con phải (cả cây con, không chỉ con trực tiếp)",
+            "- Tìm / thêm / xoá theo giá trị: đi một đường từ gốc xuống, O(h) chứ không phải O(n)",
+            "- Hỏi phần tử nhỏ thứ k, liệt kê theo thứ tự tăng, phần tử đứng sau/trước một giá trị: in-order của BST là dãy đã sort",
+            "- Kiểm tra một cây có phải BST không",
+            "- Tổ tiên chung thấp nhất trong BST: so giá trị của p, q với node để chọn nhánh",
+            "- Khác với cây thường: cây thường phải đi cả hai con, BST cho phép bỏ hẳn một nhánh sau mỗi lần so sánh"
+          ],
+          "en": [
+            "- The input is a BST: every node in the left subtree < node < every node in the right subtree (whole subtrees, not just direct children)",
+            "- Search / insert / delete by value: one path from the root down, O(h) rather than O(n)",
+            "- Asks for the k-th smallest, values in increasing order, the next/previous value: a BST's in-order is sorted",
+            "- Check whether a tree is a BST",
+            "- Lowest common ancestor in a BST: compare p and q with the node to choose a branch",
+            "- Unlike a plain tree: a plain tree needs both children, a BST drops a whole branch after each comparison"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Mỗi phép so sánh với node loại hẳn một cây con, nên tìm, thêm, xoá, LCA chỉ đi một đường từ gốc xuống. In-order của BST cho dãy tăng dần.",
+            "",
+            "- Validate: truyền khoảng mở `(low, high)` từ tổ tiên xuống; sang trái thì `high = node.val`, sang phải thì `low = node.val`",
+            "- Kth Smallest: in-order lặp bằng stack, dừng ngay ở node thứ k",
+            "- LCA: p và q cùng nhỏ hơn node thì sang trái, cùng lớn hơn thì sang phải, còn lại node đó là LCA (kể cả khi node chính là p hoặc q)",
+            "- Delete: không có hoặc chỉ có một con thì đưa con đó lên thay; đủ hai con thì chép giá trị successor (nhỏ nhất của cây phải) vào node rồi xoá successor ở cây phải",
+            "",
+            "Độ phức tạp: O(h) mỗi thao tác, h = log n khi cây cân bằng nhưng tới n khi cây lệch (chèn dãy đã sort); duyệt in-order O(n)."
+          ],
+          "en": [
+            "Each comparison with a node rules out a whole subtree, so search, insert, delete and LCA walk one path from the root down. A BST's in-order is increasing.",
+            "",
+            "- Validate: pass an open range `(low, high)` down from the ancestors; going left sets `high = node.val`, going right sets `low = node.val`",
+            "- Kth Smallest: iterative in-order with a stack, stop at the k-th node",
+            "- LCA: if p and q are both smaller than the node go left, both larger go right, otherwise this node is the LCA (also when it is p or q itself)",
+            "- Delete: with no child or one child, lift that child up; with two children, copy the successor's value (smallest in the right subtree) into the node, then delete the successor from the right subtree",
+            "",
+            "Complexity: O(h) per operation, h = log n when balanced but up to n when skewed (inserting sorted data); in-order traversal O(n)."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Validate: each node must fall inside the open range (low, high) set by its ancestors",
+          "boolean isValidBST(TreeNode root) {",
+          "    return valid(root, Long.MIN_VALUE, Long.MAX_VALUE);  // long: values reach int limits",
+          "}",
+          "boolean valid(TreeNode node, long low, long high) {",
+          "    if (node == null) return true;",
+          "    if (node.val <= low || node.val >= high) return false;",
+          "    return valid(node.left, low, node.val) && valid(node.right, node.val, high);",
+          "}",
+          "",
+          "// Insert: one path down, return the (possibly new) subtree root and re-link it",
+          "TreeNode insert(TreeNode node, int val) {",
+          "    if (node == null) return new TreeNode(val);",
+          "    if (val < node.val) node.left = insert(node.left, val);",
+          "    else node.right = insert(node.right, val);",
+          "    return node;",
+          "}",
+          "",
+          "// Delete: 0/1 child -> lift the child; 2 children -> copy successor, delete it on the right",
+          "TreeNode delete(TreeNode node, int key) {",
+          "    if (node == null) return null;",
+          "    if (key < node.val) node.left = delete(node.left, key);",
+          "    else if (key > node.val) node.right = delete(node.right, key);",
+          "    else {",
+          "        if (node.left == null) return node.right;",
+          "        if (node.right == null) return node.left;",
+          "        TreeNode succ = node.right;",
+          "        while (succ.left != null) succ = succ.left;      // smallest in the right subtree",
+          "        node.val = succ.val;",
+          "        node.right = delete(node.right, succ.val);",
+          "    }",
+          "    return node;",
+          "}",
+          "",
+          "// LCA in a BST: walk down while p and q are on the same side",
+          "TreeNode lcaBst(TreeNode node, TreeNode p, TreeNode q) {",
+          "    while (node != null) {",
+          "        if (p.val < node.val && q.val < node.val) node = node.left;",
+          "        else if (p.val > node.val && q.val > node.val) node = node.right;",
+          "        else return node;                                 // they split here",
+          "    }",
+          "    return null;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Chỉ so node với hai con trực tiếp: `[5, 4, 6, null, null, 3, 7]` vẫn qua dù 3 nằm trong cây con phải của 5 (Validate Binary Search Tree)",
+            "- Dùng `Integer.MIN_VALUE`/`MAX_VALUE` làm biên khi node có thể mang đúng giá trị đó, hoặc kiểm tra `node.val < low` thay vì `<=` nên giá trị trùng lọt qua; dùng biên `long` (hoặc `null`) và so sánh chặt (Validate Binary Search Tree)",
+            "- Gọi đệ quy mà quên gán lại `node.left = delete(node.left, key)`: thay đổi không được nối vào cây (Delete Node in a BST)",
+            "- Duyệt in-order hết cây vào một list rồi mới lấy phần tử k: tốn O(n) thời gian và bộ nhớ dù k nhỏ; dừng sớm, và giữ bộ đếm ở field chứ không ở tham số `int` (Kth Smallest Element in a BST)",
+            "- Tin rằng thao tác BST luôn O(log n): cây không tự cân bằng, chèn dãy đã sort biến thành danh sách liên kết; cần đảm bảo thì dùng `TreeMap` (Insert into a Binary Search Tree)"
+          ],
+          "en": [
+            "- Comparing a node only with its two children: `[5, 4, 6, null, null, 3, 7]` passes even though 3 sits in 5's right subtree (Validate Binary Search Tree)",
+            "- Using `Integer.MIN_VALUE`/`MAX_VALUE` as bounds when a node can hold exactly that value, or checking `node.val < low` instead of `<=` so duplicates slip through; use `long` (or `null`) bounds and strict comparisons (Validate Binary Search Tree)",
+            "- Recursing without re-linking `node.left = delete(node.left, key)`: the change never reaches the tree (Delete Node in a BST)",
+            "- Collecting the whole in-order into a list before taking the k-th: O(n) time and space even for a small k; stop early, and keep the counter in a field, not an `int` parameter (Kth Smallest Element in a BST)",
+            "- Assuming BST operations are always O(log n): the tree does not rebalance, and sorted inserts turn it into a linked list; use `TreeMap` when you need the guarantee (Insert into a Binary Search Tree)"
+          ]
+        }
+      }
     },
     {
       "id": "p5-trie",
@@ -133,7 +736,115 @@
       "resources": [
         { "type": "article", "title": "Tech Interview Handbook: Trie", "url": "https://www.techinterviewhandbook.org/algorithms/trie/" },
         { "type": "practice", "title": "LeetCode tag: Trie", "url": "https://leetcode.com/problem-list/trie/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Nhiều truy vấn theo **tiền tố** (prefix): \"có từ nào bắt đầu bằng...\", autocomplete, đếm số từ có tiền tố cho trước",
+            "- Có một từ điển và phải khớp **nhiều từ cùng lúc**, ví dụ tìm mọi từ của danh sách trên một lưới chữ",
+            "- Thay mỗi từ bằng tiền tố ngắn nhất có trong từ điển",
+            "- Tìm kiếm có ký tự đại diện `.` khớp với mọi chữ",
+            "- Kiểm tra có từ nào là tiền tố của từ khác trong tập",
+            "- Khác với `HashSet`: `HashSet` trả lời \"có đúng từ này không\" trong O(L), nhưng không trả lời được theo tiền tố hay wildcard nếu không thử từng biến thể"
+          ],
+          "en": [
+            "- Many queries by **prefix**: \"is there a word starting with...\", autocomplete, count the words with a given prefix",
+            "- A dictionary that must be matched against **many words at once**, e.g. find every listed word on a letter grid",
+            "- Replace each word with the shortest prefix that is in the dictionary",
+            "- Search with a wildcard `.` that matches any letter",
+            "- Check whether any word in the set is a prefix of another",
+            "- Unlike a `HashSet`: it answers \"is this exact word here\" in O(L), but cannot answer by prefix or wildcard without trying every variant"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Mỗi cạnh từ node xuống con là một ký tự; mọi từ có chung tiền tố đi chung một đường từ gốc. Node gồm `children[26]` và cờ `isEnd` đánh dấu có từ kết thúc tại đây (có thể ở giữa đường, như \"app\" nằm trên đường của \"apple\").",
+            "",
+            "- insert / search / startsWith: đi theo từng ký tự; search cần `isEnd` ở node cuối, startsWith chỉ cần đi hết được",
+            "- Wildcard `.`: DFS, tại vị trí đó thử cả 26 con",
+            "- Word Search II: dựng trie từ danh sách từ, rồi backtrack trên lưới và đi xuống trie cùng lúc; ký tự của ô không có trong `children` thì cắt nhánh ngay",
+            "- Thêm field vào node theo đề: `count` số từ đi qua (Contacts), `word` lưu nguyên từ ở node cuối (Word Search II), tối đa 3 từ đầu tiên đi qua khi chèn theo thứ tự đã sort (Search Suggestions System)",
+            "",
+            "Độ phức tạp: insert / search O(L) thời gian (L = độ dài từ); bộ nhớ O(tổng số ký tự × 26) với mảng con."
+          ],
+          "en": [
+            "Each edge from a node to a child is one character; all words sharing a prefix share one path from the root. A node has `children[26]` and an `isEnd` flag saying a word ends here (possibly mid-path, like \"app\" on the way to \"apple\").",
+            "",
+            "- insert / search / startsWith: follow one character at a time; search needs `isEnd` on the last node, startsWith only needs the walk to succeed",
+            "- Wildcard `.`: DFS, trying all 26 children at that position",
+            "- Word Search II: build a trie from the word list, then backtrack on the grid while walking down the trie; if a cell's letter is not in `children`, prune right away",
+            "- Add fields to the node as the problem needs: `count` of words passing through (Contacts), the whole `word` at its last node (Word Search II), the first 3 words passing through when inserting in sorted order (Search Suggestions System)",
+            "",
+            "Complexity: insert / search O(L) time (L = word length); O(total characters × 26) space with child arrays."
+          ]
+        },
+        "template": [
+          "```java",
+          "static class TrieNode {",
+          "    TrieNode[] children = new TrieNode[26];",
+          "    boolean isEnd;",
+          "    String word;                                         // Word Search II: the word ending here",
+          "}",
+          "TrieNode root = new TrieNode();",
+          "",
+          "void insert(String word) {",
+          "    TrieNode node = root;",
+          "    for (char c : word.toCharArray()) {",
+          "        if (node.children[c - 'a'] == null) node.children[c - 'a'] = new TrieNode();",
+          "        node = node.children[c - 'a'];",
+          "    }",
+          "    node.isEnd = true;",
+          "    node.word = word;",
+          "}",
+          "",
+          "TrieNode walk(String s) {          // search: walk(w) != null && isEnd; startsWith: != null",
+          "    TrieNode node = root;",
+          "    for (char c : s.toCharArray()) {",
+          "        node = node.children[c - 'a'];",
+          "        if (node == null) return null;",
+          "    }",
+          "    return node;",
+          "}",
+          "",
+          "boolean match(TrieNode node, String w, int k) {          // '.' matches any letter",
+          "    if (node == null) return false;",
+          "    if (k == w.length()) return node.isEnd;",
+          "    char c = w.charAt(k);",
+          "    if (c != '.') return match(node.children[c - 'a'], w, k + 1);",
+          "    for (TrieNode child : node.children) if (match(child, w, k + 1)) return true;",
+          "    return false;",
+          "}",
+          "",
+          "void dfs(char[][] b, int r, int c, TrieNode parent, List<String> found) { // Word Search II",
+          "    if (r < 0 || c < 0 || r >= b.length || c >= b[0].length || b[r][c] == '#') return;",
+          "    TrieNode node = parent.children[b[r][c] - 'a'];",
+          "    if (node == null) return;                            // no word has this prefix: prune",
+          "    if (node.word != null) { found.add(node.word); node.word = null; } // report once",
+          "    char ch = b[r][c];",
+          "    b[r][c] = '#';                                       // mark visited",
+          "    dfs(b, r + 1, c, node, found); dfs(b, r - 1, c, node, found);",
+          "    dfs(b, r, c + 1, node, found); dfs(b, r, c - 1, node, found);",
+          "    b[r][c] = ch;                                        // restore",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- `search` quên kiểm tra `isEnd`: chỉ chèn \"apple\" mà tìm \"app\" vẫn ra `true` (Implement Trie (Prefix Tree))",
+            "- Chạy Word Search riêng cho từng từ: TLE khi danh sách dài; và không xoá `word` sau khi tìm thấy thì một từ xuất hiện nhiều lần trong kết quả (Word Search II)",
+            "- Đi hết từ rồi mới xét: phải dừng ở node `isEnd` **đầu tiên** để lấy tiền tố ngắn nhất (Replace Words)",
+            "- Mỗi truy vấn lại DFS cả cây con để đếm: TLE; tăng `count` ở mỗi node trên đường khi insert, truy vấn chỉ cần đi tới node cuối (Contacts)",
+            "- Chỉ kiểm tra một chiều: từ mới phải không đi qua node `isEnd` nào (từ cũ là tiền tố của nó) **và** không kết thúc ở node đã có con hoặc đã là `isEnd` (nó là tiền tố của từ cũ) (No Prefix Set)"
+          ],
+          "en": [
+            "- `search` without checking `isEnd`: after inserting only \"apple\", searching \"app\" still returns `true` (Implement Trie (Prefix Tree))",
+            "- Running Word Search separately for each word: times out on a long list; and not clearing `word` once found makes the same word appear several times in the result (Word Search II)",
+            "- Walking the whole word before deciding: stop at the **first** `isEnd` node to get the shortest root (Replace Words)",
+            "- Counting with a DFS of the whole subtree on each query: times out; increment `count` on every node along the path during insert, so a query just walks to the last node (Contacts)",
+            "- Checking only one direction: the new word must not pass through any `isEnd` node (an old word is its prefix) **and** must not end on a node that already has children or is `isEnd` (it is a prefix of an old word) (No Prefix Set)"
+          ]
+        }
+      }
     },
     {
       "id": "p3-graph",
@@ -154,7 +865,111 @@
         { "type": "visual", "title": "VisuAlgo: Graph Traversal (DFS/BFS)", "url": "https://visualgo.net/en/dfsbfs" },
         { "type": "video", "title": "freeCodeCamp: Graph Algorithms for Technical Interviews", "url": "https://www.youtube.com/watch?v=tWVWeAqZ0WU" },
         { "type": "practice", "title": "LeetCode tag: Breadth-First Search", "url": "https://leetcode.com/problem-list/breadth-first-search/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đề cho **danh sách cạnh** `edges[i] = [u, v]`, ma trận kề `isConnected[i][j]`, hoặc mô tả quan hệ \"nối với\", \"là bạn của\", \"có đường giữa\"",
+            "- Hỏi có đường đi từ A tới B không, có bao nhiêu nhóm liên thông, mỗi nhóm lớn bao nhiêu",
+            "- Hỏi đồ thị có phải là cây không: n đỉnh, đúng n - 1 cạnh và liên thông",
+            "- Phải sao chép một cấu trúc node có chu trình (Clone Graph): cần map node cũ → node mới",
+            "- Liệt kê mọi đường đi trong một DAG nhỏ (n ≤ 15): DFS + backtracking, số đường đi có thể tăng theo hàm mũ",
+            "- Khác với lưới: ở lưới láng giềng là 4 ô kề nên không cần dựng danh sách kề. Khác với BFS đường ngắn nhất: ở đây chỉ cần biết tới được hay không, DFS hay BFS đều được"
+          ],
+          "en": [
+            "- The input is an **edge list** `edges[i] = [u, v]`, an adjacency matrix `isConnected[i][j]`, or a relation like \"connected to\", \"friends with\", \"there is a road between\"",
+            "- Asks whether B is reachable from A, how many connected groups there are, or how big each group is",
+            "- Asks whether the graph is a tree: n vertices, exactly n - 1 edges, and connected",
+            "- You must copy a node structure that has cycles (Clone Graph): you need an old node → new node map",
+            "- List every path in a small DAG (n ≤ 15): DFS + backtracking, and the number of paths can be exponential",
+            "- Unlike grids: there the neighbours are the 4 adjacent cells, so no adjacency list is built. Unlike BFS shortest paths: here you only need reachability, so DFS and BFS both work"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Đổi input về danh sách kề `List<List<Integer>>`; đồ thị vô hướng thì thêm cả `u → v` lẫn `v → u`. Duyệt (DFS hoặc BFS) từ một đỉnh và đánh dấu `visited`: mỗi đỉnh chỉ được thăm một lần, nên chu trình không gây lặp vô hạn và mỗi cạnh chỉ được xét một (hoặc hai) lần.",
+            "",
+            "- Đếm thành phần liên thông: lặp qua mọi đỉnh, gặp đỉnh chưa thăm thì `count++` rồi loang hết nhóm của nó. Cạnh đến dần theo thời gian thì dùng Union-Find",
+            "- Clone Graph: `Map<Node, Node>` vừa là visited vừa giữ bản sao; tạo bản sao và đưa vào map **trước** khi đi sang láng giềng",
+            "- Graph Valid Tree: `edges.length == n - 1` và loang từ 0 thăm đủ n đỉnh. Đã liên thông mà chỉ có n - 1 cạnh thì không thể có chu trình",
+            "- All Paths From Source to Target: DAG nên không cần visited; DFS giữ `path`, thêm đỉnh khi đi vào, bỏ ra khi quay lui",
+            "",
+            "Độ phức tạp: O(V + E) thời gian, O(V + E) bộ nhớ. Liệt kê mọi đường đi thì tỉ lệ với số đường đi, tới O(2^V · V)."
+          ],
+          "en": [
+            "Turn the input into an adjacency list `List<List<Integer>>`; for an undirected graph add both `u → v` and `v → u`. Traverse (DFS or BFS) from a vertex and mark `visited`: each vertex is visited once, so cycles cannot loop forever and each edge is looked at once (or twice).",
+            "",
+            "- Counting components: loop over every vertex; on an unvisited one, `count++` and flood its whole group. If edges arrive over time, use Union-Find",
+            "- Clone Graph: a `Map<Node, Node>` is both the visited set and the copy store; create the copy and put it in the map **before** visiting neighbours",
+            "- Graph Valid Tree: `edges.length == n - 1` and a traversal from 0 reaches all n vertices. A connected graph with only n - 1 edges cannot have a cycle",
+            "- All Paths From Source to Target: it is a DAG, so no visited set; DFS keeps a `path`, adding a vertex on the way in and removing it on the way back",
+            "",
+            "Complexity: O(V + E) time, O(V + E) space. Listing every path costs as much as there are paths, up to O(2^V · V)."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Build an adjacency list, then count connected components (iterative DFS)",
+          "int countComponents(int n, int[][] edges) {",
+          "    List<List<Integer>> g = new ArrayList<>();",
+          "    for (int i = 0; i < n; i++) g.add(new ArrayList<>());",
+          "    for (int[] e : edges) {                  // undirected: add both directions",
+          "        g.get(e[0]).add(e[1]);",
+          "        g.get(e[1]).add(e[0]);",
+          "    }",
+          "    boolean[] seen = new boolean[n];",
+          "    int components = 0;",
+          "    for (int start = 0; start < n; start++) {",
+          "        if (seen[start]) continue;",
+          "        components++;                        // new group: flood all of it",
+          "        Deque<Integer> stack = new ArrayDeque<>();",
+          "        stack.push(start);",
+          "        seen[start] = true;",
+          "        while (!stack.isEmpty()) {",
+          "            int u = stack.pop();",
+          "            for (int v : g.get(u)) {",
+          "                if (!seen[v]) { seen[v] = true; stack.push(v); }",
+          "            }",
+          "        }",
+          "    }",
+          "    return components;",
+          "}",
+          "// Graph Valid Tree: edges.length == n - 1 && countComponents(n, edges) == 1",
+          "",
+          "// Clone Graph: the map is both the visited set and old -> copy",
+          "static class Node {",
+          "    int val;",
+          "    List<Node> neighbors = new ArrayList<>();",
+          "    Node(int val) { this.val = val; }",
+          "}",
+          "Map<Node, Node> copies = new HashMap<>();",
+          "Node cloneGraph(Node node) {",
+          "    if (node == null) return null;",
+          "    if (copies.containsKey(node)) return copies.get(node);",
+          "    Node copy = new Node(node.val);",
+          "    copies.put(node, copy);                  // register before recursing: cycles",
+          "    for (Node next : node.neighbors) copy.neighbors.add(cloneGraph(next));",
+          "    return copy;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Quên thêm cạnh chiều ngược lại cho đồ thị vô hướng: loang từ một phía sẽ thiếu đỉnh (Find if Path Exists in Graph)",
+            "- Đưa bản sao vào map **sau** khi đã đệ quy sang láng giềng: gặp chu trình là đệ quy vô hạn, hoặc tạo hai bản sao cho cùng một node (Clone Graph)",
+            "- Thêm `path` vào kết quả mà không copy (`new ArrayList<>(path)`), nên mọi phần tử cuối cùng đều thành list rỗng; hoặc dùng visited toàn cục làm mất các đường đi qua chung một đỉnh (All Paths From Source to Target)",
+            "- Chỉ kiểm tra không có chu trình, hoặc chỉ kiểm tra liên thông: một rừng nhiều cây không có chu trình nhưng không phải cây (Graph Valid Tree)",
+            "- Số cặp phi hành gia khác quốc gia có thể vượt 2³¹: tính bằng `long` (Journey to the Moon)"
+          ],
+          "en": [
+            "- Forgetting the reverse edge in an undirected graph: a traversal from one side misses vertices (Find if Path Exists in Graph)",
+            "- Putting the copy in the map **after** recursing into neighbours: a cycle recurses forever or creates two copies of one node (Clone Graph)",
+            "- Adding `path` to the result without copying it (`new ArrayList<>(path)`), so every entry ends up as the same empty list; or using a global visited set, which drops paths that share a vertex (All Paths From Source to Target)",
+            "- Checking only for no cycle, or only for connectivity: a forest of several trees has no cycle but is not a tree (Graph Valid Tree)",
+            "- The number of astronaut pairs from different countries can exceed 2³¹: count with `long` (Journey to the Moon)"
+          ]
+        }
+      }
     },
     {
       "id": "p3-graphs",
@@ -174,7 +989,110 @@
         { "type": "article", "title": "USACO Guide: Flood Fill", "url": "https://usaco.guide/silver/flood-fill" },
         { "type": "practice", "title": "LeetCode study plan: Graph Theory", "url": "https://leetcode.com/studyplan/graph-theory/" },
         { "type": "practice", "title": "LeetCode tag: Graph Theory", "url": "https://leetcode.com/problem-list/graph/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Input là **lưới** `char[][]` / `int[][]`, mỗi ô nối với ô kề trên, dưới, trái, phải",
+            "- Đếm \"đảo\", \"vùng\", nhóm ô liền nhau; tô lại một vùng (Flood Fill); tìm vùng lớn nhất",
+            "- Đề nói tới vùng **không chạm biên** hoặc nước **chảy ra biển**: loang ngược từ biên vào trong",
+            "- Nhiều điểm cùng lan ra một lúc, hỏi \"sau bao nhiêu phút\" hoặc \"khoảng cách tới cổng gần nhất\": BFS nhiều nguồn",
+            "- Lưới cỡ 300 × 300 hay 10⁵ ô: mỗi ô thăm một lần là đủ, O(rows × cols)",
+            "- Khác với BFS đường ngắn nhất (một nguồn, một đích): ở đây thường chỉ cần loang hết vùng, hoặc tính khoảng cách tới nguồn gần nhất trong cả một **tập** nguồn"
+          ],
+          "en": [
+            "- The input is a **grid** `char[][]` / `int[][]`, each cell connected to the cells above, below, left and right",
+            "- Count \"islands\", \"regions\", groups of touching cells; repaint one region (Flood Fill); find the largest region",
+            "- The statement talks about regions **not touching the border** or water **flowing to the ocean**: search inward from the border",
+            "- Several points spread at the same time and it asks \"after how many minutes\" or \"distance to the nearest gate\": multi-source BFS",
+            "- A 300 × 300 grid or 10⁵ cells: visiting each cell once is enough, O(rows × cols)",
+            "- Unlike BFS shortest path (one source, one target): here you usually just flood whole regions, or want the distance to the nearest of a whole **set** of sources"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Mỗi ô là một đỉnh, láng giềng là 4 ô kề lấy từ mảng `DIRS`, không cần dựng danh sách kề. Loang (DFS hoặc BFS) từ một ô và đánh dấu ô đã thăm: sửa thẳng lưới (`'1'` → `'0'`) nếu được phép, không thì dùng `boolean[][]`.",
+            "",
+            "- Đếm vùng / vùng lớn nhất: quét mọi ô, gặp ô đất chưa thăm thì `count++` và loang hết vùng; cần diện tích thì cho DFS trả về số ô đã loang",
+            "- Bắt đầu từ biên: Surrounded Regions loang từ mọi `'O'` trên biên để đánh dấu ô thoát được, phần còn lại mới lật thành `'X'`. Pacific Atlantic loang ngược dốc (sang ô cao hơn hoặc bằng) từ mỗi đại dương, đáp án là giao của hai tập",
+            "- BFS nhiều nguồn: đẩy mọi nguồn vào queue ngay từ đầu (khoảng cách 0) rồi BFS theo tầng; lần đầu một ô được chạm tới cho ra khoảng cách tới nguồn gần nhất của nó (Rotting Oranges, Walls and Gates)",
+            "",
+            "Độ phức tạp: O(rows × cols) thời gian, O(rows × cols) bộ nhớ cho queue hoặc stack đệ quy trong trường hợp xấu nhất."
+          ],
+          "en": [
+            "Each cell is a vertex and its neighbours are the 4 adjacent cells from a `DIRS` array, so no adjacency list is built. Flood (DFS or BFS) from a cell and mark cells visited: overwrite the grid (`'1'` → `'0'`) if allowed, otherwise use a `boolean[][]`.",
+            "",
+            "- Counting regions / largest region: scan every cell; on unvisited land, `count++` and flood the region; for the area, have the DFS return how many cells it flooded",
+            "- Start from the border: Surrounded Regions floods from every border `'O'` to mark cells that escape, then flips the rest to `'X'`. Pacific Atlantic floods uphill (to cells at least as high) from each ocean, and the answer is the intersection of the two sets",
+            "- Multi-source BFS: push every source at the start (distance 0) and BFS by levels; the first time a cell is reached gives its distance to the nearest source (Rotting Oranges, Walls and Gates)",
+            "",
+            "Complexity: O(rows × cols) time, O(rows × cols) space for the queue or the recursion stack in the worst case."
+          ]
+        },
+        "template": [
+          "```java",
+          "static final int[][] DIRS = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};",
+          "",
+          "// Count regions: flood fill each unvisited land cell (Number of Islands)",
+          "int numIslands(char[][] grid) {",
+          "    int count = 0;",
+          "    for (int r = 0; r < grid.length; r++)",
+          "        for (int c = 0; c < grid[0].length; c++)",
+          "            if (grid[r][c] == '1') { count++; sink(grid, r, c); }",
+          "    return count;",
+          "}",
+          "// Recursion depth can reach rows * cols: switch to BFS on huge grids",
+          "void sink(char[][] grid, int r, int c) {",
+          "    if (r < 0 || r >= grid.length || c < 0 || c >= grid[0].length) return; // bounds first",
+          "    if (grid[r][c] != '1') return;           // water or already visited",
+          "    grid[r][c] = '0';                        // mark visited in place",
+          "    for (int[] d : DIRS) sink(grid, r + d[0], c + d[1]);",
+          "}",
+          "",
+          "// Multi-source BFS: all sources start in the queue at minute 0 (Rotting Oranges)",
+          "int orangesRotting(int[][] grid) {",
+          "    int rows = grid.length, cols = grid[0].length, fresh = 0, minutes = 0;",
+          "    Deque<int[]> q = new ArrayDeque<>();",
+          "    for (int r = 0; r < rows; r++)",
+          "        for (int c = 0; c < cols; c++) {",
+          "            if (grid[r][c] == 2) q.offer(new int[]{r, c});",
+          "            else if (grid[r][c] == 1) fresh++;",
+          "        }",
+          "    while (!q.isEmpty() && fresh > 0) {",
+          "        for (int size = q.size(); size > 0; size--) {   // one level = one minute",
+          "            int[] cell = q.poll();",
+          "            for (int[] d : DIRS) {",
+          "                int nr = cell[0] + d[0], nc = cell[1] + d[1];",
+          "                if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;",
+          "                if (grid[nr][nc] != 1) continue;",
+          "                grid[nr][nc] = 2;            // mark when enqueuing",
+          "                fresh--;",
+          "                q.offer(new int[]{nr, nc});",
+          "            }",
+          "        }",
+          "        minutes++;",
+          "    }",
+          "    return fresh == 0 ? minutes : -1;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Màu mới trùng màu cũ: tô xong ô vẫn mang \"màu cũ\" nên DFS quay lại mãi; gặp `image[sr][sc] == color` thì trả về ngay (Flood Fill)",
+            "- Lật `'O'` thành `'X'` ngay khi loang từ trong ra, lúc chưa biết vùng đó có chạm biên không. Đánh dấu tạm (`'#'`) các ô nối với biên trước, rồi lật phần còn lại và trả `'#'` về `'O'` (Surrounded Regions)",
+            "- Loang xuôi từ từng ô ra biển là O((rows × cols)²); và khi loang ngược từ biển, điều kiện là `heights[next] >= heights[cur]`, viết ngược dấu là sai (Pacific Atlantic Water Flow)",
+            "- Chạy BFS riêng từ từng nguồn: O((rows × cols)²), TLE; đẩy mọi nguồn vào queue một lần (Walls and Gates)",
+            "- Đếm phút lệch một khi vẫn tăng `minutes` sau tầng cuối không làm thối thêm quả nào; dừng khi `fresh == 0`, và trả -1 nếu vẫn còn quả tươi (Rotting Oranges)"
+          ],
+          "en": [
+            "- New colour equals the old one: a painted cell still has the \"old colour\", so the DFS keeps coming back; return at once when `image[sr][sc] == color` (Flood Fill)",
+            "- Flipping `'O'` to `'X'` while flooding from the inside, before knowing whether the region touches the border. Mark border-connected cells first (`'#'`), then flip the rest and turn `'#'` back into `'O'` (Surrounded Regions)",
+            "- Flooding from every cell out to the ocean is O((rows × cols)²); and when flooding back from the ocean the condition is `heights[next] >= heights[cur]`, the reversed comparison is wrong (Pacific Atlantic Water Flow)",
+            "- Running a separate BFS from each source: O((rows × cols)²), TLE; push all sources into the queue once (Walls and Gates)",
+            "- Off-by-one minutes from still incrementing `minutes` after a last level that rots nothing new; stop when `fresh == 0`, and return -1 if fresh oranges remain (Rotting Oranges)"
+          ]
+        }
+      }
     },
     {
       "id": "p3-bfs-path",
@@ -188,7 +1106,112 @@
         { "title": "KnightL on a Chessboard", "url": "https://www.hackerrank.com/challenges/knightl-on-chessboard/problem", "level": "Medium" },
         { "title": "Find the nearest clone", "url": "https://www.hackerrank.com/challenges/find-the-nearest-clone/problem", "level": "Medium" },
         { "title": "Rust & Murderer", "url": "https://www.hackerrank.com/challenges/rust-murderer/problem", "level": "Medium" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Hỏi **số bước ít nhất** / đường đi ngắn nhất, và mọi bước có cùng chi phí (cạnh không trọng số)",
+            "- Lưới có vật cản, đi 4 hoặc 8 hướng, hỏi đường ngắn nhất từ ô này tới ô kia",
+            "- Trạng thái không phải là ô: mã khoá `\"0000\"`, một từ trong từ điển, vị trí quân mã; mỗi phép biến đổi hợp lệ là một cạnh",
+            "- Số trạng thái đủ nhỏ để duyệt hết: 10⁴ mã khoá, vài nghìn từ, lưới n × n",
+            "- Khác với DFS: DFS tìm ra *một* đường, không đảm bảo ngắn nhất. Khác với Dijkstra: cạnh có trọng số khác nhau thì BFS sai (trọng số chỉ 0 hoặc 1 thì dùng 0-1 BFS với deque)"
+          ],
+          "en": [
+            "- Asks for the **fewest steps** / shortest path, and every step costs the same (unweighted edges)",
+            "- A grid with obstacles, moving in 4 or 8 directions, asking for the shortest path between two cells",
+            "- The states are not cells: a lock code `\"0000\"`, a word from a dictionary, a knight's position; each allowed transformation is an edge",
+            "- The state space is small enough to explore fully: 10⁴ lock codes, a few thousand words, an n × n grid",
+            "- Unlike DFS: DFS finds *a* path, not necessarily the shortest. Unlike Dijkstra: with different edge weights BFS is wrong (with weights 0 or 1 only, use 0-1 BFS with a deque)"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "BFS lấy đỉnh ra theo từng tầng khoảng cách: mọi đỉnh cách nguồn d bước đều ra khỏi queue trước bất kỳ đỉnh nào cách d + 1 bước. Vì vậy lần đầu chạm tới một đỉnh là bằng đường ngắn nhất: đánh dấu nó ngay lúc đẩy vào queue và không bao giờ cập nhật lại.",
+            "",
+            "- Khoảng cách: lưu `dist[]` cho từng đỉnh, hoặc xử lý trọn một tầng bằng `for (size = q.size(); ...)` rồi tăng bộ đếm bước",
+            "- State-space: sinh láng giềng lúc lấy trạng thái ra (xoay từng bánh khoá ±1, thay từng ký tự bằng a–z), visited là `Set<String>`; trạng thái cấm cho sẵn vào visited",
+            "- Lưới 8 hướng: 8 cặp `(dr, dc)`, bước chéo vẫn tính là 1",
+            "- Bidirectional BFS: loang đồng thời từ nguồn và đích, mỗi lượt mở rộng phía có frontier nhỏ hơn, dừng khi hai phía chạm nhau. Khi mỗi trạng thái có nhiều láng giềng (Word Ladder), số trạng thái phải thăm giảm rất mạnh",
+            "",
+            "Độ phức tạp: O(V + E) thời gian, O(V) bộ nhớ. Với state-space, V là số trạng thái và E là V × số láng giềng của mỗi trạng thái."
+          ],
+          "en": [
+            "BFS takes vertices out level by level: every vertex d steps from the source leaves the queue before any vertex d + 1 steps away. So the first time a vertex is reached is along a shortest path: mark it the moment it is enqueued and never update it again.",
+            "",
+            "- Distances: keep a `dist[]` per vertex, or process a whole level with `for (size = q.size(); ...)` and then bump a step counter",
+            "- State space: generate neighbours when a state is polled (turn each wheel ±1, replace each character with a–z), with a `Set<String>` as visited; put forbidden states into visited up front",
+            "- 8-direction grids: 8 `(dr, dc)` pairs, a diagonal step still counts as 1",
+            "- Bidirectional BFS: search from the source and the target at once, each round expanding the side with the smaller frontier, and stop when they meet. When states have many neighbours (Word Ladder) it visits far fewer states",
+            "",
+            "Complexity: O(V + E) time, O(V) space. In a state space, V is the number of states and E is V × the neighbours per state."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Grid BFS by levels, 8 directions, length counted in cells (Shortest Path in Binary Matrix)",
+          "int shortestPathBinaryMatrix(int[][] grid) {",
+          "    int n = grid.length;",
+          "    if (grid[0][0] != 0 || grid[n - 1][n - 1] != 0) return -1;  // blocked start or end",
+          "    Deque<int[]> q = new ArrayDeque<>(List.of(new int[]{0, 0}));",
+          "    grid[0][0] = 1;                                  // mark visited when enqueuing",
+          "    for (int len = 1; !q.isEmpty(); len++) {         // one round = one level",
+          "        for (int size = q.size(); size > 0; size--) {",
+          "            int[] cell = q.poll();",
+          "            if (cell[0] == n - 1 && cell[1] == n - 1) return len;",
+          "            for (int dr = -1; dr <= 1; dr++)",
+          "                for (int dc = -1; dc <= 1; dc++) {",
+          "                    int r = cell[0] + dr, c = cell[1] + dc;",
+          "                    if (r < 0 || r >= n || c < 0 || c >= n || grid[r][c] != 0) continue;",
+          "                    grid[r][c] = 1;",
+          "                    q.offer(new int[]{r, c});",
+          "                }",
+          "        }",
+          "    }",
+          "    return -1;",
+          "}",
+          "",
+          "// State-space BFS: states are strings, neighbours generated on the fly (Open the Lock)",
+          "int openLock(String[] deadends, String target) {",
+          "    Set<String> seen = new HashSet<>(Arrays.asList(deadends)); // forbidden = already seen",
+          "    if (!seen.add(\"0000\")) return -1;               // the start itself is a deadend",
+          "    Deque<String> q = new ArrayDeque<>(List.of(\"0000\"));",
+          "    for (int steps = 0; !q.isEmpty(); steps++) {",
+          "        for (int size = q.size(); size > 0; size--) {",
+          "            String cur = q.poll();",
+          "            if (cur.equals(target)) return steps;",
+          "            char[] s = cur.toCharArray();",
+          "            for (int i = 0; i < 4; i++) {",
+          "                char old = s[i];",
+          "                for (int delta : new int[]{1, 9}) {  // +1 or -1, mod 10",
+          "                    s[i] = (char) ('0' + (old - '0' + delta) % 10);",
+          "                    String next = new String(s);",
+          "                    if (seen.add(next)) q.offer(next); // add() marks when enqueuing",
+          "                }",
+          "                s[i] = old;",
+          "            }",
+          "        }",
+          "    }",
+          "    return -1;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Đánh dấu visited lúc lấy ra khỏi queue thay vì lúc đẩy vào: một trạng thái bị đẩy nhiều lần từ nhiều láng giềng, queue phình to và TLE (Word Ladder)",
+            "- Lệch một đơn vị: bài này đếm số **ô** trên đường (bắt đầu từ 1), không phải số bước; và quên trả -1 khi ô đầu hoặc ô cuối bị chặn (Shortest Path in Binary Matrix)",
+            "- Quên ca đặc biệt: `\"0000\"` nằm trong deadends thì trả -1, target là `\"0000\"` thì trả 0 (Open the Lock)",
+            "- Tìm láng giềng bằng cách so từng cặp từ là O(N² · L); thay từng ký tự bằng a–z rồi tra `HashSet`. endWord không có trong danh sách thì trả 0 ngay (Word Ladder)",
+            "- Mỗi nước đi trượt được nhiều ô với chi phí 1: láng giềng là mọi ô dọc đường trượt cho tới vật cản, không chỉ ô kề (Castle on the Grid)"
+          ],
+          "en": [
+            "- Marking visited when polling instead of when enqueuing: a state gets pushed many times from different neighbours, the queue blows up and it times out (Word Ladder)",
+            "- Off-by-one: this problem counts **cells** on the path (starting at 1), not steps; and forgetting to return -1 when the start or end cell is blocked (Shortest Path in Binary Matrix)",
+            "- Missing special cases: `\"0000\"` in deadends returns -1, a target of `\"0000\"` returns 0 (Open the Lock)",
+            "- Finding neighbours by comparing every pair of words is O(N² · L); replace each character with a–z and look it up in a `HashSet`. If endWord is not in the list, return 0 at once (Word Ladder)",
+            "- A move slides any number of cells for cost 1: the neighbours are all cells along the slide up to an obstacle, not just the adjacent one (Castle on the Grid)"
+          ]
+        }
+      }
     },
     {
       "id": "p3-topo",
@@ -203,7 +1226,106 @@
       "resources": [
         { "type": "article", "title": "cp-algorithms: Topological sorting", "url": "https://cp-algorithms.com/graph/topological-sort.html" },
         { "type": "practice", "title": "LeetCode tag: Topological Sort", "url": "https://leetcode.com/problem-list/topological-sort/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Có **quan hệ phụ thuộc / trước-sau**: \"phải học môn A trước môn B\", task phụ thuộc task, thứ tự build",
+            "- Hỏi có làm hết được không (= đồ thị có hướng có chu trình không), hoặc trả về một thứ tự hợp lệ",
+            "- Thứ tự phải suy ra từ dữ liệu: danh sách từ đã sắp xếp theo một bảng chữ cái lạ (Alien Dictionary)",
+            "- Hỏi đỉnh nào \"an toàn\", mọi đường đi từ nó đều dừng lại, không rơi vào chu trình (Find Eventual Safe States)",
+            "- Trên cây vô hướng, tìm \"tâm\" bằng cách bóc lá từng lớp (Minimum Height Trees): cùng cách làm với Kahn nhưng dùng bậc thay cho in-degree",
+            "- Khác với BFS/DFS thường: cạnh có hướng và thứ tự xử lý là kết quả cần tìm; đồ thị vô hướng không có thứ tự topo"
+          ],
+          "en": [
+            "- There are **dependencies / before-after constraints**: \"course A before course B\", tasks depending on tasks, a build order",
+            "- Asks whether everything can be finished (= does the directed graph have a cycle), or for one valid order",
+            "- The order has to be inferred from data: words sorted by an unknown alphabet (Alien Dictionary)",
+            "- Asks which nodes are \"safe\": every path from them ends instead of falling into a cycle (Find Eventual Safe States)",
+            "- On an undirected tree, find the \"centre\" by peeling leaves layer by layer (Minimum Height Trees): the same mechanics as Kahn with degree instead of in-degree",
+            "- Unlike plain BFS/DFS: edges are directed and the processing order is the answer; an undirected graph has no topological order"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Thứ tự topo chỉ tồn tại khi đồ thị có hướng không có chu trình (DAG). Kahn: đỉnh có in-degree 0 không phụ thuộc ai nên đưa ra trước; bỏ nó đi thì giảm in-degree các đỉnh nó trỏ tới, đỉnh nào về 0 thì vào queue. Lấy ra được ít hơn n đỉnh nghĩa là các đỉnh còn lại nằm trên hoặc phía sau một chu trình.",
+            "",
+            "- DFS ba màu: 0 = chưa thăm, 1 = đang nằm trên stack đệ quy, 2 = đã xong. Gặp cạnh tới đỉnh màu 1 là có chu trình. Đảo ngược thứ tự post-order (thứ tự tô màu 2) là một thứ tự topo",
+            "- Alien Dictionary: so hai từ **kề nhau**, ký tự khác nhau đầu tiên cho cạnh `a → b`. Nếu từ trước dài hơn và nhận từ sau làm tiền tố (`\"abc\"` đứng trước `\"ab\"`) thì input sai, trả `\"\"`",
+            "- Find Eventual Safe States: đỉnh an toàn là đỉnh không tới được chu trình; DFS ba màu (màu 2 là an toàn), hoặc Kahn trên đồ thị đảo cạnh, xuất phát từ các đỉnh không có cạnh ra",
+            "- Minimum Height Trees: bóc các lá (bậc 1) theo từng lớp tới khi còn ≤ 2 đỉnh; đó là các gốc cho cây thấp nhất",
+            "",
+            "Độ phức tạp: O(V + E) thời gian, O(V + E) bộ nhớ."
+          ],
+          "en": [
+            "A topological order exists only when the directed graph has no cycle (a DAG). Kahn: a vertex with in-degree 0 depends on nothing, so it goes first; removing it lowers the in-degree of the vertices it points to, and any that reach 0 join the queue. Fewer than n vertices coming out means the rest lie on or behind a cycle.",
+            "",
+            "- DFS with three colours: 0 = new, 1 = on the recursion stack, 2 = done. An edge to a colour-1 vertex is a cycle. The reversed post-order (the order vertices turn colour 2) is a topological order",
+            "- Alien Dictionary: compare **adjacent** words; their first differing character gives an edge `a → b`. If the earlier word is longer and the later one is its prefix (`\"abc\"` before `\"ab\"`), the input is invalid, return `\"\"`",
+            "- Find Eventual Safe States: a safe vertex cannot reach a cycle; use three-colour DFS (colour 2 means safe), or Kahn on the reversed graph starting from vertices with no outgoing edge",
+            "- Minimum Height Trees: peel leaves (degree 1) layer by layer until at most 2 vertices remain; those are the roots of the shortest trees",
+            "",
+            "Complexity: O(V + E) time, O(V + E) space."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Kahn's algorithm (Course Schedule II): pair [a, b] means b comes before a",
+          "int[] findOrder(int n, int[][] prerequisites) {",
+          "    List<List<Integer>> g = new ArrayList<>();",
+          "    for (int i = 0; i < n; i++) g.add(new ArrayList<>());",
+          "    int[] indegree = new int[n];",
+          "    for (int[] p : prerequisites) {",
+          "        g.get(p[1]).add(p[0]);                    // edge: before -> after",
+          "        indegree[p[0]]++;",
+          "    }",
+          "    Deque<Integer> q = new ArrayDeque<>();",
+          "    for (int i = 0; i < n; i++) if (indegree[i] == 0) q.offer(i);",
+          "    int[] order = new int[n];",
+          "    int taken = 0;",
+          "    while (!q.isEmpty()) {",
+          "        int u = q.poll();",
+          "        order[taken++] = u;",
+          "        for (int v : g.get(u))",
+          "            if (--indegree[v] == 0) q.offer(v);   // its last dependency is done",
+          "    }",
+          "    return taken == n ? order : new int[0];       // fewer than n: there is a cycle",
+          "}",
+          "",
+          "// DFS with three colours (Find Eventual Safe States): 0 new, 1 on stack, 2 done = safe",
+          "List<Integer> eventualSafeNodes(int[][] graph) {",
+          "    int[] color = new int[graph.length];",
+          "    List<Integer> safe = new ArrayList<>();",
+          "    for (int u = 0; u < graph.length; u++) if (isSafe(graph, u, color)) safe.add(u);",
+          "    return safe;",
+          "}",
+          "boolean isSafe(int[][] graph, int u, int[] color) {",
+          "    if (color[u] != 0) return color[u] == 2;      // colour 1 here = back edge = cycle",
+          "    color[u] = 1;",
+          "    for (int v : graph[u])",
+          "        if (!isSafe(graph, v, color)) return false; // u stays 1: it leads to a cycle",
+          "    color[u] = 2;                                 // post-order: a topo sort records u here",
+          "    return true;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Đảo chiều cạnh: `[a, b]` nghĩa là học b trước a, nên cạnh là `b → a`; dựng ngược thì thứ tự ra ngược (Course Schedule II)",
+            "- DFS chỉ dùng `boolean visited`: không phân biệt được \"đang trên stack\" với \"đã xong\", nên hai nhánh cùng đi tới một đỉnh bị báo nhầm là chu trình (Course Schedule)",
+            "- So mọi cặp từ thay vì chỉ cặp kề nhau, hoặc quên `break` sau ký tự khác nhau đầu tiên; quên đưa vào kết quả các ký tự không có cạnh nào (Alien Dictionary)",
+            "- Khử cạnh trùng bằng `Set` nhưng vẫn tăng in-degree mỗi lần gặp cặp đó: in-degree không bao giờ về 0 và bị báo nhầm là có chu trình (Alien Dictionary)",
+            "- Quên ca `n == 1` (không có cạnh, đáp án `[0]`), hoặc bóc từng lá một rồi kiểm tra `remaining > 2`: có thể dừng giữa chừng một lớp, phải bóc trọn cả lớp mỗi vòng (Minimum Height Trees)"
+          ],
+          "en": [
+            "- Reversed edges: `[a, b]` means take b before a, so the edge is `b → a`; building it backwards gives the order backwards (Course Schedule II)",
+            "- DFS with only a `boolean visited`: it cannot tell \"on the stack\" from \"done\", so two branches reaching the same vertex are wrongly reported as a cycle (Course Schedule)",
+            "- Comparing every pair of words instead of adjacent ones, or not breaking after the first differing character; leaving out characters that have no edges (Alien Dictionary)",
+            "- Deduplicating edges with a `Set` but still incrementing the in-degree for every occurrence: the in-degree never reaches 0 and a cycle is reported by mistake (Alien Dictionary)",
+            "- Missing `n == 1` (no edges, answer `[0]`), or peeling one leaf at a time and checking `remaining > 2`: it can stop halfway through a layer, so peel a whole layer per round (Minimum Height Trees)"
+          ]
+        }
+      }
     },
     {
       "id": "p3-greedy",
@@ -226,7 +1348,107 @@
       "resources": [
         { "type": "article", "title": "USACO Guide: Greedy Algorithms with Sorting", "url": "https://usaco.guide/silver/greedy-sorting" },
         { "type": "practice", "title": "LeetCode tag: Greedy", "url": "https://leetcode.com/problem-list/greedy/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Hỏi giá trị tối ưu (ít nhất, nhiều nhất, có làm được không) và mỗi bước có một lựa chọn \"hiển nhiên tốt nhất\": đi xa nhất, kết thúc sớm nhất, lấy phần tử nhỏ nhất còn lại",
+            "- Sort xong thì quét một lượt là quyết định được (Minimum Absolute Difference in an Array: chỉ cần so các cặp kề nhau)",
+            "- n tới 10⁵ – 10⁶ nên DP O(n²) không kịp, đề gợi ý O(n) hoặc O(n log n)",
+            "- Bài \"có tới được / có đi hết vòng được không\": theo dõi một đại lượng chạy như tầm xa nhất, lượng xăng trong bình, số ngoặc mở",
+            "- Khác với DP: tìm được phản ví dụ nhỏ là tham lam sai. Ví dụ đổi tiền với mệnh giá {1, 3, 4}, tổng 6: tham lam lấy 4 + 1 + 1 (3 đồng), tối ưu là 3 + 3 (2 đồng), nên Coin Change phải dùng DP"
+          ],
+          "en": [
+            "- Asks for an optimum (fewest, most, possible or not) and each step has an \"obviously best\" choice: go farthest, finish earliest, take the smallest remaining element",
+            "- After sorting, one scan decides everything (Minimum Absolute Difference in an Array: only adjacent pairs matter)",
+            "- n is 10⁵ – 10⁶, so an O(n²) DP is too slow and O(n) or O(n log n) is expected",
+            "- \"Can you reach the end / complete the loop\": track one running quantity such as the farthest reach, the fuel in the tank, the number of open brackets",
+            "- Unlike DP: one small counterexample kills a greedy idea. Coins {1, 3, 4} with total 6: greedy takes 4 + 1 + 1 (3 coins), the optimum is 3 + 3 (2 coins), so Coin Change needs DP"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Mỗi bước chọn phương án tốt nhất tại chỗ và không quay lại. Chỉ đúng khi chứng minh được lựa chọn đó an toàn, thường bằng **exchange argument**: lấy một lời giải tối ưu bất kỳ, đổi bước đầu của nó thành lựa chọn tham lam mà kết quả không tệ đi, nên luôn có một lời giải tối ưu bắt đầu bằng lựa chọn tham lam. Không chứng minh được và có phản ví dụ thì chuyển sang DP.",
+            "",
+            "- Jump Game: giữ `reach` là chỉ số xa nhất tới được, gặp `i > reach` là kẹt. Jump Game II: BFS theo đoạn, các ô trong `[.., end]` tới được bằng k bước, hết đoạn thì tăng bước và đoạn mới kết thúc ở `farthest`",
+            "- Gas Station: tổng gas < tổng cost thì không có đáp án. Ngược lại, khi bình xăng âm tại i thì mọi điểm xuất phát từ `start` tới i đều hỏng, nên nhảy `start` sang i + 1",
+            "- Hand of Straights: luôn mở nhóm từ lá nhỏ nhất còn lại (`TreeMap` đếm số lượng), vì lá đó không thể nằm giữa nhóm nào khác",
+            "- Partition Labels: lưu vị trí xuất hiện cuối của mỗi ký tự; đoạn hiện tại đóng lại khi `i` bằng max vị trí cuối của các ký tự đã gặp trong đoạn",
+            "- Valid Parenthesis String: giữ khoảng `[low, high]` số ngoặc mở có thể có; `high < 0` là sai, `low` kẹp về 0, cuối cùng cần `low == 0`",
+            "",
+            "Độ phức tạp: thường O(n) sau một lần sort O(n log n); bộ nhớ O(1) tới O(n)."
+          ],
+          "en": [
+            "At each step take the locally best option and never go back. It is only correct when you can show the choice is safe, usually with an **exchange argument**: take any optimal solution, swap its first step for the greedy choice without making it worse, so some optimal solution always starts with the greedy choice. No proof and a counterexample exists: switch to DP.",
+            "",
+            "- Jump Game: keep `reach`, the farthest index reachable; `i > reach` means stuck. Jump Game II: BFS over ranges, cells in `[.., end]` are reachable in k jumps; at the end of the range add a jump and the new range ends at `farthest`",
+            "- Gas Station: if total gas < total cost there is no answer. Otherwise, when the tank goes negative at i, every start from `start` to i fails, so jump `start` to i + 1",
+            "- Hand of Straights: always open a group at the smallest remaining card (`TreeMap` of counts), because that card cannot sit inside any other group",
+            "- Partition Labels: store the last index of each character; the current part closes when `i` equals the max last index of the characters seen in it",
+            "- Valid Parenthesis String: keep a range `[low, high]` of possible open counts; `high < 0` fails, `low` is clamped at 0, and the end needs `low == 0`",
+            "",
+            "Complexity: usually O(n) after one O(n log n) sort; O(1) to O(n) space."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Jump Game II: BFS over ranges; indices up to `end` are reachable in `jumps` jumps",
+          "int jump(int[] nums) {",
+          "    int jumps = 0, end = 0, farthest = 0;",
+          "    for (int i = 0; i < nums.length - 1; i++) {     // no jump needed from the last index",
+          "        farthest = Math.max(farthest, i + nums[i]);",
+          "        if (i == end) {                             // current range used up: jump",
+          "            jumps++;",
+          "            end = farthest;",
+          "        }",
+          "    }",
+          "    return jumps;",
+          "}",
+          "",
+          "// Gas Station: when the tank goes negative at i, no start in [start, i] works",
+          "int canCompleteCircuit(int[] gas, int[] cost) {",
+          "    int total = 0, tank = 0, start = 0;",
+          "    for (int i = 0; i < gas.length; i++) {",
+          "        total += gas[i] - cost[i];",
+          "        tank += gas[i] - cost[i];",
+          "        if (tank < 0) {                             // restart right after i",
+          "            start = i + 1;",
+          "            tank = 0;",
+          "        }",
+          "    }",
+          "    return total >= 0 ? start : -1;",
+          "}",
+          "",
+          "// Valid Parenthesis String: range [low, high] of possible open counts",
+          "boolean checkValidString(String s) {",
+          "    int low = 0, high = 0;",
+          "    for (char ch : s.toCharArray()) {",
+          "        low += ch == '(' ? 1 : -1;                  // '*' and ')' may both close",
+          "        high += ch == ')' ? -1 : 1;                 // '*' and '(' may both open",
+          "        if (high < 0) return false;                 // too many ')' whatever '*' is",
+          "        low = Math.max(low, 0);                     // a '*' never closes below zero",
+          "    }",
+          "    return low == 0;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Tin vào tham lam mà không thử phản ví dụ nhỏ: chọn đồng lớn nhất trước chỉ đúng với một số hệ mệnh giá, còn tổng quát phải DP (Coin Change)",
+            "- Lặp tới `i < n` thay vì `i < n - 1`: khi `end` vừa chạm ô cuối sẽ đếm thừa một bước nhảy (Jump Game II)",
+            "- Thử từng điểm xuất phát rồi mô phỏng cả vòng là O(n²); hoặc quên kiểm tra tổng gas ≥ tổng cost trước khi trả `start` (Gas Station)",
+            "- Mở nhóm từ một lá bất kỳ thay vì lá nhỏ nhất còn lại; quên trả false ngay khi `n % groupSize != 0` (Hand of Straights)",
+            "- Đóng đoạn khi gặp vị trí cuối của ký tự hiện tại, thay vì max vị trí cuối của mọi ký tự đã có trong đoạn (Partition Labels)"
+          ],
+          "en": [
+            "- Trusting a greedy idea without trying a small counterexample: largest coin first only works for some coin systems, the general case needs DP (Coin Change)",
+            "- Looping to `i < n` instead of `i < n - 1`: when `end` lands exactly on the last index, one extra jump is counted (Jump Game II)",
+            "- Trying every start and simulating the whole loop is O(n²); or forgetting to check total gas ≥ total cost before returning `start` (Gas Station)",
+            "- Opening a group at any card instead of the smallest remaining one; not returning false at once when `n % groupSize != 0` (Hand of Straights)",
+            "- Closing the part at the last index of the current character instead of the max last index of every character already in the part (Partition Labels)"
+          ]
+        }
+      }
     },
     {
       "id": "p3-intervals",
@@ -242,7 +1464,104 @@
       ],
       "resources": [
         { "type": "article", "title": "Tech Interview Handbook: Interval", "url": "https://www.techinterviewhandbook.org/algorithms/interval/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Input là danh sách **khoảng** `[start, end]`: lịch họp, khoảng thời gian, đoạn trên trục số, quả bóng bay",
+            "- Hỏi gộp các khoảng chồng nhau, chèn một khoảng mới, hoặc có hai khoảng nào chồng nhau không",
+            "- Hỏi bỏ ít khoảng nhất để hết chồng / bắn ít mũi tên nhất / chọn nhiều khoảng rời nhau nhất: sort theo **điểm cuối**",
+            "- Hỏi tại cùng một lúc có tối đa bao nhiêu khoảng đang mở (số phòng họp tối thiểu): heap các thời điểm kết thúc hoặc sweep line",
+            "- Nhiều truy vấn trên cùng một tập khoảng và được trả lời theo thứ tự tuỳ ý: sort cả truy vấn rồi xử lý offline (Minimum Interval to Include Each Query)",
+            "- Khác với Greedy nói chung: gần như mọi bài khoảng mở đầu bằng sort, và quyết định chính là sort theo start hay theo end"
+          ],
+          "en": [
+            "- The input is a list of **intervals** `[start, end]`: meetings, time ranges, segments on a line, balloons",
+            "- Asks to merge overlapping intervals, insert a new one, or whether any two overlap",
+            "- Asks for the fewest removals to remove overlaps / the fewest arrows / the most disjoint intervals: sort by **end**",
+            "- Asks how many intervals are open at the same moment at most (minimum meeting rooms): a heap of end times or a sweep line",
+            "- Many queries on one set of intervals that may be answered in any order: sort the queries too and process offline (Minimum Interval to Include Each Query)",
+            "- Unlike greedy in general: almost every interval problem starts with a sort, and the key decision is sorting by start or by end"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Sau khi sort, các khoảng có thể chồng nhau đứng cạnh nhau, nên mỗi khoảng chỉ cần so với khoảng cuối cùng đang giữ. Với `a.start <= b.start`, hai khoảng chồng nhau khi `b.start <= a.end` (hoặc `<` nếu chạm đầu mút không tính, đọc kỹ đề).",
+            "",
+            "- Merge Intervals: sort theo start; chồng thì kéo dài `last.end = max(last.end, cur.end)`, không thì mở khoảng mới. Meeting Rooms: có cặp kề nhau nào chồng là không dự hết được",
+            "- Insert Interval: input đã sort sẵn nên O(n): thêm các khoảng kết thúc trước newInterval, gộp mọi khoảng chồng vào newInterval, rồi thêm phần còn lại",
+            "- Non-overlapping Intervals / mũi tên: sort theo end, luôn giữ khoảng kết thúc sớm nhất vì nó để lại nhiều chỗ nhất cho phần sau",
+            "- Meeting Rooms II: min-heap chứa end của các phòng đang dùng; khoảng mới có start ≥ đỉnh heap thì dùng lại phòng đó. Hoặc sweep line: sự kiện +1 tại start, -1 tại end, sort (cùng thời điểm thì -1 trước), đáp án là max của tổng chạy",
+            "- Minimum Interval to Include Each Query: sort khoảng theo start và truy vấn tăng dần; với mỗi truy vấn q đẩy các khoảng có start ≤ q vào heap theo độ dài, bỏ khỏi đỉnh heap các khoảng có end < q",
+            "",
+            "Độ phức tạp: O(n log n) thời gian cho sort và heap, O(n) bộ nhớ. Có q truy vấn offline: O(n log n + q log q)."
+          ],
+          "en": [
+            "After sorting, intervals that can overlap sit next to each other, so each one only needs comparing with the last kept interval. With `a.start <= b.start`, they overlap when `b.start <= a.end` (or `<` if touching endpoints do not count, read the statement).",
+            "",
+            "- Merge Intervals: sort by start; on overlap extend `last.end = max(last.end, cur.end)`, otherwise open a new interval. Meeting Rooms: any overlapping adjacent pair means you cannot attend all",
+            "- Insert Interval: the input is already sorted, so O(n): add the intervals ending before newInterval, merge every overlapping one into newInterval, then add the rest",
+            "- Non-overlapping Intervals / arrows: sort by end and always keep the interval that ends first, because it leaves the most room for the rest",
+            "- Meeting Rooms II: a min-heap of end times of rooms in use; a new interval whose start ≥ the heap top reuses that room. Or a sweep line: +1 at start, -1 at end, sorted (at equal times -1 first), and the answer is the max running sum",
+            "- Minimum Interval to Include Each Query: sort intervals by start and queries ascending; for each query q push intervals with start ≤ q into a heap by length, and pop from the top those with end < q",
+            "",
+            "Complexity: O(n log n) time for the sort and heap, O(n) space. With q offline queries: O(n log n + q log q)."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Merge Intervals: sort by start, compare with the last kept interval",
+          "int[][] merge(int[][] intervals) {",
+          "    Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));",
+          "    List<int[]> merged = new ArrayList<>();",
+          "    for (int[] cur : intervals) {",
+          "        int[] last = merged.isEmpty() ? null : merged.get(merged.size() - 1);",
+          "        if (last != null && cur[0] <= last[1]) last[1] = Math.max(last[1], cur[1]); // overlap",
+          "        else merged.add(new int[]{cur[0], cur[1]});",
+          "    }",
+          "    return merged.toArray(new int[0][]);",
+          "}",
+          "",
+          "// Non-overlapping Intervals: sort by end, keep the earliest end, count removals",
+          "int eraseOverlapIntervals(int[][] intervals) {",
+          "    Arrays.sort(intervals, (a, b) -> Integer.compare(a[1], b[1]));",
+          "    int removed = 0, lastEnd = Integer.MIN_VALUE;",
+          "    for (int[] cur : intervals) {",
+          "        if (cur[0] >= lastEnd) lastEnd = cur[1];     // fits (touching is fine here): keep",
+          "        else removed++;                              // overlaps: drop it, it ends later",
+          "    }",
+          "    return removed;",
+          "}",
+          "",
+          "// Meeting Rooms II: min-heap of end times of the rooms in use",
+          "int minMeetingRooms(int[][] intervals) {",
+          "    Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));",
+          "    PriorityQueue<Integer> ends = new PriorityQueue<>();",
+          "    for (int[] cur : intervals) {",
+          "        if (!ends.isEmpty() && ends.peek() <= cur[0]) ends.poll(); // reuse the room freed first",
+          "        ends.offer(cur[1]);",
+          "    }",
+          "    return ends.size();                              // never shrinks: the max in use at once",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Comparator `(a, b) -> a[0] - b[0]` tràn số khi giá trị gần ±2³¹ và sort sai; dùng `Integer.compare` (Minimum Number of Arrows to Burst Balloons)",
+            "- Nhầm chuyện chạm đầu mút: `[1, 2]` và `[2, 3]` được gộp trong Merge Intervals, không tính là chồng trong Non-overlapping Intervals, và một mũi tên tại 2 bắn được cả hai bóng (Non-overlapping Intervals)",
+            "- Gán `last[1] = cur[1]` thay vì lấy `max`: một khoảng nằm trọn bên trong (`[1, 10]` rồi `[2, 3]`) làm co khoảng đã gộp (Merge Intervals)",
+            "- Sweep line xử lý +1 trước -1 khi start và end trùng thời điểm: một cuộc họp kết thúc lúc 10 và một cuộc bắt đầu lúc 10 bị đếm thành 2 phòng (Meeting Rooms II)",
+            "- Sort mảng truy vấn trực tiếp làm mất thứ tự gốc; sort một mảng index rồi ghi đáp án vào đúng vị trí (Minimum Interval to Include Each Query)"
+          ],
+          "en": [
+            "- The comparator `(a, b) -> a[0] - b[0]` overflows for values near ±2³¹ and sorts wrongly; use `Integer.compare` (Minimum Number of Arrows to Burst Balloons)",
+            "- Mixing up touching endpoints: `[1, 2]` and `[2, 3]` merge in Merge Intervals, do not overlap in Non-overlapping Intervals, and one arrow at 2 bursts both balloons (Non-overlapping Intervals)",
+            "- Setting `last[1] = cur[1]` instead of taking the `max`: an interval fully inside (`[1, 10]` then `[2, 3]`) shrinks the merged one (Merge Intervals)",
+            "- A sweep line that applies +1 before -1 at equal times: a meeting ending at 10 and one starting at 10 count as 2 rooms (Meeting Rooms II)",
+            "- Sorting the queries array itself loses the original order; sort an array of indices and write each answer to its own slot (Minimum Interval to Include Each Query)"
+          ]
+        }
+      }
     },
     {
       "id": "p3-bit",
@@ -262,7 +1581,116 @@
       "resources": [
         { "type": "article", "title": "Tech Interview Handbook: Binary", "url": "https://www.techinterviewhandbook.org/algorithms/binary/" },
         { "type": "practice", "title": "LeetCode tag: Bit Manipulation", "url": "https://leetcode.com/problem-list/bit-manipulation/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Mọi số xuất hiện hai lần trừ một số, hoặc thiếu đúng một số trong `0..n`, và đề đòi O(1) bộ nhớ: nghĩ tới XOR",
+            "- Hỏi thẳng về biểu diễn nhị phân: đếm bit 1, đảo thứ tự bit, lật mọi bit, số 32-bit không dấu",
+            "- Cấm dùng `+` / `-`: cộng bằng XOR (tổng không nhớ) và AND dịch trái (phần nhớ)",
+            "- Tập con của n ≤ 20 phần tử: biểu diễn bằng mask `int`, duyệt `0..(1 << n) - 1`",
+            "- Tìm XOR lớn nhất giữa hai số: tham lam từ bit cao xuống, dùng Trie trên các bit (Maximum Xor)",
+            "- Khác với Hashing: `HashSet` cũng giải được Single Number / Missing Number nhưng tốn O(n) bộ nhớ, còn bit chỉ cần O(1)"
+          ],
+          "en": [
+            "- Every number appears twice except one, or exactly one number of `0..n` is missing, and O(1) space is required: think XOR",
+            "- Asks directly about the binary form: count set bits, reverse the bits, flip every bit, 32-bit unsigned values",
+            "- `+` / `-` are forbidden: add with XOR (sum without carry) and AND shifted left (the carry)",
+            "- Subsets of n ≤ 20 elements: represent them as an `int` mask and loop over `0..(1 << n) - 1`",
+            "- Maximum XOR of two numbers: greedy from the high bit down, with a Trie over the bits (Maximum Xor)",
+            "- Unlike hashing: a `HashSet` also solves Single Number / Missing Number but takes O(n) space, bits take O(1)"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Tính chất cần thuộc: `a ^ a = 0`, `a ^ 0 = a`, XOR giao hoán và kết hợp, nên XOR cả dãy thì các cặp giống nhau tự triệt tiêu, bất kể thứ tự.",
+            "",
+            "- Single Number: XOR cả mảng. Missing Number: XOR mọi index `0..n` với mọi phần tử, còn lại đúng số thiếu",
+            "- `n & (n - 1)` xoá bit 1 thấp nhất: lặp tới khi n = 0 là đếm được số bit 1; `n > 0 && (n & (n - 1)) == 0` là luỹ thừa của 2. `n & -n` giữ lại bit 1 thấp nhất",
+            "- Counting Bits (DP): `bits[i] = bits[i >> 1] + (i & 1)`, bỏ bit cuối thì được số nhỏ hơn đã tính",
+            "- Bit thứ i: đọc `(x >> i) & 1`, bật `x | (1 << i)`, tắt `x & ~(1 << i)`, lật `x ^ (1 << i)`",
+            "- Cộng không dùng `+`: `a ^ b` là tổng không nhớ, `(a & b) << 1` là phần nhớ, lặp tới khi phần nhớ bằng 0. `int` trong Java là bù 2 và bỏ bit tràn, nên số âm vẫn đúng",
+            "- Java: `>>` dịch có dấu (chép bit dấu), `>>>` dịch không dấu (chèn 0). Số coi là unsigned thì dùng `>>>`",
+            "- Maximum Xor: Trie hai nhánh trên 31 bit; với mỗi số đi từ bit cao xuống, ưu tiên nhánh có bit ngược lại",
+            "",
+            "Độ phức tạp: thường O(n) thời gian, O(1) bộ nhớ; thao tác trên một số là O(số bit) = O(32)."
+          ],
+          "en": [
+            "Facts to know by heart: `a ^ a = 0`, `a ^ 0 = a`, and XOR is commutative and associative, so XOR-ing a whole sequence cancels equal pairs regardless of order.",
+            "",
+            "- Single Number: XOR the whole array. Missing Number: XOR every index `0..n` with every element, and the missing number is what remains",
+            "- `n & (n - 1)` clears the lowest set bit: looping until n = 0 counts the set bits; `n > 0 && (n & (n - 1)) == 0` means a power of two. `n & -n` keeps only the lowest set bit",
+            "- Counting Bits (DP): `bits[i] = bits[i >> 1] + (i & 1)`, dropping the last bit gives a smaller number already computed",
+            "- Bit i: read `(x >> i) & 1`, set `x | (1 << i)`, clear `x & ~(1 << i)`, flip `x ^ (1 << i)`",
+            "- Adding without `+`: `a ^ b` is the sum without carry, `(a & b) << 1` is the carry, repeat until the carry is 0. Java `int` is two's complement and drops overflow bits, so negatives work too",
+            "- Java: `>>` is a signed shift (copies the sign bit), `>>>` is unsigned (shifts in 0). For values treated as unsigned, use `>>>`",
+            "- Maximum Xor: a two-way Trie over 31 bits; for each number walk from the high bit down, preferring the child with the opposite bit",
+            "",
+            "Complexity: usually O(n) time, O(1) space; work on one number is O(bits) = O(32)."
+          ]
+        },
+        "template": [
+          "```java",
+          "// XOR cancels pairs: a ^ a = 0, a ^ 0 = a. Single Number: XOR all the values.",
+          "// Missing Number: also XOR in every index 0..n; only the missing value survives",
+          "int missingNumber(int[] nums) {",
+          "    int x = nums.length;",
+          "    for (int i = 0; i < nums.length; i++) x ^= i ^ nums[i];",
+          "    return x;",
+          "}",
+          "",
+          "// Number of 1 Bits: n & (n - 1) clears the lowest set bit",
+          "int hammingWeight(int n) {",
+          "    int count = 0;",
+          "    for (; n != 0; n &= n - 1) count++;      // != 0, not > 0: n may be negative",
+          "    return count;",
+          "}",
+          "",
+          "// Counting Bits: i without its last bit is a smaller, already computed number",
+          "int[] countBits(int n) {",
+          "    int[] bits = new int[n + 1];",
+          "    for (int i = 1; i <= n; i++) bits[i] = bits[i >> 1] + (i & 1);",
+          "    return bits;",
+          "}",
+          "",
+          "// Reverse Bits: exactly 32 rounds, read the low bit, then unsigned shift",
+          "int reverseBits(int n) {",
+          "    int result = 0;",
+          "    for (int i = 0; i < 32; i++) {",
+          "        result = (result << 1) | (n & 1);",
+          "        n >>>= 1;",
+          "    }",
+          "    return result;",
+          "}",
+          "",
+          "// Sum of Two Integers: XOR = sum without carry, (AND << 1) = carry",
+          "int getSum(int a, int b) {",
+          "    while (b != 0) {",
+          "        int carry = (a & b) << 1;",
+          "        a ^= b;",
+          "        b = carry;",
+          "    }",
+          "    return a;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Đếm bit bằng `while (n != 0) { ...; n >>= 1; }` với n âm: `>>` chép bit dấu nên n không bao giờ về 0, lặp vô hạn; dùng `>>>` (Number of 1 Bits)",
+            "- Dùng `while (n > 0)`: input \"unsigned\" có bit cao nhất bằng 1 là một `int` âm trong Java, vòng lặp không chạy lần nào (Number of 1 Bits)",
+            "- Thứ tự ưu tiên: `==` mạnh hơn `&`, `^`, `|`, còn `+` mạnh hơn `<<`; `x & 1 == 0` không biên dịch được. Luôn bọc ngoặc: `(x & 1) == 0`, `bits[i >> 1] + (i & 1)` (Counting Bits)",
+            "- `1 << 31` là số âm và `1 << 32` bằng 1, vì `int` chỉ dùng 5 bit thấp của số lần dịch; với giá trị tới 10¹⁵ phải dùng `long` và `1L << i` (Sum vs XOR)",
+            "- XOR chỉ triệt tiêu khi các số khác xuất hiện số lần **chẵn**; mỗi số xuất hiện ba lần thì phải đếm từng bit theo mod 3 (Single Number II)"
+          ],
+          "en": [
+            "- Counting bits with `while (n != 0) { ...; n >>= 1; }` on a negative n: `>>` copies the sign bit so n never reaches 0, an infinite loop; use `>>>` (Number of 1 Bits)",
+            "- Using `while (n > 0)`: an \"unsigned\" input with the top bit set is a negative `int` in Java, so the loop never runs (Number of 1 Bits)",
+            "- Precedence: `==` binds tighter than `&`, `^`, `|`, and `+` tighter than `<<`; `x & 1 == 0` does not compile. Always add parentheses: `(x & 1) == 0`, `bits[i >> 1] + (i & 1)` (Counting Bits)",
+            "- `1 << 31` is negative and `1 << 32` is 1, because an `int` shift uses only the low 5 bits of the distance; for values up to 10¹⁵ use `long` and `1L << i` (Sum vs XOR)",
+            "- XOR only cancels when the other numbers appear an **even** number of times; if each appears three times, count each bit mod 3 (Single Number II)"
+          ]
+        }
+      }
     },
     {
       "id": "p3-cses",

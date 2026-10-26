@@ -459,7 +459,17 @@
     "addedItems_other": "Đã thêm {{count}} mục vào pattern.",
     "undo": "Hoàn tác",
     "addNamed": "Thêm {{name}}",
-    "added": "Đã thêm"
+    "added": "Đã thêm",
+    "notesTitle": "Lý thuyết",
+    "itemsTitle": "Bài và tài liệu",
+    "pitfallsLabel": "Bẫy hay gặp",
+    "copy": "Chép vào",
+    "copyNamed": "Chép {{name}} vào ghi chú",
+    "noteCopied": "Đã chép",
+    "noteCopiedTo": "Đã chép vào {{section}}.",
+    "noteTitle": "{{name}} · gợi ý",
+    "noteHint": "Chép vào thì nội dung này nằm ở mục {{section}}, bên dưới phần bạn đã viết. Sau đó viết lại bằng lời của bạn.",
+    "close": "Đóng"
   },
   "graph": {
     "intro": "Mỗi chấm là một chủ đề, pattern hoặc bài. Pattern càng đậm càng nắm chắc; mũi tên là “học trước”. Bấm một chấm để mở.",

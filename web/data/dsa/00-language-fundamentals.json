@@ -9,7 +9,51 @@
         { "type": "course", "title": "CS50x (Harvard)", "url": "https://cs50.harvard.edu/x/" },
         { "type": "docs", "title": "Python docs: The Python Tutorial", "url": "https://docs.python.org/3/tutorial/" },
         { "type": "docs", "title": "dev.java: Learn Java", "url": "https://dev.java/learn/" }
-      ]
+      ],
+      "notes": {
+        "idea": {
+          "vi": [
+            "Phỏng vấn thuật toán gần như luôn cho tự chọn ngôn ngữ. Ứng tuyển backend Java thì cứ dùng Java: người phỏng vấn đọc quen, và bạn cho thấy luôn mình nắm ngôn ngữ dùng hằng ngày. Java dài hơn Python vài dòng, nhưng không chậm hơn khi viết nếu đã thuộc sẵn API.",
+            "",
+            "Cần thuộc tới mức không phải nghĩ:",
+            "- Mảng và chuỗi: `int[]`, `char[]`, `String`, `StringBuilder`, `Arrays.sort`, `Arrays.fill`",
+            "- Collections: `HashMap`, `HashSet`, `ArrayList`, `ArrayDeque`, `PriorityQueue`, `TreeMap`",
+            "- Comparator bằng lambda: `Integer.compare(a, b)`, `Comparator.comparingInt(...)`",
+            "- Giới hạn kiểu: `int` tới khoảng 2.1·10⁹, `long` tới khoảng 9.2·10¹⁸",
+            "- Khung `class Solution` của LeetCode, và tự viết `main` để chạy thử khi không có IDE",
+            "",
+            "Không đổi ngôn ngữ giữa chừng: mỗi lần đổi là học lại thư viện chuẩn và các bẫy của nó."
+          ],
+          "en": [
+            "Coding interviews almost always let you pick the language. For a Java backend role, use Java: the interviewer reads it easily, and it shows you know the language you use every day. Java takes a few more lines than Python, but it is not slower to write once the APIs are in your fingers.",
+            "",
+            "Know these without thinking:",
+            "- Arrays and strings: `int[]`, `char[]`, `String`, `StringBuilder`, `Arrays.sort`, `Arrays.fill`",
+            "- Collections: `HashMap`, `HashSet`, `ArrayList`, `ArrayDeque`, `PriorityQueue`, `TreeMap`",
+            "- Comparators as lambdas: `Integer.compare(a, b)`, `Comparator.comparingInt(...)`",
+            "- Type limits: `int` up to about 2.1·10⁹, `long` up to about 9.2·10¹⁸",
+            "- LeetCode's `class Solution` skeleton, and writing your own `main` to test without an IDE",
+            "",
+            "Do not switch languages halfway: every switch means relearning the standard library and its traps."
+          ]
+        },
+        "pitfalls": {
+          "vi": [
+            "- `int` tràn âm thầm, không báo lỗi: `long x = a * b` vẫn tràn vì phép nhân làm trên `int`, phải viết `(long) a * b`; `(lo + hi) / 2` tràn khi hai số lớn, dùng `lo + (hi - lo) / 2` (First Bad Version)",
+            "- So sánh hai `Integer` bằng `==` là so sánh tham chiếu: chỉ đúng trong khoảng -128..127 nhờ cache, số lớn hơn thì sai; dùng `.equals()` (Minimum Window Substring). `String` cũng vậy",
+            "- Chia số nguyên làm tròn về 0 (`7 / 2 == 3`, `-7 / 2 == -3`) và `%` có thể âm (`-7 % 3 == -1`); cần số dư không âm thì viết `((x % k) + k) % k` (Subarray Sums Divisible by K)",
+            "- `char` cộng với số ra `int`: `sb.append(d + '0')` thêm chuỗi \"48\" chứ không phải ký tự `'0'`, phải ép `(char) (d + '0')` (Multiply Strings)",
+            "- `List<Integer>.remove(x)` với `x` kiểu `int` xoá theo **index**, không theo giá trị; muốn xoá giá trị thì `remove(Integer.valueOf(x))` (Insert Delete GetRandom O(1))"
+          ],
+          "en": [
+            "- `int` overflows silently: `long x = a * b` still overflows because the multiplication is done in `int`, write `(long) a * b`; `(lo + hi) / 2` overflows for large values, use `lo + (hi - lo) / 2` (First Bad Version)",
+            "- `==` on two `Integer` objects compares references: it only works in -128..127 thanks to the cache and fails above that; use `.equals()` (Minimum Window Substring). Same for `String`",
+            "- Integer division rounds toward zero (`7 / 2 == 3`, `-7 / 2 == -3`) and `%` can be negative (`-7 % 3 == -1`); for a non-negative remainder write `((x % k) + k) % k` (Subarray Sums Divisible by K)",
+            "- `char` plus a number is an `int`: `sb.append(d + '0')` appends the text \"48\", not the character `'0'`; cast with `(char) (d + '0')` (Multiply Strings)",
+            "- `List<Integer>.remove(x)` with an `int` argument removes by **index**, not by value; to remove the value call `remove(Integer.valueOf(x))` (Insert Delete GetRandom O(1))"
+          ]
+        }
+      }
     },
     {
       "id": "p0-basics",
@@ -32,7 +76,93 @@
       "resources": [
         { "type": "article", "title": "USACO Guide: Input & Output", "url": "https://usaco.guide/general/input-output" },
         { "type": "article", "title": "USACO Guide: Fast Input & Output", "url": "https://usaco.guide/general/fast-io" }
-      ]
+      ],
+      "notes": {
+        "idea": {
+          "vi": [
+            "Mục tiêu là viết các thao tác cơ bản không cần nghĩ, để lúc phỏng vấn đầu óc dành cho thuật toán. Các bài ở đây dễ về ý tưởng, chủ yếu luyện tay.",
+            "",
+            "- `String` là bất biến: nối nhiều lần thì dùng `StringBuilder`, sửa từng ký tự thì đổi sang `char[]` (`s.toCharArray()`, rồi `new String(chars)`)",
+            "- Đếm chữ cái thường bằng `int[26]` với chỉ số `c - 'a'`, gọn và nhanh hơn `HashMap`",
+            "- Hai chỉ số ở hai đầu (`i++`, `j--`) cho đảo ngược và kiểm tra palindrome",
+            "- Chữ số của một số: `x % 10` lấy chữ số cuối, `x / 10` bỏ nó đi",
+            "- LeetCode đưa input qua tham số; HackerRank/Codeforces bắt tự đọc stdin: dùng `BufferedReader` + `StringTokenizer`, gom output vào `StringBuilder` rồi in một lần",
+            "",
+            "Độ phức tạp: `sb.append` O(1) khấu hao, còn `s += x` trong vòng lặp n lần là O(n²) tổng cộng vì mỗi lần chép lại cả chuỗi."
+          ],
+          "en": [
+            "The goal is to write the basic operations without thinking, so that in the interview your head is free for the algorithm. These problems are easy on ideas; they train your hands.",
+            "",
+            "- `String` is immutable: to build one in a loop use `StringBuilder`, to change single characters switch to `char[]` (`s.toCharArray()`, then `new String(chars)`)",
+            "- Count lowercase letters with `int[26]` indexed by `c - 'a'`, shorter and faster than a `HashMap`",
+            "- Two indices from both ends (`i++`, `j--`) for reversing and palindrome checks",
+            "- Digits of a number: `x % 10` is the last digit, `x / 10` drops it",
+            "- LeetCode passes input as parameters; HackerRank/Codeforces make you read stdin: use `BufferedReader` + `StringTokenizer`, collect output in a `StringBuilder` and print once",
+            "",
+            "Complexity: `sb.append` is amortized O(1), while `s += x` in a loop of n steps is O(n²) in total because each step copies the whole string."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Fast stdin reader for HackerRank/Codeforces (java.io written out in full)",
+          "java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));",
+          "StringTokenizer st;",
+          "",
+          "String next() throws java.io.IOException {        // next token, even across lines",
+          "    while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(in.readLine());",
+          "    return st.nextToken();",
+          "}",
+          "",
+          "// Read n, then n numbers; print once at the end (A Very Big Sum)",
+          "void solve() throws java.io.IOException {",
+          "    int n = Integer.parseInt(next());",
+          "    long sum = 0;                                  // long: values up to 10^10",
+          "    for (int i = 0; i < n; i++) sum += Long.parseLong(next());",
+          "    StringBuilder out = new StringBuilder();       // collect all output here",
+          "    out.append(sum).append('\\n');",
+          "    System.out.print(out);",
+          "}",
+          "",
+          "// Two indices from both ends (Reverse String)",
+          "void reverse(char[] s) {",
+          "    for (int i = 0, j = s.length - 1; i < j; i++, j--) {",
+          "        char t = s[i]; s[i] = s[j]; s[j] = t;",
+          "    }",
+          "}",
+          "",
+          "// Count letters with int[26], lowercase a-z only",
+          "int[] letterCounts(String s) {",
+          "    int[] cnt = new int[26];",
+          "    for (int i = 0; i < s.length(); i++) cnt[s.charAt(i) - 'a']++;",
+          "    return cnt;",
+          "}",
+          "",
+          "// Digits without String: % 10 takes the last digit, / 10 drops it (Palindrome Number)",
+          "boolean isPalindrome(int x) {",
+          "    if (x < 0) return false;",
+          "    long rev = 0;                                  // long: the reverse may not fit in int",
+          "    for (int t = x; t > 0; t /= 10) rev = rev * 10 + t % 10;",
+          "    return rev == x;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Đọc 10⁵ dòng bằng `Scanner` và in từng dòng bằng `System.out.println` dễ TLE; dùng `BufferedReader` và gom output vào `StringBuilder` (Frequency Queries)",
+            "- Cộng dồn vào `int` khi tổng vượt 2.1·10⁹; dùng `long` (A Very Big Sum)",
+            "- Xoá ký tự bằng cách tạo chuỗi mới mỗi bước (`s.substring(0, i) + s.substring(i + 1)`) là O(n) mỗi lần, cả vòng thành O(n²); chỉ cần đếm ký tự trùng kề nhau (Alternating Characters)",
+            "- 12 giờ: `12:xx:xxAM` thành `00`, còn `12:xx:xxPM` giữ nguyên `12` (Time Conversion)",
+            "- Số âm không bao giờ là palindrome, và đảo một số `int` có thể tràn (Palindrome Number)"
+          ],
+          "en": [
+            "- Reading 10⁵ lines with `Scanner` and printing each with `System.out.println` can TLE; use `BufferedReader` and collect output in a `StringBuilder` (Frequency Queries)",
+            "- Summing into an `int` when the total exceeds 2.1·10⁹; use `long` (A Very Big Sum)",
+            "- Deleting characters by building a new string each step (`s.substring(0, i) + s.substring(i + 1)`) is O(n) each time and O(n²) overall; just count equal adjacent characters (Alternating Characters)",
+            "- Hour 12: `12:xx:xxAM` becomes `00`, while `12:xx:xxPM` stays `12` (Time Conversion)",
+            "- A negative number is never a palindrome, and reversing an `int` can overflow (Palindrome Number)"
+          ]
+        }
+      }
     },
     {
       "id": "p0-stdlib",
@@ -54,7 +184,99 @@
         { "type": "docs", "title": "Python docs: collections", "url": "https://docs.python.org/3/library/collections.html" },
         { "type": "docs", "title": "Oracle: Java Collections tutorial", "url": "https://docs.oracle.com/javase/tutorial/collections/" },
         { "type": "article", "title": "Python Wiki: TimeComplexity", "url": "https://wiki.python.org/moin/TimeComplexity" }
-      ]
+      ],
+      "notes": {
+        "idea": {
+          "vi": [
+            "Chọn collection theo câu hỏi bạn cần trả lời nhanh:",
+            "- Đã gặp x chưa, x xuất hiện mấy lần: `HashSet` / `HashMap`, thêm/tra/xoá O(1) trung bình",
+            "- Key có thứ tự, tìm key gần nhất ≤ x hoặc ≥ x, min/max của tập đang thay đổi: `TreeMap` / `TreeSet`, O(log n)",
+            "- Lấy phần tử nhỏ nhất (lớn nhất) liên tục: `PriorityQueue`, `offer`/`poll` O(log n), `peek` O(1)",
+            "- Stack hoặc queue: `ArrayDeque`, O(1) ở cả hai đầu; không dùng `Stack` và `LinkedList`",
+            "- Truy cập theo index: `ArrayList`, `get` O(1), thêm cuối O(1) khấu hao, chèn/xoá ở giữa O(n)",
+            "- Sắp xếp: `Arrays.sort` / `List.sort` O(n log n); với object là TimSort, ổn định (stable)",
+            "",
+            "Khai báo bằng interface, khởi tạo bằng class cụ thể: `Map<String, Integer> m = new HashMap<>()`.",
+            "",
+            "Độ phức tạp ẩn cần nhớ: `contains`/`remove(Object)` trên `List` và `remove(Object)` trên `PriorityQueue` đều O(n)."
+          ],
+          "en": [
+            "Pick the collection by the question you need answered fast:",
+            "- Have I seen x, how many times: `HashSet` / `HashMap`, add/lookup/remove O(1) on average",
+            "- Ordered keys, nearest key ≤ x or ≥ x, min/max of a changing set: `TreeMap` / `TreeSet`, O(log n)",
+            "- Take the smallest (largest) element again and again: `PriorityQueue`, `offer`/`poll` O(log n), `peek` O(1)",
+            "- Stack or queue: `ArrayDeque`, O(1) at both ends; not `Stack` or `LinkedList`",
+            "- Access by index: `ArrayList`, `get` O(1), append amortized O(1), insert/remove in the middle O(n)",
+            "- Sorting: `Arrays.sort` / `List.sort` O(n log n); for objects it is TimSort, which is stable",
+            "",
+            "Declare with the interface, create with the concrete class: `Map<String, Integer> m = new HashMap<>()`.",
+            "",
+            "Hidden costs to remember: `contains`/`remove(Object)` on a `List` and `remove(Object)` on a `PriorityQueue` are O(n)."
+          ]
+        },
+        "template": [
+          "```java",
+          "record Person(String name, int age) {}",
+          "",
+          "void cheatSheet(String s, int[] nums, List<Person> people) {",
+          "    // HashMap: count, default value, group into lists",
+          "    Map<Character, Integer> count = new HashMap<>();",
+          "    for (char c : s.toCharArray()) count.merge(c, 1, Integer::sum);",
+          "    int a = count.getOrDefault('a', 0);              // get() would return null",
+          "    Map<Integer, List<Integer>> byLength = new HashMap<>();",
+          "    byLength.computeIfAbsent(s.length(), k -> new ArrayList<>()).add(0);",
+          "",
+          "    // TreeMap: nearest keys in O(log n), null when there is none",
+          "    TreeMap<Integer, String> tm = new TreeMap<>(Map.of(10, \"x\", 20, \"y\"));",
+          "    Integer floor = tm.floorKey(15);                 // 10: largest key <= 15",
+          "    Integer ceil = tm.ceilingKey(15);                // 20: smallest key >= 15",
+          "    int smallest = tm.firstKey(), largest = tm.lastKey();",
+          "",
+          "    // ArrayDeque as a stack and as a queue",
+          "    Deque<Integer> stack = new ArrayDeque<>();",
+          "    stack.push(1); int top = stack.peek(); stack.pop();",
+          "    Deque<Integer> queue = new ArrayDeque<>();",
+          "    queue.offer(1); int head = queue.peek(); queue.poll();",
+          "",
+          "    // PriorityQueue: min-heap by default",
+          "    PriorityQueue<Integer> minHeap = new PriorityQueue<>();",
+          "    PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Comparator.reverseOrder());",
+          "    PriorityQueue<int[]> byCost = new PriorityQueue<>((x, y) -> Integer.compare(x[1], y[1]));",
+          "",
+          "    // Sorting with comparators (int[] cannot take one: box it or use int[][])",
+          "    Integer[] boxed = Arrays.stream(nums).boxed().toArray(Integer[]::new);",
+          "    Arrays.sort(boxed, (x, y) -> Integer.compare(y, x));          // descending",
+          "    int[][] intervals = {{3, 4}, {1, 2}};",
+          "    Arrays.sort(intervals, (x, y) -> Integer.compare(x[0], y[0])); // by start",
+          "    people.sort(Comparator.comparingInt(Person::age).thenComparing(Person::name));",
+          "",
+          "    // Arrays and Collections helpers",
+          "    int[] dist = new int[nums.length];",
+          "    Arrays.fill(dist, Integer.MAX_VALUE);",
+          "    List<Integer> list = new ArrayList<>(List.of(3, 1, 2));          // List.of is read-only",
+          "    Collections.sort(list);",
+          "    Collections.reverse(list);",
+          "    int max = Collections.max(list);",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- `map.get(k)` trả `null` khi chưa có key, gán vào `int` là NullPointerException; dùng `getOrDefault` (First Unique Character in a String)",
+            "- Duyệt `PriorityQueue` bằng for-each hoặc in ra bằng `toString` không theo thứ tự ưu tiên; muốn đúng thứ tự phải `poll` lần lượt (Java Priority Queue)",
+            "- Dùng `HashSet` cho cửa sổ trượt có phần tử trùng: phần tử rời cửa sổ bị xoá khỏi set dù trong cửa sổ còn bản sao khác; dùng `HashMap` đếm số lần (Java Dequeue)",
+            "- Ghép hai chuỗi làm key mà không có ký tự phân cách: (\"ab\", \"c\") và (\"a\", \"bc\") ra cùng key (Java Hashset)",
+            "- `Arrays.asList(nums)` với `int[] nums` cho ra `List<int[]>` một phần tử, không phải `List<Integer>`; `new HashSet<>(Arrays.asList(nums)).size()` vẫn biên dịch nhưng luôn bằng 1 (Contains Duplicate)"
+          ],
+          "en": [
+            "- `map.get(k)` returns `null` for a missing key, and assigning it to an `int` throws NullPointerException; use `getOrDefault` (First Unique Character in a String)",
+            "- Iterating a `PriorityQueue` with for-each or printing it with `toString` is not in priority order; `poll` one by one to get the order (Java Priority Queue)",
+            "- Using a `HashSet` for a sliding window with duplicates: the leaving element is removed from the set even though a copy is still inside; count with a `HashMap` (Java Dequeue)",
+            "- Joining two strings into a key without a separator: (\"ab\", \"c\") and (\"a\", \"bc\") give the same key (Java Hashset)",
+            "- `Arrays.asList(nums)` with `int[] nums` gives a one-element `List<int[]>`, not a `List<Integer>`; `new HashSet<>(Arrays.asList(nums)).size()` still compiles but is always 1 (Contains Duplicate)"
+          ]
+        }
+      }
     },
     {
       "id": "p0-easy",

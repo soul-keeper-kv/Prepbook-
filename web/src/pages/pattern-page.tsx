@@ -1,19 +1,31 @@
 import { useEffect, useState } from "react"
 import { useNow } from "@/lib/clock"
-import { ListPlusIcon, PlusIcon, Trash2Icon } from "lucide-react"
+import { ClipboardPasteIcon, ListPlusIcon, PlusIcon, Trash2Icon } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { LevelTag, OutcomeBar } from "@/components/common/badges"
 import { ConflictList } from "@/components/common/conflicts"
 import { EditableText, NoteEditor } from "@/components/common/editing"
+import { Markdown } from "@/components/common/markdown"
 import { DocSection, PageHeader, Panel } from "@/components/common/page"
 import { CardList } from "@/components/pattern/card-list"
 import { PatternLinks } from "@/components/pattern/pattern-links"
 import { ProblemList, ProblemTableActions } from "@/components/pattern/problem-list"
 import { ResourceList } from "@/components/pattern/resource-list"
+import { LABEL } from "@/components/section"
+import { Tag } from "@/components/tag"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { useContent } from "@/content/context"
 import { localize } from "@/content/localize"
 import { useLang, useNotebook } from "@/notebook/hooks"
@@ -28,10 +40,11 @@ import {
 } from "@/notebook/logic"
 import type { Conflict, Pattern } from "@/notebook/schema"
 import { notebookActions } from "@/notebook/store"
-import { patternSuggestions } from "@/notebook/suggestions"
+import { patternSuggestions, withNote, type SuggestedNote } from "@/notebook/suggestions"
 import { CODE_SECTIONS, SECTION_TEMPLATES } from "@/notebook/templates"
 import { href, navigate } from "@/state/router"
 import { uiActions } from "@/state/ui"
+import { cn } from "@/lib/utils"
 
 function MasteryStrip({ pattern, status }: { pattern: Pattern; status: PatternStatus }) {
   const { t } = useTranslation()
@@ -79,13 +92,87 @@ function MasteryStrip({ pattern, status }: { pattern: Pattern; status: PatternSt
   )
 }
 
+/** One suggested note: read it in a dialog, then copy it below what the section already has */
+function NoteSuggestion({ pattern, note }: { pattern: Pattern; note: SuggestedNote }) {
+  const { t } = useTranslation()
+  const [open, setOpen] = useState(false)
+  const section = t(`section.${note.key}.title` as "section.idea.title")
+  // Suggested pitfalls are common ones; the section is for the user's own
+  const label = note.key === "pitfalls" ? t("suggest.pitfallsLabel") : section
+
+  function copy() {
+    const before = pattern.sections[note.key] ?? ""
+    notebookActions.setSection(pattern.id, note.key, withNote(before, note.text))
+    setOpen(false)
+    toast.success(t("suggest.noteCopiedTo", { section }), {
+      action: {
+        label: t("suggest.undo"),
+        onClick: () => notebookActions.setSection(pattern.id, note.key, before),
+      },
+    })
+  }
+
+  return (
+    <li className="flex items-center gap-2 border-t py-1.5 text-13">
+      <button
+        type="button"
+        className="min-w-0 flex-1 cursor-pointer truncate rounded-sm text-left text-link outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+        onClick={() => setOpen(true)}
+      >
+        {label}
+      </button>
+      {note.copied ? (
+        <Tag tone="ok">{t("suggest.noteCopied")}</Tag>
+      ) : (
+        <Button
+          size="xs"
+          variant="outline"
+          aria-label={t("suggest.copyNamed", { name: label })}
+          onClick={copy}
+        >
+          <ClipboardPasteIcon />
+          {t("suggest.copy")}
+        </Button>
+      )}
+      <Dialog open={open} onOpenChange={setOpen}>
+        {/* Only the note scrolls: the title and the Copy button stay in view on a phone */}
+        <DialogContent className="flex max-h-[85vh] flex-col gap-4 rounded-lg border border-border-strong bg-card ring-0 sm:max-w-180">
+          <DialogHeader>
+            <DialogTitle className="text-15 font-semibold">
+              {t("suggest.noteTitle", { name: label })}
+            </DialogTitle>
+            <DialogDescription className="text-13">
+              {t("suggest.noteHint", { section })}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="min-h-0 min-w-0 flex-1 overflow-y-auto text-14">
+            <Markdown text={note.text} />
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">{t("suggest.close")}</Button>
+            </DialogClose>
+            {!note.copied && (
+              <Button onClick={copy}>
+                <ClipboardPasteIcon />
+                {t("suggest.copy")}
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </li>
+  )
+}
+
 function PatternSuggestions({ pattern }: { pattern: Pattern }) {
   const { t } = useTranslation()
   const content = useContent()
   const nb = useNotebook()
   const lang = useLang()
-  const { module, problems, resources } = patternSuggestions(content, nb, pattern, lang)
-  if (!module || (!problems.length && !resources.length)) return null
+  const { module, notes, problems, resources } = patternSuggestions(content, nb, pattern, lang)
+  if (!module || (!notes.length && !problems.length && !resources.length)) return null
+  const items = problems.length + resources.length
 
   // Every suggested problem and link in one change, with Undo
   function addAll() {
@@ -115,13 +202,28 @@ function PatternSuggestions({ pattern }: { pattern: Pattern }) {
     <Panel
       title={t("suggest.title", { name: localize(module.title, lang) })}
       actions={
-        <Button size="xs" onClick={addAll}>
-          <ListPlusIcon />
-          {t("suggest.addAll", { count: problems.length + resources.length })}
-        </Button>
+        items > 0 && (
+          <Button size="xs" onClick={addAll}>
+            <ListPlusIcon />
+            {t("suggest.addAll", { count: items })}
+          </Button>
+        )
       }
     >
       <p className="mb-2 text-12 text-faint">{t("suggest.patternIntro")}</p>
+      {notes.length > 0 && (
+        <>
+          <h3 className={cn(LABEL, "mt-3 mb-1")}>{t("suggest.notesTitle")}</h3>
+          <ul className={cn(items > 0 && "mb-3")}>
+            {notes.map((note) => (
+              <NoteSuggestion key={note.key} pattern={pattern} note={note} />
+            ))}
+          </ul>
+        </>
+      )}
+      {items > 0 && notes.length > 0 && (
+        <h3 className={cn(LABEL, "mb-1")}>{t("suggest.itemsTitle")}</h3>
+      )}
       {problems.length > 0 && (
         <ul className="mb-2">
           {problems.map((p) => (

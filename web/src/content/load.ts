@@ -7,6 +7,7 @@ import {
   type Localized,
   type Phase,
 } from "@/content/schema"
+import { DEFAULT_TOPICS, SECTION_TEMPLATES } from "@/notebook/templates"
 
 // The suggestions in data/: one folder per module, bundled at build time and checked against
 // the schema and the naming rules in data/README.md. Editing a file there shows up at once
@@ -109,12 +110,21 @@ export function buildContent(files: Map<string, unknown>): Content {
     const meta = parse(ModuleSchema, metaFile, files.get(metaFile))
     if (!names.length) throw new ContentError(metaFile, "the module has no phase files")
     const module: Module = { id: dir, topicId: meta.topic, title: meta.title, phases: [] }
+    // Notes go into the sections of the topic's kind: a DSA pattern has no "tradeoffs"
+    const kind = DEFAULT_TOPICS.find((t) => t.id === meta.topic)?.kind ?? "dsa"
+    const sections: readonly string[] = SECTION_TEMPLATES[kind]
     for (const name of names) {
       const file = `${dir}/${name}`
       const phase = parse(PhaseSchema, file, files.get(file))
       claim(phase.id, file)
       for (const item of phase.items) {
         claim(item.id, file)
+        const wrong = Object.keys(item.notes ?? {}).find((key) => !sections.includes(key))
+        if (wrong)
+          throw new ContentError(
+            file,
+            `item "${item.id}": notes.${wrong} is not a section of a ${kind} topic (${sections.join(", ")})`
+          )
         items.set(item.id, { item, phase, module })
       }
       module.phases.push(phase)

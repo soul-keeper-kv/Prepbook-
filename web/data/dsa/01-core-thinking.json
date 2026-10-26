@@ -8,7 +8,69 @@
       "resources": [
         { "type": "article", "title": "USACO Guide: Time Complexity", "url": "https://usaco.guide/bronze/time-comp" },
         { "type": "article", "title": "Big-O Cheat Sheet", "url": "https://www.bigocheatsheet.com/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- n ≤ 10: O(n!·n), thử mọi hoán vị",
+            "- n ≤ 20: O(2ⁿ·n), thử mọi tập con, backtracking, bitmask DP",
+            "- n ≤ 500: O(n³), ví dụ DP trên khoảng, Floyd–Warshall",
+            "- n ≤ 5000: O(n²), hai vòng lặp lồng nhau, DP hai chiều",
+            "- n tới 10⁵–10⁶: O(n log n) hoặc O(n): sort, heap, binary search, hash map, two pointers, sliding window",
+            "- n hoặc giá trị tới 10⁹–10¹⁸: O(log n) hoặc O(1): binary search trên đáp án, lũy thừa nhanh, công thức; O(√n) chỉ ổn tới khoảng 10¹²"
+          ],
+          "en": [
+            "- n ≤ 10: O(n!·n), try every permutation",
+            "- n ≤ 20: O(2ⁿ·n), try every subset, backtracking, bitmask DP",
+            "- n ≤ 500: O(n³), e.g. interval DP, Floyd–Warshall",
+            "- n ≤ 5000: O(n²), two nested loops, 2-D DP",
+            "- n up to 10⁵–10⁶: O(n log n) or O(n): sorting, heap, binary search, hash map, two pointers, sliding window",
+            "- n or values up to 10⁹–10¹⁸: O(log n) or O(1): binary search on the answer, fast power, a formula; O(√n) is fine only up to about 10¹²"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Máy chấm chạy cỡ 10⁸ phép tính đơn giản mỗi giây (Java gần mức đó, Python chậm hơn khoảng 10 lần). Thay n lớn nhất vào độ phức tạp: dưới ~10⁸ là kịp, từ 10⁹ trở lên là TLE. Vì vậy ràng buộc là gợi ý về lời giải: n ≤ 10⁵ nghĩa là đề muốn O(n log n) trở xuống. Phỏng vấn thường không ghi ràng buộc thì hỏi lại n cỡ bao nhiêu.",
+            "",
+            "Đọc độ phức tạp từ code:",
+            "- Vòng lặp nối tiếp thì cộng, lồng nhau thì nhân: O(n + m) khác O(n·m)",
+            "- Mỗi bước chia đôi phạm vi: O(log n)",
+            "- Hai vòng lồng nhau mà con trỏ trong chỉ tiến, không quay lại: tổng vẫn O(n) (phân tích khấu hao)",
+            "- Đệ quy: số lời gọi × việc mỗi lời gọi; rẽ 2 nhánh, sâu n tầng là O(2ⁿ)",
+            "- Bộ nhớ cũng tính: đệ quy sâu n tầng tốn O(n) stack, mảng `n × n` với n = 10⁵ không chứa nổi",
+            "",
+            "Độ phức tạp: chỉ giữ bậc cao nhất, bỏ hằng số, ví dụ O(3n² + n log n) = O(n²); hằng số chỉ đáng lo khi sát giới hạn."
+          ],
+          "en": [
+            "A judge runs about 10⁸ simple operations per second (Java is close to that, Python roughly 10 times slower). Plug the largest n into the complexity: under ~10⁸ is fine, 10⁹ and above times out. So the constraints hint at the solution: n ≤ 10⁵ means the problem wants O(n log n) or better. Interviews often give no constraints, so ask how big n can be.",
+            "",
+            "Reading complexity from code:",
+            "- Loops one after another add, nested loops multiply: O(n + m) is not O(n·m)",
+            "- Halving the range at each step: O(log n)",
+            "- Nested loops where the inner pointer only moves forward and never resets: still O(n) in total (amortized analysis)",
+            "- Recursion: number of calls × work per call; two branches, n levels deep is O(2ⁿ)",
+            "- Memory counts too: recursion n levels deep uses O(n) stack, an `n × n` array with n = 10⁵ does not fit",
+            "",
+            "Complexity: keep only the highest-order term and drop constants, e.g. O(3n² + n log n) = O(n²); constants only matter near the limit."
+          ]
+        },
+        "pitfalls": {
+          "vi": [
+            "- Quên chi phí ẩn của hàm thư viện: `list.contains(x)`, `list.remove(0)`, `s.substring(...)`, nối chuỗi `s + t` đều O(n); đặt trong vòng lặp thành O(n²) (Contains Duplicate)",
+            "- Băm hoặc so sánh một chuỗi dài k tốn O(k), nên n chuỗi là O(n·k), không phải O(n); sort từng chuỗi là O(n·k log k) (Group Anagrams)",
+            "- Đệ quy không nhớ kết quả các bài con trùng nhau: O(2ⁿ) thay vì O(n) (Climbing Stairs)",
+            "- Thấy hai vòng lặp lồng nhau là kết luận O(n²) và bỏ một lời giải O(n) đúng: con trỏ trái chỉ tiến nên tổng số bước là O(n) (Longest Substring Without Repeating Characters)",
+            "- Chỉ nhìn n mà quên miền giá trị: thử lần lượt mọi đáp án tới 10⁹ là TLE, phải binary search trên đáp án (Koko Eating Bananas)"
+          ],
+          "en": [
+            "- Forgetting the hidden cost of library calls: `list.contains(x)`, `list.remove(0)`, `s.substring(...)` and `s + t` are all O(n); inside a loop that becomes O(n²) (Contains Duplicate)",
+            "- Hashing or comparing a string of length k costs O(k), so n strings are O(n·k), not O(n); sorting each one is O(n·k log k) (Group Anagrams)",
+            "- Recursion that does not remember overlapping subproblems: O(2ⁿ) instead of O(n) (Climbing Stairs)",
+            "- Seeing two nested loops, calling it O(n²) and dropping a correct O(n) solution: the left pointer only moves forward, so the total number of steps is O(n) (Longest Substring Without Repeating Characters)",
+            "- Looking only at n and forgetting the value range: trying every answer up to 10⁹ times out, binary search on the answer instead (Koko Eating Bananas)"
+          ]
+        }
+      }
     },
     {
       "id": "p1-math",
@@ -33,7 +95,109 @@
         { "type": "article", "title": "cp-algorithms: Binary exponentiation", "url": "https://cp-algorithms.com/algebra/binary-exp.html" },
         { "type": "practice", "title": "LeetCode tag: Math", "url": "https://leetcode.com/problem-list/math/" },
         { "type": "practice", "title": "LeetCode tag: Number Theory", "url": "https://leetcode.com/problem-list/number-theory/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đề nói về ước chung, chia hết, chu kỳ lặp, hoặc chuỗi được tạo bằng cách lặp một chuỗi con: nghĩ tới GCD (Greatest Common Divisor of Strings: độ dài đáp án là gcd của hai độ dài)",
+            "- Đếm hoặc liệt kê số nguyên tố tới n cỡ 10⁶–10⁷: sàng Eratosthenes; chỉ kiểm tra vài số thì thử ước tới √n",
+            "- \"Trả kết quả modulo 10⁹ + 7\": lấy `% MOD` sau mỗi phép cộng/nhân, nhân trong `long`",
+            "- Lũy thừa với số mũ lớn (tới 2³¹ hoặc hơn): lũy thừa nhanh O(log n)",
+            "- Số quá lớn cho `long`, đề cấm chuyển sang số, hoặc giới hạn 32-bit: làm theo từng chữ số như tính tay, kiểm tra tràn trước mỗi bước (Plus One, Multiply Strings, Reverse Integer)",
+            "- Khác với duyệt trâu: n tới 10⁹ thì không lặp nổi, cần công thức đóng (Handshake: n·(n − 1) / 2)"
+          ],
+          "en": [
+            "- The statement is about common divisors, divisibility, periods, or a string built by repeating a piece: think GCD (Greatest Common Divisor of Strings: the answer's length is the gcd of the two lengths)",
+            "- Count or list primes up to n around 10⁶–10⁷: sieve of Eratosthenes; to test just a few numbers, try divisors up to √n",
+            "- \"Return the answer modulo 10⁹ + 7\": apply `% MOD` after every addition/multiplication, multiply in `long`",
+            "- A power with a huge exponent (2³¹ or more): fast exponentiation in O(log n)",
+            "- Numbers too big for `long`, no conversion to numbers allowed, or a 32-bit limit: work digit by digit as on paper, check overflow before each step (Plus One, Multiply Strings, Reverse Integer)",
+            "- Unlike brute force: with n up to 10⁹ you cannot loop, you need a closed formula (Handshake: n·(n − 1) / 2)"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "- GCD Euclid: `gcd(a, b) = gcd(b, a % b)`, dừng khi b = 0. `lcm = a / gcd(a, b) * b`, chia trước để đỡ tràn",
+            "- Kiểm tra nguyên tố: thử ước từ 2 tới √n, vì nếu n = p·q thì một trong hai thừa số ≤ √n",
+            "- Sàng: với mỗi i còn là nguyên tố, gạch các bội bắt đầu từ i², vì bội nhỏ hơn đã bị một ước nhỏ hơn gạch rồi",
+            "- Modulo giữ đúng qua phép cộng, trừ, nhân, nên lấy mod sau mỗi phép để số không phình ra. Phép chia thì không (cần nghịch đảo modulo)",
+            "- Lũy thừa nhanh: aⁿ = (a^(n/2))², nhân thêm a khi n lẻ; mỗi bước số mũ giảm một nửa",
+            "- Chữ số: `x % 10` là chữ số cuối, `x / 10` bỏ nó; cộng/nhân chuỗi số làm như tính tay với biến nhớ (carry)",
+            "",
+            "Độ phức tạp: GCD O(log min(a, b)), kiểm tra nguyên tố O(√n), sàng O(n log log n) thời gian và O(n) bộ nhớ, lũy thừa nhanh O(log n)."
+          ],
+          "en": [
+            "- Euclid's GCD: `gcd(a, b) = gcd(b, a % b)`, stop when b = 0. `lcm = a / gcd(a, b) * b`, divide first to avoid overflow",
+            "- Primality test: try divisors from 2 to √n, because if n = p·q one factor is ≤ √n",
+            "- Sieve: for each i still marked prime, cross out multiples starting at i², since smaller multiples were already crossed out by a smaller factor",
+            "- Modulo survives addition, subtraction and multiplication, so reduce after every operation to keep numbers small. Division does not (it needs a modular inverse)",
+            "- Fast power: aⁿ = (a^(n/2))², times one more a when n is odd; the exponent halves at each step",
+            "- Digits: `x % 10` is the last digit, `x / 10` drops it; add/multiply digit strings as on paper with a carry",
+            "",
+            "Complexity: GCD O(log min(a, b)), primality test O(√n), sieve O(n log log n) time and O(n) space, fast power O(log n)."
+          ]
+        },
+        "template": [
+          "```java",
+          "long gcd(long a, long b) {                     // Euclid, O(log min(a, b))",
+          "    return b == 0 ? a : gcd(b, a % b);",
+          "}",
+          "",
+          "// Count primes < n with a sieve (Count Primes)",
+          "int countPrimes(int n) {",
+          "    boolean[] composite = new boolean[Math.max(n, 2)];",
+          "    int count = 0;",
+          "    for (int i = 2; i < n; i++) {",
+          "        if (composite[i]) continue;",
+          "        count++;",
+          "        for (long j = (long) i * i; j < n; j += i) composite[(int) j] = true;  // from i*i",
+          "    }",
+          "    return count;",
+          "}",
+          "",
+          "// a^e % mod by repeated squaring, O(log e)",
+          "// Pow(x, n): same loop on double, no mod; for n < 0 use x = 1 / x, e = -(long) n",
+          "long powMod(long a, long e, long mod) {",
+          "    long result = 1;",
+          "    a %= mod;",
+          "    while (e > 0) {",
+          "        if ((e & 1) == 1) result = result * a % mod;  // odd exponent: take one a",
+          "        a = a * a % mod;                               // square the base",
+          "        e >>= 1;",
+          "    }",
+          "    return result;",
+          "}",
+          "",
+          "// Digit by digit, check overflow before it happens (Reverse Integer)",
+          "int reverse(int x) {",
+          "    int rev = 0;",
+          "    while (x != 0) {",
+          "        int d = x % 10;                            // negative when x is negative: fine",
+          "        x /= 10;",
+          "        if (rev > Integer.MAX_VALUE / 10 || rev < Integer.MIN_VALUE / 10) return 0;",
+          "        rev = rev * 10 + d;",
+          "    }",
+          "    return rev;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Nhân rồi mới kiểm tra tràn: lúc đó số đã tràn và bị quấn sang giá trị khác; kiểm tra `rev` với `Integer.MAX_VALUE / 10` trước khi nhân (Reverse Integer)",
+            "- Count Primes đếm số nguyên tố **nhỏ hơn** n, không phải ≤ n; và `i * i` tràn `int` khi i lớn, phải tính bằng `long` (Count Primes)",
+            "- n âm trong lũy thừa: `-n` tràn khi n = `Integer.MIN_VALUE`, chuyển n sang `long` trước khi đổi dấu (Pow(x, n))",
+            "- `a * b % MOD` với a, b kiểu `int` tràn trước khi kịp lấy mod; ép `(long) a * b % MOD` (Count Good Numbers)",
+            "- Mọi chữ số đều là 9 thì kết quả dài thêm một chữ số (999 + 1 = 1000), cần mảng mới (Plus One)"
+          ],
+          "en": [
+            "- Multiplying first and checking overflow afterwards: by then the value has already wrapped around; compare `rev` with `Integer.MAX_VALUE / 10` before multiplying (Reverse Integer)",
+            "- Count Primes counts primes **less than** n, not ≤ n; and `i * i` overflows `int` for large i, compute it in `long` (Count Primes)",
+            "- Negative exponent: `-n` overflows when n = `Integer.MIN_VALUE`, convert n to `long` before negating (Pow(x, n))",
+            "- `a * b % MOD` with `int` a, b overflows before the mod is applied; write `(long) a * b % MOD` (Count Good Numbers)",
+            "- When every digit is 9 the result gets one digit longer (999 + 1 = 1000), so you need a new array (Plus One)"
+          ]
+        }
+      }
     },
     {
       "id": "p1-sort",
@@ -57,7 +221,110 @@
         { "type": "article", "title": "Tech Interview Handbook: Sorting and searching", "url": "https://www.techinterviewhandbook.org/algorithms/sorting-searching/" },
         { "type": "course", "title": "Coursera: Algorithms, Part I (Princeton)", "url": "https://www.coursera.org/learn/algorithms-part1" },
         { "type": "practice", "title": "LeetCode tag: Sorting", "url": "https://leetcode.com/problem-list/sorting/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đề yêu cầu tự cài sort, cấm hàm có sẵn, hoặc hỏi về stable / in-place / độ phức tạp xấu nhất (Sort an Array)",
+            "- Thứ tự không phải số tăng dần: nhiều tiêu chí, theo tần suất, theo chuỗi ghép: viết comparator (Largest Number, Sorting: Comparator)",
+            "- Giá trị chỉ có vài loại hoặc miền nhỏ (0/1/2, 0..200): counting sort, hoặc chia 3 phần trong một lượt (Sort Colors, Fraudulent Activity Notifications)",
+            "- Hai dãy đã sắp xếp cần gộp: merge bằng hai con trỏ; gộp tại chỗ thì đi từ cuối (Merge Sorted Array)",
+            "- Sort trước thì bài dễ hẳn: gom phần tử bằng nhau, tham lam từ nhỏ tới lớn, two pointers (Mark and Toys)",
+            "- Khác với heap / quick select: chỉ cần k phần tử nhỏ nhất hoặc phần tử thứ k thì không cần sort cả mảng (heap O(n log k), quick select O(n) trung bình)"
+          ],
+          "en": [
+            "- The problem asks you to implement a sort, bans the built-in one, or asks about stable / in-place / worst case (Sort an Array)",
+            "- The order is not plain ascending numbers: several keys, by frequency, by concatenation: write a comparator (Largest Number, Sorting: Comparator)",
+            "- Only a few distinct values or a small range (0/1/2, 0..200): counting sort, or a one-pass 3-way split (Sort Colors, Fraudulent Activity Notifications)",
+            "- Two sorted sequences to combine: merge with two pointers; in place, merge from the back (Merge Sorted Array)",
+            "- Sorting first makes the problem easy: groups equal values, greedy from small to large, two pointers (Mark and Toys)",
+            "- Unlike a heap / quick select: if you only need the k smallest or the k-th element, do not sort everything (heap O(n log k), quick select O(n) on average)"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "- Merge sort: chia đôi, sort từng nửa, trộn hai nửa đã sắp xếp bằng hai con trỏ. Luôn O(n log n), stable, tốn O(n) bộ nhớ phụ",
+            "- Quick sort: chọn pivot, partition thành phần < pivot, = pivot, > pivot, đệ quy hai phần ngoài. O(n log n) trung bình, O(n²) xấu nhất; pivot ngẫu nhiên và partition 3 phần tránh được trường hợp xấu thường gặp",
+            "- Dutch flag (Sort Colors) chính là một lượt partition 3 phần với pivot = 1",
+            "- Counting sort: miền giá trị nhỏ cỡ k thì đếm rồi ghi lại, O(n + k)",
+            "",
+            "Comparator trả số âm khi a phải đứng trước b. Dùng `Integer.compare(a, b)` hoặc `Comparator.comparingInt(...).thenComparing(...)`. Largest Number so sánh `a + b` với `b + a`; phép so sánh này có tính bắc cầu nên sort được.",
+            "",
+            "Trong Java, `Arrays.sort(int[])` là dual-pivot quick sort (không stable, với số nguyên thì không sao); với object (`Integer[]`, `List`) là TimSort, stable.",
+            "",
+            "Độ phức tạp: sort dựa trên so sánh cần ít nhất O(n log n); merge sort O(n) bộ nhớ, quick sort O(log n) stack trung bình."
+          ],
+          "en": [
+            "- Merge sort: split in half, sort each half, merge the two sorted halves with two pointers. Always O(n log n), stable, O(n) extra memory",
+            "- Quick sort: pick a pivot, partition into < pivot, = pivot, > pivot, recurse on the outer parts. O(n log n) on average, O(n²) worst case; a random pivot and a 3-way partition avoid the usual bad cases",
+            "- The Dutch flag (Sort Colors) is one pass of the 3-way partition with pivot = 1",
+            "- Counting sort: with a small value range k, count then write back, O(n + k)",
+            "",
+            "A comparator returns a negative number when a must come before b. Use `Integer.compare(a, b)` or `Comparator.comparingInt(...).thenComparing(...)`. Largest Number compares `a + b` with `b + a`; that comparison is transitive, so sorting with it works.",
+            "",
+            "In Java, `Arrays.sort(int[])` is a dual-pivot quick sort (not stable, which does not matter for ints); for objects (`Integer[]`, `List`) it is TimSort, which is stable.",
+            "",
+            "Complexity: comparison sorts need at least O(n log n); merge sort uses O(n) memory, quick sort O(log n) stack on average."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Merge sort on a[lo..hi), tmp has the same length as a (Sort an Array)",
+          "void mergeSort(int[] a, int lo, int hi, int[] tmp) {",
+          "    if (hi - lo <= 1) return;",
+          "    int mid = (lo + hi) >>> 1;",
+          "    mergeSort(a, lo, mid, tmp);",
+          "    mergeSort(a, mid, hi, tmp);",
+          "    int i = lo, j = mid, k = lo;",
+          "    while (i < mid && j < hi) tmp[k++] = a[i] <= a[j] ? a[i++] : a[j++];  // <= keeps it stable",
+          "    while (i < mid) tmp[k++] = a[i++];",
+          "    while (j < hi) tmp[k++] = a[j++];",
+          "    System.arraycopy(tmp, lo, a, lo, hi - lo);",
+          "}",
+          "",
+          "// Quick sort on a[lo..hi], random pivot, 3-way partition",
+          "// Sort Colors is one pass of the while loop with pivot = 1",
+          "final Random rng = new Random();",
+          "void quickSort(int[] a, int lo, int hi) {",
+          "    if (lo >= hi) return;",
+          "    int pivot = a[lo + rng.nextInt(hi - lo + 1)];",
+          "    int lt = lo, i = lo, gt = hi;              // a[lo..lt) < pivot, a(gt..hi] > pivot",
+          "    while (i <= gt) {",
+          "        if (a[i] < pivot) swap(a, lt++, i++);",
+          "        else if (a[i] > pivot) swap(a, i, gt--); // keep i: the swapped-in value is unseen",
+          "        else i++;",
+          "    }",
+          "    quickSort(a, lo, lt - 1);",
+          "    quickSort(a, gt + 1, hi);",
+          "}",
+          "",
+          "void swap(int[] a, int i, int j) { int t = a[i]; a[i] = a[j]; a[j] = t; }",
+          "",
+          "// Custom order: a goes first if a + b > b + a (Largest Number)",
+          "String largestNumber(int[] nums) {",
+          "    String[] s = Arrays.stream(nums).mapToObj(String::valueOf).toArray(String[]::new);",
+          "    Arrays.sort(s, (a, b) -> (b + a).compareTo(a + b));",
+          "    return s[0].equals(\"0\") ? \"0\" : String.join(\"\", s);",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Comparator `(a, b) -> a - b` tràn khi giá trị gần `Integer.MIN_VALUE`/`MAX_VALUE` và cho thứ tự sai; dùng `Integer.compare(a, b)` (Minimum Number of Arrows to Burst Balloons)",
+            "- Quick sort với pivot cố định gặp mảng đã sắp xếp, hoặc partition 2 phần gặp mảng toàn giá trị bằng nhau, thành O(n²) (Sort an Array)",
+            "- Dutch flag: sau khi đổi chỗ với `gt`/`high` mà tăng luôn `i`/`mid` thì bỏ sót phần tử vừa đổi về (Sort Colors)",
+            "- Mảng toàn số 0 phải trả \"0\", không phải \"000\" (Largest Number)",
+            "- Gộp từ đầu ghi đè lên phần tử chưa xét của `nums1`; gộp từ cuối vì cuối `nums1` đang trống (Merge Sorted Array)"
+          ],
+          "en": [
+            "- The comparator `(a, b) -> a - b` overflows for values near `Integer.MIN_VALUE`/`MAX_VALUE` and gives a wrong order; use `Integer.compare(a, b)` (Minimum Number of Arrows to Burst Balloons)",
+            "- Quick sort with a fixed pivot on already sorted input, or a 2-way partition on all-equal values, degrades to O(n²) (Sort an Array)",
+            "- Dutch flag: moving `i`/`mid` forward right after swapping with `gt`/`high` skips the value that was just swapped in (Sort Colors)",
+            "- An all-zero array must return \"0\", not \"000\" (Largest Number)",
+            "- Merging from the front overwrites unread values in `nums1`; merge from the back, where `nums1` has free space (Merge Sorted Array)"
+          ]
+        }
+      }
     },
     {
       "id": "p1-hashing",
@@ -85,7 +352,120 @@
         { "type": "visual", "title": "VisuAlgo: Hash Table", "url": "https://visualgo.net/en/hashtable" },
         { "type": "practice", "title": "NeetCode Roadmap", "url": "https://neetcode.io/roadmap" },
         { "type": "practice", "title": "LeetCode tag: Hash Table", "url": "https://leetcode.com/problem-list/hash-table/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đề hỏi \"có trùng không\", \"đã xuất hiện chưa\", \"có tồn tại không\": HashSet (Contains Duplicate)",
+            "- Tìm cặp thỏa điều kiện (tổng = target, hiệu = k) trên mảng **chưa sắp xếp**, cần index gốc: HashMap giá trị → index, tra phần bù (Two Sum)",
+            "- Đếm tần suất, so sánh hai multiset (anagram, ransom note): `int[26]` hoặc HashMap đếm (Valid Anagram)",
+            "- Gom nhóm các phần tử có chung một \"chữ ký\" (chuỗi đã sort, mảng đếm): HashMap key → list (Group Anagrams)",
+            "- Cần O(n) cho bài mà sort chỉ cho O(n log n): dãy liên tiếp dài nhất, top K theo tần suất (Longest Consecutive Sequence, Top K Frequent Elements)",
+            "- Khác với Two Pointers: mảng đã sắp xếp thì two pointers chỉ tốn O(1) bộ nhớ; chưa sắp xếp mà cần index gốc thì dùng hash map"
+          ],
+          "en": [
+            "- The question is \"any duplicates\", \"seen before\", \"does it exist\": HashSet (Contains Duplicate)",
+            "- Find a pair meeting a condition (sum = target, difference = k) in an **unsorted** array, original indices needed: HashMap value → index, look up the complement (Two Sum)",
+            "- Count frequencies, compare two multisets (anagram, ransom note): `int[26]` or a counting HashMap (Valid Anagram)",
+            "- Group items that share a \"signature\" (sorted string, count array): HashMap key → list (Group Anagrams)",
+            "- Need O(n) where sorting would give O(n log n): longest consecutive run, top K by frequency (Longest Consecutive Sequence, Top K Frequent Elements)",
+            "- Unlike two pointers: on a sorted array two pointers need only O(1) memory; unsorted with original indices needed, use a hash map"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Đổi bộ nhớ lấy thời gian: lưu những gì đã thấy vào HashMap/HashSet để mỗi câu hỏi \"đã gặp x chưa\", \"x xuất hiện mấy lần\", \"x ở index nào\" trả lời trong O(1) trung bình, thay vì quét lại O(n).",
+            "",
+            "- Tra phần bù: duyệt một lượt, hỏi map xem `target - x` đã có chưa, rồi mới thêm x (Two Sum)",
+            "- Đếm: `map.merge(x, 1, Integer::sum)`; chỉ có chữ cái thường thì `int[26]`",
+            "- Gom nhóm: tính một key chuẩn hóa cho mỗi phần tử, `computeIfAbsent(key, k -> new ArrayList<>()).add(x)`",
+            "- Tập hợp: cho hết vào HashSet, chỉ bắt đầu đếm ở đầu mỗi dãy, tức khi `x - 1` không có trong set; mỗi số được duyệt tối đa hai lần",
+            "- Top K theo tần suất: bucket theo số lần xuất hiện (tối đa n), duyệt bucket từ cao xuống",
+            "",
+            "Độ phức tạp: thường O(n) thời gian, O(n) bộ nhớ; key là chuỗi dài k thì mỗi lần băm tốn O(k)."
+          ],
+          "en": [
+            "Trade memory for time: keep what you have seen in a HashMap/HashSet so \"have I seen x\", \"how many times\", \"at which index\" are answered in O(1) on average instead of rescanning in O(n).",
+            "",
+            "- Complement lookup: one pass, ask the map for `target - x` first, then add x (Two Sum)",
+            "- Counting: `map.merge(x, 1, Integer::sum)`; for lowercase letters only, `int[26]`",
+            "- Grouping: compute a canonical key per item, `computeIfAbsent(key, k -> new ArrayList<>()).add(x)`",
+            "- Set lookup: put everything in a HashSet, start counting only at the start of a run, i.e. when `x - 1` is not in the set; each number is visited at most twice",
+            "- Top K by frequency: bucket by count (at most n), walk the buckets from high to low",
+            "",
+            "Complexity: usually O(n) time, O(n) space; with string keys of length k each hash costs O(k)."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Look up the complement before inserting (Two Sum)",
+          "int[] twoSum(int[] nums, int target) {",
+          "    Map<Integer, Integer> indexOf = new HashMap<>();       // value -> index",
+          "    for (int i = 0; i < nums.length; i++) {",
+          "        Integer j = indexOf.get(target - nums[i]);",
+          "        if (j != null) return new int[]{j, i};",
+          "        indexOf.put(nums[i], i);",
+          "    }",
+          "    return new int[0];",
+          "}",
+          "",
+          "// Group by a canonical key (Group Anagrams)",
+          "List<List<String>> groupAnagrams(String[] strs) {",
+          "    Map<String, List<String>> groups = new HashMap<>();",
+          "    for (String s : strs) {",
+          "        char[] key = s.toCharArray();",
+          "        Arrays.sort(key);                                   // or a 26-count key",
+          "        groups.computeIfAbsent(new String(key), k -> new ArrayList<>()).add(s);",
+          "    }",
+          "    return new ArrayList<>(groups.values());",
+          "}",
+          "",
+          "// Set lookup, count only from the start of a run (Longest Consecutive Sequence)",
+          "int longestConsecutive(int[] nums) {",
+          "    Set<Integer> set = new HashSet<>();",
+          "    for (int x : nums) set.add(x);",
+          "    int best = 0;",
+          "    for (int x : set) {                                     // the set, not nums",
+          "        if (set.contains(x - 1)) continue;                  // not a start: skip",
+          "        int len = 1;",
+          "        while (set.contains(x + len)) len++;",
+          "        best = Math.max(best, len);",
+          "    }",
+          "    return best;",
+          "}",
+          "",
+          "// Count, then bucket by frequency (Top K Frequent Elements)",
+          "int[] topKFrequent(int[] nums, int k) {",
+          "    Map<Integer, Integer> freq = new HashMap<>();",
+          "    for (int x : nums) freq.merge(x, 1, Integer::sum);",
+          "    List<List<Integer>> bucket = new ArrayList<>();",
+          "    for (int f = 0; f <= nums.length; f++) bucket.add(new ArrayList<>());",
+          "    freq.forEach((x, f) -> bucket.get(f).add(x));",
+          "    int[] res = new int[k];",
+          "    int n = 0;",
+          "    for (int f = nums.length; f > 0 && n < k; f--)",
+          "        for (int x : bucket.get(f)) if (n < k) res[n++] = x;",
+          "    return res;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Thêm x vào map trước khi tra phần bù: khi `target = 2x` thì x tự ghép với chính nó (Two Sum)",
+            "- Không kiểm tra `x - 1` trước khi đếm, hoặc duyệt `nums` có nhiều số trùng thay vì duyệt set: cùng một dãy bị đếm lại nhiều lần, thành O(n²) (Longest Consecutive Sequence)",
+            "- Dùng `char[]` hoặc `int[]` làm key: mảng băm theo địa chỉ chứ không theo nội dung; đổi sang `String` (`new String(chars)`, `Arrays.toString(count)`) (Group Anagrams)",
+            "- Nối chuỗi bằng một ký tự phân cách: vỡ khi chính chuỗi chứa ký tự đó; ghi độ dài trước mỗi chuỗi, dạng `len#str` (Encode and Decode Strings)",
+            "- Dùng HashSet khi cần đếm: \"có chữ x\" khác \"có đủ số chữ x\" (Hash Tables: Ransom Note)"
+          ],
+          "en": [
+            "- Adding x to the map before looking up the complement: when `target = 2x`, x pairs with itself (Two Sum)",
+            "- Not checking `x - 1` before counting, or iterating `nums` with many duplicates instead of the set: the same run is walked many times and it becomes O(n²) (Longest Consecutive Sequence)",
+            "- Using a `char[]` or `int[]` as a key: arrays hash by identity, not content; convert to a `String` (`new String(chars)`, `Arrays.toString(count)`) (Group Anagrams)",
+            "- Joining strings with a separator character: breaks when a string contains that character; write each string's length first, as `len#str` (Encode and Decode Strings)",
+            "- Using a HashSet where you need counts: \"has an x\" is not \"has enough x's\" (Hash Tables: Ransom Note)"
+          ]
+        }
+      }
     },
     {
       "id": "p1-twoptr",
@@ -103,7 +483,115 @@
       "resources": [
         { "type": "article", "title": "USACO Guide: Two Pointers", "url": "https://usaco.guide/silver/two-pointers" },
         { "type": "practice", "title": "LeetCode tag: Two Pointers", "url": "https://leetcode.com/problem-list/two-pointers/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Mảng **đã sắp xếp** (hoặc sort được mà không mất thông tin cần trả về), tìm cặp hoặc bộ ba có tổng = target (Two Sum II - Input Array Is Sorted, 3Sum)",
+            "- Kiểm tra palindrome, đảo ngược tại chỗ: so sánh hoặc đổi chỗ hai đầu rồi tiến vào giữa (Valid Palindrome)",
+            "- Chọn hai vị trí i < j để tối ưu một đại lượng phụ thuộc cả hai đầu, ví dụ `min(h[i], h[j]) * (j - i)` (Container With Most Water)",
+            "- Đề đòi O(1) bộ nhớ trong khi lời giải hash map tốn O(n)",
+            "- n tới 10⁴–10⁵ nên thử mọi cặp O(n²) (hoặc mọi bộ ba O(n³)) sẽ TLE",
+            "- Khác với Sliding Window: ở đây hai con trỏ ở hai đầu đi vào nhau và quan tâm cặp (i, j); cửa sổ thì đi cùng chiều và quan tâm cả đoạn ở giữa"
+          ],
+          "en": [
+            "- A **sorted** array (or one you can sort without losing what you must return), find a pair or triple summing to a target (Two Sum II - Input Array Is Sorted, 3Sum)",
+            "- Palindrome check, in-place reversal: compare or swap both ends and move inward (Valid Palindrome)",
+            "- Choose two positions i < j to optimize something that depends on both ends, e.g. `min(h[i], h[j]) * (j - i)` (Container With Most Water)",
+            "- O(1) extra memory is required while the hash map solution uses O(n)",
+            "- n up to 10⁴–10⁵, so trying every pair in O(n²) (or every triple in O(n³)) times out",
+            "- Unlike sliding window: here the pointers start at both ends, move toward each other and care about the pair (i, j); a window moves one way and cares about everything in between"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Đặt `left = 0`, `right = n - 1`. Mỗi bước so sánh rồi dời **một** con trỏ, loại hẳn một hàng hoặc một cột trong bảng mọi cặp (i, j) mà chắc chắn không bỏ sót đáp án.",
+            "",
+            "Ví dụ với mảng đã sắp xếp, nếu `a[left] + a[right] < target` thì mọi cặp (left, j) với j ≤ right đều có tổng nhỏ hơn target, nên bỏ `left` là an toàn. Container With Most Water: dời bên **thấp hơn**, vì giữ nó thì chiều rộng giảm mà chiều cao không vượt quá nó.",
+            "",
+            "- 3Sum: sort, cố định `i`, chạy two pointers trên phần còn lại, bỏ qua giá trị trùng",
+            "- Trapping Rain Water: nước tại i = `min(leftMax, rightMax) - h[i]`. Bên nào thấp hơn thì bên kia chắc chắn có tường cao hơn, nên mực nước của bên thấp chỉ phụ thuộc max của chính nó",
+            "- Palindrome: so sánh hai đầu, bỏ qua ký tự không hợp lệ ở mỗi bên",
+            "",
+            "Độ phức tạp: O(n) mỗi lượt quét, cộng O(n log n) nếu phải sort; 3Sum là O(n²); O(1) bộ nhớ thêm."
+          ],
+          "en": [
+            "Set `left = 0`, `right = n - 1`. At each step compare, then move **one** pointer, ruling out a whole row or column of the table of pairs (i, j) without losing the answer.",
+            "",
+            "For example, in a sorted array, if `a[left] + a[right] < target` then every pair (left, j) with j ≤ right sums to less than target, so dropping `left` is safe. Container With Most Water: move the **shorter** side, because keeping it only loses width while the height can never exceed it.",
+            "",
+            "- 3Sum: sort, fix `i`, run two pointers on the rest, skip repeated values",
+            "- Trapping Rain Water: water at i = `min(leftMax, rightMax) - h[i]`. Whichever side is lower, the other side surely has a taller wall, so the lower side's water level depends only on its own max",
+            "- Palindrome: compare both ends, skip invalid characters on each side",
+            "",
+            "Complexity: O(n) per scan, plus O(n log n) if you need to sort; 3Sum is O(n²); O(1) extra space."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Sort + fix i + two pointers on the rest (3Sum); the inner loop alone is Two Sum II",
+          "List<List<Integer>> threeSum(int[] nums) {",
+          "    Arrays.sort(nums);",
+          "    List<List<Integer>> res = new ArrayList<>();",
+          "    for (int i = 0; i < nums.length - 2; i++) {",
+          "        if (i > 0 && nums[i] == nums[i - 1]) continue;    // same first value: skip",
+          "        int left = i + 1, right = nums.length - 1;",
+          "        while (left < right) {",
+          "            int sum = nums[i] + nums[left] + nums[right];",
+          "            if (sum < 0) left++;                           // need a bigger sum",
+          "            else if (sum > 0) right--;                     // need a smaller sum",
+          "            else {",
+          "                res.add(List.of(nums[i], nums[left++], nums[right--]));",
+          "                while (left < right && nums[left] == nums[left - 1]) left++;  // skip repeats",
+          "            }",
+          "        }",
+          "    }",
+          "    return res;",
+          "}",
+          "",
+          "// Move the shorter side (Container With Most Water)",
+          "int maxArea(int[] h) {",
+          "    int left = 0, right = h.length - 1, best = 0;",
+          "    while (left < right) {",
+          "        best = Math.max(best, Math.min(h[left], h[right]) * (right - left));",
+          "        if (h[left] < h[right]) left++; else right--;",
+          "    }",
+          "    return best;",
+          "}",
+          "",
+          "// Process the lower side: the other side has a wall at least this high (Trapping Rain Water)",
+          "int trap(int[] h) {",
+          "    int left = 0, right = h.length - 1, leftMax = 0, rightMax = 0, water = 0;",
+          "    while (left < right) {",
+          "        if (h[left] < h[right]) {",
+          "            leftMax = Math.max(leftMax, h[left]);              // update max first",
+          "            water += leftMax - h[left++];",
+          "        } else {",
+          "            rightMax = Math.max(rightMax, h[right]);",
+          "            water += rightMax - h[right--];",
+          "        }",
+          "    }",
+          "    return water;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Quên bỏ qua giá trị trùng ở `i` hoặc ở `left` thì ra bộ ba lặp lại; bỏ trùng bằng `nums[i] == nums[i + 1]` thì lại mất bộ như `[-1, -1, 2]` (3Sum)",
+            "- Dời bên cao hơn thay vì bên thấp hơn (Container With Most Water)",
+            "- Sort rồi dùng two pointers khi đề cần index gốc: sort làm mất index; mảng chưa sắp xếp thì dùng hash map (Two Sum)",
+            "- Vòng bỏ qua ký tự không phải chữ/số thiếu điều kiện `left < right` nên chạy ra ngoài mảng; quên đổi về chữ thường trước khi so sánh (Valid Palindrome)",
+            "- Cộng nước trước khi cập nhật max: ra lượng nước âm (Trapping Rain Water)"
+          ],
+          "en": [
+            "- Not skipping repeated values at `i` or at `left` gives duplicate triplets; skipping with `nums[i] == nums[i + 1]` instead loses triplets like `[-1, -1, 2]` (3Sum)",
+            "- Moving the taller side instead of the shorter one (Container With Most Water)",
+            "- Sorting and using two pointers when the original indices are required: sorting loses them; for unsorted input use a hash map (Two Sum)",
+            "- The loop that skips non-alphanumeric characters lacks `left < right` and runs off the array; forgetting to lowercase before comparing (Valid Palindrome)",
+            "- Adding water before updating the max: the amount goes negative (Trapping Rain Water)"
+          ]
+        }
+      }
     },
     {
       "id": "p1-window",
@@ -122,7 +610,97 @@
       "resources": [
         { "type": "article", "title": "GeeksforGeeks: Sliding Window Technique", "url": "https://www.geeksforgeeks.org/dsa/window-sliding-technique/" },
         { "type": "practice", "title": "LeetCode tag: Sliding Window", "url": "https://leetcode.com/problem-list/sliding-window/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đề hỏi về **đoạn con / chuỗi con liên tiếp** (subarray, substring), không phải dãy con bất kỳ",
+            "- Tìm đoạn **dài nhất / ngắn nhất** thoả điều kiện, hoặc đếm số đoạn thoả",
+            "- Điều kiện có tính đơn điệu: nới rộng cửa sổ chỉ làm nó \"tệ hơn\", co lại chỉ làm nó \"tốt hơn\" (ví dụ: không lặp ký tự, tổng ≤ k với số không âm)",
+            "- Cửa sổ kích thước cố định k: \"mọi đoạn dài k\", \"trung bình của k phần tử liên tiếp\"",
+            "- n tới 10⁵ trở lên nên O(n²) duyệt mọi đoạn sẽ TLE",
+            "- Khác với Prefix sum: có số âm thì co cửa sổ không còn đúng, chuyển sang prefix sum + hash map"
+          ],
+          "en": [
+            "- Asks about a **contiguous subarray / substring**, not an arbitrary subsequence",
+            "- Wants the **longest / shortest** window meeting a condition, or the number of such windows",
+            "- The condition is monotonic: growing the window can only break it, shrinking can only fix it (e.g. no repeated character, sum ≤ k with non-negative numbers)",
+            "- Fixed window of size k: \"every block of k\", \"average of k consecutive elements\"",
+            "- n is 10⁵ or more, so trying every window in O(n²) times out",
+            "- Unlike prefix sums: with negative numbers shrinking stops being safe, switch to prefix sum + hash map"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Giữ một cửa sổ `[left, right]` và trạng thái của nó (đếm ký tự, tổng...). `right` luôn tiến: thêm `a[right]` vào trạng thái. Khi cửa sổ vi phạm điều kiện thì tăng `left`, bỏ `a[left]` ra, cho tới khi hợp lệ lại.",
+            "",
+            "Mỗi phần tử vào cửa sổ 1 lần và ra tối đa 1 lần, nên hai vòng lặp lồng nhau vẫn chỉ là O(n).",
+            "",
+            "- Tìm đoạn **dài nhất**: co cho tới khi hợp lệ, rồi cập nhật đáp án",
+            "- Tìm đoạn **ngắn nhất**: trong lúc còn hợp lệ thì cập nhật đáp án rồi co tiếp",
+            "",
+            "Độ phức tạp: O(n) thời gian, O(k) bộ nhớ cho trạng thái (k = số giá trị khác nhau)."
+          ],
+          "en": [
+            "Keep a window `[left, right]` and its state (character counts, a sum...). `right` always moves on: add `a[right]` to the state. When the window breaks the condition, move `left` forward and remove `a[left]` until it holds again.",
+            "",
+            "Each element enters the window once and leaves at most once, so the nested loops are still O(n).",
+            "",
+            "- **Longest** window: shrink until valid, then update the answer",
+            "- **Shortest** window: while still valid, update the answer and keep shrinking",
+            "",
+            "Complexity: O(n) time, O(k) space for the state (k = number of distinct values)."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Longest window that stays valid (here: no repeated character)",
+          "int longestValidWindow(String s) {",
+          "    Map<Character, Integer> count = new HashMap<>();",
+          "    int left = 0, best = 0;",
+          "    for (int right = 0; right < s.length(); right++) {",
+          "        char in = s.charAt(right);",
+          "        count.merge(in, 1, Integer::sum);",
+          "        while (count.get(in) > 1) {          // window broke: shrink",
+          "            char out = s.charAt(left++);",
+          "            count.merge(out, -1, Integer::sum);",
+          "        }",
+          "        best = Math.max(best, right - left + 1); // valid here",
+          "    }",
+          "    return best;",
+          "}",
+          "",
+          "// Shortest window that is valid (here: sum >= target, numbers > 0)",
+          "int shortestValidWindow(int[] a, int target) {",
+          "    int left = 0, sum = 0, best = Integer.MAX_VALUE;",
+          "    for (int right = 0; right < a.length; right++) {",
+          "        sum += a[right];",
+          "        while (sum >= target) {              // valid: record, then shrink",
+          "            best = Math.min(best, right - left + 1);",
+          "            sum -= a[left++];",
+          "        }",
+          "    }",
+          "    return best == Integer.MAX_VALUE ? 0 : best;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Dùng `if` thay vì `while` khi co cửa sổ: một lần co có thể chưa đủ (Longest Repeating Character Replacement)",
+            "- Cập nhật đáp án sai chỗ: đoạn dài nhất cập nhật sau vòng `while`, đoạn ngắn nhất cập nhật bên trong (Minimum Window Substring)",
+            "- Quên bỏ phần tử ra khỏi trạng thái khi tăng `left`, hoặc để lại key có đếm bằng 0 rồi dùng `map.size()` làm số giá trị khác nhau",
+            "- Dùng cửa sổ khi mảng có số âm: co lại không làm tổng nhỏ đi (Subarray Sum Equals K phải dùng prefix sum)",
+            "- Độ dài cửa sổ là `right - left + 1`, không phải `right - left`"
+          ],
+          "en": [
+            "- Using `if` instead of `while` to shrink: one step may not be enough (Longest Repeating Character Replacement)",
+            "- Updating the answer in the wrong place: for the longest window after the `while`, for the shortest inside it (Minimum Window Substring)",
+            "- Forgetting to remove an element from the state when `left` moves, or leaving zero-count keys and then using `map.size()` as the number of distinct values",
+            "- Using a window with negative numbers: shrinking no longer makes the sum smaller (Subarray Sum Equals K needs prefix sums)",
+            "- The window length is `right - left + 1`, not `right - left`"
+          ]
+        }
+      }
     },
     {
       "id": "p1-prefix",
@@ -142,7 +720,119 @@
       "resources": [
         { "type": "article", "title": "USACO Guide: Introduction to Prefix Sums", "url": "https://usaco.guide/silver/prefix-sums" },
         { "type": "practice", "title": "LeetCode tag: Prefix Sum", "url": "https://leetcode.com/problem-list/prefix-sum/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Nhiều truy vấn tổng đoạn `[l, r]` trên một mảng không đổi: dựng prefix sum một lần, mỗi truy vấn O(1) (Range Sum Query - Immutable)",
+            "- Đếm hoặc tìm đoạn con có tổng = k, tổng chia hết cho k, số 0 bằng số 1, khi mảng **có số âm**: prefix sum + hash map (Subarray Sum Equals K, Contiguous Array, Continuous Subarray Sum)",
+            "- Nhiều lệnh \"cộng v vào mọi phần tử trong `[l, r]`\", chỉ hỏi kết quả ở cuối: mảng hiệu (Corporate Flight Bookings, Array Manipulation)",
+            "- Tổng của hình chữ nhật con trong ma trận: prefix sum 2 chiều (Range Sum Query 2D - Immutable)",
+            "- \"Tích mọi phần tử trừ chính nó\", cấm dùng phép chia: tích tiền tố × tích hậu tố (Product of Array Except Self)",
+            "- Khác với Sliding Window: cửa sổ cần số không âm để co lại đúng; có số âm, hoặc cần đếm chính xác số đoạn, thì dùng prefix sum + hash map"
+          ],
+          "en": [
+            "- Many range-sum queries `[l, r]` on an array that does not change: build prefix sums once, O(1) per query (Range Sum Query - Immutable)",
+            "- Count or find subarrays with sum = k, sum divisible by k, as many 0s as 1s, when the array **has negatives**: prefix sum + hash map (Subarray Sum Equals K, Contiguous Array, Continuous Subarray Sum)",
+            "- Many \"add v to every element in `[l, r]`\" updates, with the result read only at the end: difference array (Corporate Flight Bookings, Array Manipulation)",
+            "- Sum of a sub-rectangle of a matrix: 2-D prefix sums (Range Sum Query 2D - Immutable)",
+            "- \"Product of all elements except itself\" without division: prefix product × suffix product (Product of Array Except Self)",
+            "- Unlike sliding window: a window needs non-negative numbers to shrink correctly; with negatives, or to count subarrays exactly, use prefix sum + hash map"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "`pre[i]` = tổng `a[0..i-1]`, với `pre[0] = 0`, nên tổng đoạn `[l, r]` = `pre[r + 1] - pre[l]`. Câu hỏi về đoạn con trở thành câu hỏi về **hiệu hai prefix**.",
+            "",
+            "- Đoạn con tổng = k: đoạn kết thúc tại i có tổng k khi trước đó có prefix bằng `pre - k`. Đếm các prefix đã gặp trong HashMap, khởi tạo `{0: 1}`",
+            "- Biến thể: lưu prefix mod k (Continuous Subarray Sum); đổi 0 thành -1 rồi tìm tổng 0 (Contiguous Array); cần đoạn dài nhất thì lưu index **đầu tiên** của mỗi prefix",
+            "- 2 chiều: `P[r][c]` = tổng hình chữ nhật từ góc (0, 0); truy vấn bằng bao hàm loại trừ: góc lớn trừ hai dải, cộng lại góc bị trừ hai lần",
+            "- Mảng hiệu là phép ngược của prefix sum: cộng v vào `[l, r]` bằng `d[l] += v`, `d[r + 1] -= v`, cuối cùng cộng dồn một lần",
+            "- Product of Array Except Self: `ans[i]` = tích bên trái × tích bên phải, hai lượt quét",
+            "",
+            "Độ phức tạp: O(n) để dựng (O(R·C) cho 2 chiều), O(1) mỗi truy vấn, O(n) bộ nhớ."
+          ],
+          "en": [
+            "`pre[i]` = sum of `a[0..i-1]`, with `pre[0] = 0`, so the sum of `[l, r]` is `pre[r + 1] - pre[l]`. A question about subarrays becomes a question about **the difference of two prefixes**.",
+            "",
+            "- Subarray sum = k: the subarray ending at i sums to k when an earlier prefix equals `pre - k`. Count the prefixes seen in a HashMap, starting with `{0: 1}`",
+            "- Variants: store prefix mod k (Continuous Subarray Sum); turn 0 into -1 and look for sum 0 (Contiguous Array); for the longest subarray store the **first** index of each prefix",
+            "- 2-D: `P[r][c]` = sum of the rectangle from corner (0, 0); answer a query by inclusion-exclusion: big corner minus two strips, plus the corner subtracted twice",
+            "- A difference array is the inverse of prefix sums: add v to `[l, r]` with `d[l] += v`, `d[r + 1] -= v`, then take one running sum at the end",
+            "- Product of Array Except Self: `ans[i]` = product on the left × product on the right, two passes",
+            "",
+            "Complexity: O(n) to build (O(R·C) in 2-D), O(1) per query, O(n) space."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Count subarrays with sum k, negatives allowed (Subarray Sum Equals K)",
+          "int subarraySum(int[] nums, int k) {",
+          "    Map<Integer, Integer> seen = new HashMap<>();   // prefix sum -> how many times",
+          "    seen.put(0, 1);                                 // the empty prefix",
+          "    int pre = 0, count = 0;",
+          "    for (int x : nums) {",
+          "        pre += x;",
+          "        count += seen.getOrDefault(pre - k, 0);     // look up before adding pre",
+          "        seen.merge(pre, 1, Integer::sum);",
+          "    }",
+          "    return count;",
+          "}",
+          "",
+          "// 2-D: P[r + 1][c + 1] = sum of m[0..r][0..c] (Range Sum Query 2D - Immutable)",
+          "int[][] build(int[][] m) {",
+          "    int[][] P = new int[m.length + 1][m[0].length + 1];",
+          "    for (int r = 0; r < m.length; r++)",
+          "        for (int c = 0; c < m[0].length; c++)",
+          "            P[r + 1][c + 1] = m[r][c] + P[r][c + 1] + P[r + 1][c] - P[r][c];",
+          "    return P;",
+          "}",
+          "int query(int[][] P, int r1, int c1, int r2, int c2) {    // inclusive corners",
+          "    return P[r2 + 1][c2 + 1] - P[r1][c2 + 1] - P[r2 + 1][c1] + P[r1][c1];",
+          "}",
+          "",
+          "// Difference array: O(1) per range update, one running sum (Corporate Flight Bookings)",
+          "int[] corpFlightBookings(int[][] bookings, int n) {   // {first, last, seats}, 1-based",
+          "    int[] d = new int[n + 1];",
+          "    for (int[] b : bookings) {",
+          "        d[b[0] - 1] += b[2];",
+          "        d[b[1]] -= b[2];                              // index (last - 1) + 1",
+          "    }",
+          "    for (int i = 1; i < n; i++) d[i] += d[i - 1];",
+          "    return Arrays.copyOf(d, n);",
+          "}",
+          "",
+          "// Prefix and suffix products, no division (Product of Array Except Self)",
+          "int[] productExceptSelf(int[] nums) {",
+          "    int n = nums.length;",
+          "    int[] ans = new int[n];",
+          "    ans[0] = 1;",
+          "    for (int i = 1; i < n; i++) ans[i] = ans[i - 1] * nums[i - 1];   // left product",
+          "    for (int i = n - 1, right = 1; i >= 0; i--) {",
+          "        ans[i] *= right;                              // times right product",
+          "        right *= nums[i];",
+          "    }",
+          "    return ans;",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Quên khởi tạo `{0: 1}` nên bỏ sót các đoạn bắt đầu từ index 0 (Subarray Sum Equals K)",
+            "- Thêm prefix hiện tại vào map trước khi tra: với k = 0 sẽ đếm cả đoạn rỗng (Subarray Sum Equals K)",
+            "- Cần đoạn dài nhất mà ghi đè index của prefix bằng index mới hơn; chỉ lưu lần đầu, và khởi tạo `{0: -1}` (Contiguous Array). Continuous Subarray Sum còn đòi đoạn dài ít nhất 2",
+            "- Cộng dồn mảng hiệu bằng `int` khi tổng có thể vượt 2.1·10⁹; dùng `long` (Array Manipulation)",
+            "- Truy vấn 2 chiều quên cộng lại góc `P[r1][c1]` bị trừ hai lần, hoặc lệch một chỉ số giữa `m` và `P` (Range Sum Query 2D - Immutable)"
+          ],
+          "en": [
+            "- Forgetting to start with `{0: 1}`, which misses subarrays starting at index 0 (Subarray Sum Equals K)",
+            "- Adding the current prefix to the map before the lookup: with k = 0 it counts the empty subarray (Subarray Sum Equals K)",
+            "- For the longest subarray, overwriting a prefix's index with a later one; keep only the first, and start with `{0: -1}` (Contiguous Array). Continuous Subarray Sum also needs length at least 2",
+            "- Running the difference-array sum in `int` when totals can exceed 2.1·10⁹; use `long` (Array Manipulation)",
+            "- In a 2-D query, forgetting to add back the corner `P[r1][c1]` that was subtracted twice, or an off-by-one between `m` and `P` (Range Sum Query 2D - Immutable)"
+          ]
+        }
+      }
     },
     {
       "id": "p1-kadane",
@@ -155,7 +845,107 @@
       ],
       "resources": [
         { "type": "article", "title": "cp-algorithms: Maximum/minimum sum subarray", "url": "https://cp-algorithms.com/others/maximum_average_segment.html" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Đề hỏi tổng (hoặc tích) lớn nhất / nhỏ nhất của một **đoạn con liên tiếp**, mảng có cả số âm (Maximum Subarray)",
+            "- Tích lớn nhất: số âm nhân số âm thành dương, nên phải theo dõi cả giá trị nhỏ nhất (Maximum Product Subarray)",
+            "- Mảng vòng: đoạn con được phép quấn từ cuối về đầu (Maximum Sum Circular Subarray)",
+            "- Mua một lần, bán một lần để lãi nhiều nhất cũng là Kadane: giữ giá thấp nhất đã thấy (Best Time to Buy and Sell Stock)",
+            "- n tới 10⁵ nên thử mọi đoạn O(n²) sẽ TLE; cần O(n) một lượt",
+            "- Khác với Sliding Window và prefix sum + hash map: có số âm nên không co cửa sổ được; còn hash map dùng để đếm đoạn có tổng **bằng** k, Kadane tìm tổng **lớn nhất**"
+          ],
+          "en": [
+            "- Asks for the largest / smallest sum (or product) of a **contiguous subarray**, with negative numbers present (Maximum Subarray)",
+            "- Largest product: negative times negative is positive, so track the smallest value too (Maximum Product Subarray)",
+            "- Circular array: the subarray may wrap from the end to the start (Maximum Sum Circular Subarray)",
+            "- Buy once, sell once for the best profit is Kadane too: keep the lowest price seen so far (Best Time to Buy and Sell Stock)",
+            "- n up to 10⁵, so trying every subarray in O(n²) times out; you need one O(n) pass",
+            "- Unlike sliding window and prefix sum + hash map: with negatives a window cannot shrink safely; the hash map counts subarrays whose sum **equals** k, Kadane finds the **largest** sum"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Gọi `cur` = tổng lớn nhất của đoạn **kết thúc tại i**. Đoạn đó hoặc nối tiếp đoạn tốt nhất kết thúc tại i - 1, hoặc bắt đầu lại từ `a[i]`: `cur = max(a[i], cur + a[i])`. Đáp án là max của mọi `cur`.",
+            "",
+            "Vì sao đúng: nếu đoạn tốt nhất kết thúc tại i - 1 có tổng âm thì mang nó theo chỉ làm đoạn mới nhỏ đi, nên bỏ. Đây là DP một chiều chỉ cần giữ trạng thái trước.",
+            "",
+            "- Tích lớn nhất: giữ cả `maxEnd` và `minEnd` của đoạn kết thúc tại i, vì nhân với số âm thì min thành max",
+            "- Mảng vòng: đáp án là max(Kadane thường, tổng cả mảng - đoạn có tổng nhỏ nhất). Nếu mọi số đều âm thì chỉ lấy Kadane thường",
+            "- Cần vị trí đoạn: lưu `start` mỗi khi bắt đầu lại, ghi `[start, i]` khi đáp án tăng",
+            "",
+            "Độ phức tạp: O(n) thời gian, O(1) bộ nhớ."
+          ],
+          "en": [
+            "Let `cur` = the best sum of a subarray **ending at i**. It either extends the best subarray ending at i - 1 or starts over at `a[i]`: `cur = max(a[i], cur + a[i])`. The answer is the max over all `cur`.",
+            "",
+            "Why it works: if the best subarray ending at i - 1 has a negative sum, carrying it only makes the new one smaller, so drop it. It is a 1-D DP that only keeps the previous state.",
+            "",
+            "- Largest product: keep both `maxEnd` and `minEnd` for the subarray ending at i, because multiplying by a negative turns the min into the max",
+            "- Circular: the answer is max(normal Kadane, total - smallest subarray sum). If every number is negative, take normal Kadane only",
+            "- Need the position: store `start` whenever you start over, record `[start, i]` when the answer improves",
+            "",
+            "Complexity: O(n) time, O(1) space."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Best sum ending at i: extend or start over (Maximum Subarray)",
+          "int maxSubArray(int[] nums) {",
+          "    int cur = nums[0], best = nums[0];             // start from nums[0], not 0",
+          "    for (int i = 1; i < nums.length; i++) {",
+          "        cur = Math.max(nums[i], cur + nums[i]);",
+          "        best = Math.max(best, cur);",
+          "    }",
+          "    return best;",
+          "}",
+          "",
+          "// Track max and min ending at i: a negative swaps them (Maximum Product Subarray)",
+          "int maxProduct(int[] nums) {",
+          "    int maxEnd = nums[0], minEnd = nums[0], best = nums[0];",
+          "    for (int i = 1; i < nums.length; i++) {",
+          "        int x = nums[i];",
+          "        int hi = Math.max(x, Math.max(maxEnd * x, minEnd * x));",
+          "        int lo = Math.min(x, Math.min(maxEnd * x, minEnd * x));",
+          "        maxEnd = hi;                                // both from the old values",
+          "        minEnd = lo;",
+          "        best = Math.max(best, maxEnd);",
+          "    }",
+          "    return best;",
+          "}",
+          "",
+          "// max(normal, total - min subarray) (Maximum Sum Circular Subarray)",
+          "int maxSubarraySumCircular(int[] nums) {",
+          "    int total = 0, curMax = 0, curMin = 0, best = nums[0], worst = nums[0];",
+          "    for (int x : nums) {",
+          "        total += x;",
+          "        curMax = Math.max(x, curMax + x);",
+          "        best = Math.max(best, curMax);",
+          "        curMin = Math.min(x, curMin + x);",
+          "        worst = Math.min(worst, curMin);",
+          "    }",
+          "    return best < 0 ? best : Math.max(best, total - worst);  // all negative: no wrap",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Khởi tạo `best = 0`: sai khi mọi số đều âm, đáp án phải là số âm lớn nhất (Maximum Subarray)",
+            "- Chỉ giữ max mà quên min, hoặc tính `minEnd` từ `maxEnd` vừa được cập nhật thay vì giá trị cũ (Maximum Product Subarray)",
+            "- Mọi số đều âm thì `total - worst` = 0, ứng với đoạn rỗng, không hợp lệ; phải trả `best` (Maximum Sum Circular Subarray)",
+            "- Dãy con không liên tiếp (subsequence) có tổng lớn nhất là tổng các số dương; không có số dương thì là số lớn nhất, không phải 0 (The Maximum Subarray)",
+            "- Dùng Kadane cho bài đếm đoạn có tổng **bằng** k: Kadane chỉ tìm max, bài đó cần prefix sum + hash map (Subarray Sum Equals K)"
+          ],
+          "en": [
+            "- Starting with `best = 0`: wrong when every number is negative, the answer must be the largest negative (Maximum Subarray)",
+            "- Keeping only the max and forgetting the min, or computing `minEnd` from the already updated `maxEnd` instead of the old one (Maximum Product Subarray)",
+            "- When every number is negative, `total - worst` = 0 means the empty subarray, which is not allowed; return `best` (Maximum Sum Circular Subarray)",
+            "- The best non-contiguous subsequence is the sum of the positive numbers; with no positives it is the largest number, not 0 (The Maximum Subarray)",
+            "- Using Kadane to count subarrays whose sum **equals** k: Kadane only finds a max, that problem needs prefix sum + hash map (Subarray Sum Equals K)"
+          ]
+        }
+      }
     },
     {
       "id": "p1-matrix",
@@ -170,7 +960,117 @@
       ],
       "resources": [
         { "type": "practice", "title": "LeetCode tag: Matrix", "url": "https://leetcode.com/problem-list/matrix/" }
-      ]
+      ],
+      "notes": {
+        "recognition": {
+          "vi": [
+            "- Input là ma trận, đề yêu cầu biến đổi **tại chỗ** (in-place) với O(1) bộ nhớ thêm (Rotate Image, Set Matrix Zeroes)",
+            "- Thứ tự duyệt đặc biệt: xoắn ốc, theo đường chéo, zigzag (Spiral Matrix, Diagonal Traverse)",
+            "- Mọi ô cập nhật **cùng lúc** dựa trên trạng thái cũ của hàng xóm (Game of Life)",
+            "- Xoay 90°, lật, chuyển vị: ghép từ các phép đơn giản thay vì tính tọa độ đích từng ô",
+            "- Tổng hoặc giá trị lớn nhất trên một hình cố định (đồng hồ cát, ô vuông k×k) trượt khắp lưới (2D Array - DS)",
+            "- Khác với BFS/DFS trên lưới: ở đây thứ tự duyệt cố định theo chỉ số, không lan theo các ô liền kề được nối với nhau"
+          ],
+          "en": [
+            "- The input is a matrix and the change must be **in place** with O(1) extra memory (Rotate Image, Set Matrix Zeroes)",
+            "- A special visiting order: spiral, diagonal, zigzag (Spiral Matrix, Diagonal Traverse)",
+            "- Every cell updates **at the same time** from its neighbours' old state (Game of Life)",
+            "- Rotate 90°, flip, transpose: compose simple operations instead of computing each cell's target",
+            "- A sum or max over a fixed shape (hourglass, k×k square) slid over the grid (2D Array - DS)",
+            "- Unlike BFS/DFS on a grid: the visiting order is fixed by indices, it does not spread through connected cells"
+          ]
+        },
+        "idea": {
+          "vi": [
+            "Phần lớn bài ma trận là quản lý chỉ số cho đúng. Các kỹ thuật chính:",
+            "",
+            "- Ghép phép biến đổi: xoay 90° theo chiều kim đồng hồ = chuyển vị (`m[i][j]` ↔ `m[j][i]`) rồi đảo từng hàng; ngược chiều kim đồng hồ = chuyển vị rồi đảo thứ tự các hàng",
+            "- Biên co dần: giữ `top`, `bottom`, `left`, `right`; đi hết một cạnh thì co cạnh đó lại (Spiral Matrix)",
+            "- Dùng chính ma trận làm bộ nhớ phụ: hàng 0 và cột 0 làm cờ đánh dấu (Set Matrix Zeroes), hoặc mã hóa trạng thái cũ và mới vào cùng một ô, bit 0 = hiện tại, bit 1 = kế tiếp (Game of Life)",
+            "- Đường chéo: các ô trên cùng một đường chéo phụ có `i + j` bằng nhau, trên cùng đường chéo chính có `i - j` bằng nhau (Diagonal Traverse)",
+            "- Hàng xóm: duyệt `r` từ `i - 1` tới `i + 1`, `c` từ `j - 1` tới `j + 1`, kẹp trong biên, bỏ chính ô đó",
+            "",
+            "Độ phức tạp: O(m·n) thời gian; các cách trên chỉ tốn O(1) bộ nhớ thêm."
+          ],
+          "en": [
+            "Most matrix problems are about getting the indices right. The main techniques:",
+            "",
+            "- Compose transforms: rotate 90° clockwise = transpose (`m[i][j]` ↔ `m[j][i]`) then reverse each row; counterclockwise = transpose then reverse the order of the rows",
+            "- Shrinking boundaries: keep `top`, `bottom`, `left`, `right`; after walking one side, pull that side in (Spiral Matrix)",
+            "- Use the matrix itself as scratch space: row 0 and column 0 as marker flags (Set Matrix Zeroes), or encode old and new state in one cell, bit 0 = now, bit 1 = next (Game of Life)",
+            "- Diagonals: cells on the same anti-diagonal share `i + j`, cells on the same main diagonal share `i - j` (Diagonal Traverse)",
+            "- Neighbours: loop `r` from `i - 1` to `i + 1` and `c` from `j - 1` to `j + 1`, clamped to the grid, skipping the cell itself",
+            "",
+            "Complexity: O(m·n) time; these tricks need only O(1) extra space."
+          ]
+        },
+        "template": [
+          "```java",
+          "// Rotate 90 degrees clockwise in place = transpose + reverse each row (Rotate Image)",
+          "void rotate(int[][] m) {",
+          "    int n = m.length;",
+          "    for (int i = 0; i < n; i++)",
+          "        for (int j = i + 1; j < n; j++) {           // j > i: swap each pair once",
+          "            int t = m[i][j]; m[i][j] = m[j][i]; m[j][i] = t;",
+          "        }",
+          "    for (int[] row : m)",
+          "        for (int l = 0, r = n - 1; l < r; l++, r--) {",
+          "            int t = row[l]; row[l] = row[r]; row[r] = t;",
+          "        }",
+          "}",
+          "",
+          "// Shrinking boundaries (Spiral Matrix)",
+          "List<Integer> spiralOrder(int[][] m) {",
+          "    List<Integer> res = new ArrayList<>();",
+          "    int top = 0, bottom = m.length - 1, left = 0, right = m[0].length - 1;",
+          "    while (top <= bottom && left <= right) {",
+          "        for (int j = left; j <= right; j++) res.add(m[top][j]);",
+          "        top++;",
+          "        for (int i = top; i <= bottom; i++) res.add(m[i][right]);",
+          "        right--;",
+          "        if (top <= bottom)                           // a row is left to walk back",
+          "            for (int j = right; j >= left; j--) res.add(m[bottom][j]);",
+          "        bottom--;",
+          "        if (left <= right)                           // a column is left to walk up",
+          "            for (int i = bottom; i >= top; i--) res.add(m[i][left]);",
+          "        left++;",
+          "    }",
+          "    return res;",
+          "}",
+          "",
+          "// Two states in one cell: bit 0 = now, bit 1 = next (Game of Life)",
+          "void gameOfLife(int[][] b) {",
+          "    int m = b.length, n = b[0].length;",
+          "    for (int i = 0; i < m; i++)",
+          "        for (int j = 0; j < n; j++) {",
+          "            int live = 0;",
+          "            for (int r = Math.max(0, i - 1); r <= Math.min(m - 1, i + 1); r++)",
+          "                for (int c = Math.max(0, j - 1); c <= Math.min(n - 1, j + 1); c++)",
+          "                    if (r != i || c != j) live += b[r][c] & 1;      // old state only",
+          "            if (live == 3 || (live == 2 && (b[i][j] & 1) == 1)) b[i][j] |= 2;",
+          "        }",
+          "    for (int[] row : b)",
+          "        for (int j = 0; j < n; j++) row[j] >>= 1;             // next becomes now",
+          "}",
+          "```"
+        ],
+        "pitfalls": {
+          "vi": [
+            "- Chuyển vị mà cho `j` chạy từ 0: mỗi cặp bị đổi hai lần, ma trận trở về như cũ (Rotate Image)",
+            "- Không kiểm tra lại `top <= bottom` / `left <= right` trước khi đi ngược: lặp lại hàng hoặc cột giữa khi ma trận không vuông (Spiral Matrix)",
+            "- Dùng hàng 0 và cột 0 làm cờ nhưng không lưu riêng việc chính chúng ban đầu có số 0, hoặc xóa hàng 0/cột 0 trước khi xử lý phần còn lại (Set Matrix Zeroes)",
+            "- Ghi trạng thái mới đè lên ô ngay, các ô sau đọc phải trạng thái mới thay vì cũ (Game of Life)",
+            "- Chạm biên ở góc khi đổi hướng: đi lên phải kiểm tra cột cuối trước hàng 0, đi xuống phải kiểm tra hàng cuối trước cột 0, nếu không sẽ ra ngoài ma trận (Diagonal Traverse)"
+          ],
+          "en": [
+            "- Transposing with `j` starting at 0: every pair is swapped twice and the matrix comes back unchanged (Rotate Image)",
+            "- Not rechecking `top <= bottom` / `left <= right` before walking back: the middle row or column is repeated in a non-square matrix (Spiral Matrix)",
+            "- Using row 0 and column 0 as flags without separately recording whether they had a zero themselves, or clearing row 0/column 0 before the rest (Set Matrix Zeroes)",
+            "- Writing the new state into a cell right away, so later cells read the new state instead of the old one (Game of Life)",
+            "- Hitting a corner while turning: going up, check the last column before row 0; going down, check the last row before column 0; otherwise you step outside the matrix (Diagonal Traverse)"
+          ]
+        }
+      }
     },
     {
       "id": "p1-cses",

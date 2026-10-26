@@ -6,6 +6,8 @@ import { defineConfig, type Plugin } from "vite"
 import { APP_PORT } from "./server/config.ts"
 import { GOOGLE_API, createGoogleAuth } from "./server/google-auth.ts"
 
+const DATA_DIR = resolve(import.meta.dirname, "data").replace(/\\/g, "/") + "/"
+
 // `npm run dev` gets the same Google sign-in endpoints as server/serve.ts, so Drive sync
 // works with hot reload too. Both use the one handler in server/google-auth.ts.
 function googleAuth(): Plugin {
@@ -52,6 +54,15 @@ export default defineConfig({
   build: {
     // Shiki grammars are split into their own lazy chunks; the warning is about those
     chunkSizeWarningLimit: 1000,
+    rolldownOptions: {
+      output: {
+        // The suggestions in data/ (theory notes included) are about a third of the code:
+        // their own chunk keeps the app chunk under the limit
+        codeSplitting: {
+          groups: [{ name: "content", test: (id) => id.replace(/\\/g, "/").startsWith(DATA_DIR) }],
+        },
+      },
+    },
   },
   test: {
     environment: "jsdom",

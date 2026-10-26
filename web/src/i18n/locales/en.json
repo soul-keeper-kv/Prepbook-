@@ -488,7 +488,17 @@
     "addedItems_other": "Added {{count}} items to the pattern.",
     "undo": "Undo",
     "addNamed": "Add {{name}}",
-    "added": "Added"
+    "added": "Added",
+    "notesTitle": "Theory",
+    "itemsTitle": "Problems and material",
+    "pitfallsLabel": "Common pitfalls",
+    "copy": "Copy in",
+    "copyNamed": "Copy {{name}} into your notes",
+    "noteCopied": "Copied",
+    "noteCopiedTo": "Copied into {{section}}.",
+    "noteTitle": "{{name}} · suggestion",
+    "noteHint": "Copy in puts this into your {{section}} section, below what you already wrote. Then rewrite it in your own words.",
+    "close": "Close"
   },
   "graph": {
     "intro": "Each dot is a topic, a pattern or a problem. The more solid a pattern, the better you know it; arrows mean “learn first”. Click a dot to open it.",
