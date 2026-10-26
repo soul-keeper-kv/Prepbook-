@@ -9,6 +9,8 @@ interface UiState {
   codeLang: string
   /** Kind of prompt sent to the AI from "Stuck?" */
   aiMode: AiMode
+  /** The pattern page opened last: a problem in several patterns steps through this one */
+  lastPatternId: string | null
 }
 
 const savedCodeLang = storage.get(KEYS.codeLang)
@@ -16,6 +18,7 @@ const savedCodeLang = storage.get(KEYS.codeLang)
 export const useUiStore = create<UiState>()(() => ({
   codeLang: typeof savedCodeLang === "string" ? savedCodeLang : "python",
   aiMode: readChoice(KEYS.aiMode, AI_MODES, "hint"),
+  lastPatternId: null,
 }))
 
 const set = useUiStore.setState
@@ -29,4 +32,5 @@ export const uiActions = {
     storage.set(KEYS.aiMode, aiMode)
     set({ aiMode })
   },
+  setLastPattern: (lastPatternId: string) => set({ lastPatternId }),
 }

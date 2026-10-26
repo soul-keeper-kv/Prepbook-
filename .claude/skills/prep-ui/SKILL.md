@@ -122,6 +122,10 @@ Other topics get their own template. Proposed, not settled:
   code and note
 - a "Stuck?" panel with solution links and AI prompts
 
+The breadcrumb row holds a Back button and `‹ n / N ›` arrows. The arrows step through the
+problem table of the pattern the problem was opened from (`lastPatternId` in `state/ui.ts`)
+and replace the history entry, so Back returns to where the problems were opened from.
+
 Later: a timer that fills in the minutes.
 
 **Review queue.** Due problems and Q&A cards across all topics. Cards are drilled one at a

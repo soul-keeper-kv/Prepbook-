@@ -89,6 +89,42 @@ describe("App", () => {
     expect(screen.getByText("Làm lại: sau 3 ngày")).toBeInTheDocument()
   })
 
+  it("steps through a pattern's problems, then goes back to the pattern", async () => {
+    const user = userEvent.setup()
+    const sorting = notebookActions.addPattern("t_dsa", null, "Sorting")
+    const pointers = notebookActions.addPattern("t_dsa", null, "Two Pointers")
+    const lc = (slug: string) => `https://leetcode.com/problems/${slug}/`
+    notebookActions.addProblem({
+      url: lc("sort-colors"),
+      title: "Sort Colors",
+      patternIds: [sorting],
+    })
+    const [, threeSum] = notebookActions.addProblems([
+      { url: lc("two-sum"), title: "Two Sum", patternIds: [pointers] },
+      { url: lc("3sum"), title: "3Sum", patternIds: [sorting, pointers] },
+      { url: lc("4sum"), title: "4Sum", patternIds: [pointers] },
+    ])
+    renderApp()
+    await go(`#/pattern/${pointers}`)
+    await screen.findByRole("heading", { level: 1, name: /Two Pointers/ })
+    await go(`#/problem/${threeSum}`)
+    await screen.findByRole("heading", { level: 1, name: /3Sum/ })
+    // 3Sum is in two patterns: it steps through the one it was opened from
+    expect(
+      screen.getByRole("navigation", { name: "Các bài trong Two Pointers" })
+    ).toHaveTextContent("2 / 3")
+
+    await user.click(screen.getByRole("button", { name: "Bài sau: 4Sum" }))
+    await screen.findByRole("heading", { level: 1, name: /4Sum/ })
+    expect(screen.getByRole("button", { name: "Bài sau" })).toBeDisabled()
+    await user.click(screen.getByRole("button", { name: "Bài trước: 3Sum" }))
+    await screen.findByRole("heading", { level: 1, name: /3Sum/ })
+
+    // Stepping added no history entries: Back skips the problems stepped through
+    await user.click(screen.getByRole("button", { name: "Quay lại" }))
+    await screen.findByRole("heading", { level: 1, name: /Two Pointers/ })
+  })
+
   it("collects a link in the inbox and files it as a problem", async () => {
     const user = userEvent.setup()
     const pattern = notebookActions.addPattern("t_dsa", null, "Graphs")

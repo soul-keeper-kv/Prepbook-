@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNow } from "@/lib/clock"
 import { ListPlusIcon, PlusIcon, Trash2Icon } from "lucide-react"
 import { useTranslation } from "react-i18next"
@@ -30,6 +30,7 @@ import { notebookActions } from "@/notebook/store"
 import { patternSuggestions } from "@/notebook/suggestions"
 import { CODE_SECTIONS, SECTION_TEMPLATES } from "@/notebook/templates"
 import { href, navigate } from "@/state/router"
+import { uiActions } from "@/state/ui"
 
 function MasteryStrip({ pattern, status }: { pattern: Pattern; status: PatternStatus }) {
   const { t } = useTranslation()
@@ -194,6 +195,7 @@ export function PatternPage({ id }: { id: string }) {
   const nb = useNotebook()
   const [confirmDelete, setConfirmDelete] = useState(false)
   const now = useNow()
+  useEffect(() => uiActions.setLastPattern(id), [id])
   const pattern = getLive(nb.patterns, id)
   const topic = getLive(nb.topics, pattern?.topicId)
   if (!pattern || !topic) {

@@ -15,6 +15,7 @@
   "nav": {
     "main": "Điều hướng chính",
     "breadcrumb": "Vị trí",
+    "back": "Quay lại",
     "today": "Hôm nay",
     "inbox": "Hộp thu",
     "review": "Ôn lại",
@@ -315,7 +316,13 @@
     "editPatterns": "Sửa pattern",
     "notes": "Ghi chú chung",
     "notesPlaceholder": "Điều cần nhớ về bài này, không gắn với một lần làm",
-    "notesEmpty": "Chưa có ghi chú chung."
+    "notesEmpty": "Chưa có ghi chú chung.",
+    "pager": "Các bài trong {{name}}",
+    "position": "Bài {{index}} trên {{count}}",
+    "prev": "Bài trước",
+    "prevNamed": "Bài trước: {{name}}",
+    "next": "Bài sau",
+    "nextNamed": "Bài sau: {{name}}"
   },
   "attempt": {
     "title": "Ghi lần làm này",

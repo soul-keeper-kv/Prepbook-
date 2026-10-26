@@ -1,7 +1,10 @@
 import { useEffect, type ReactNode } from "react"
+import { ArrowLeftIcon } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { LABEL } from "@/components/section"
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { goBack } from "@/state/router"
 
 export interface Crumb {
   label: string
@@ -15,6 +18,8 @@ export function PageHeader({
   actions,
   children,
   docTitle,
+  back,
+  pager,
 }: {
   title: ReactNode
   crumbs?: Crumb[]
@@ -22,6 +27,10 @@ export function PageHeader({
   children?: ReactNode
   /** Browser tab title when `title` is not plain text */
   docTitle?: string
+  /** A BackButton, before the breadcrumb */
+  back?: ReactNode
+  /** Steps to the previous and next page of a list, at the end of the breadcrumb row */
+  pager?: ReactNode
 }) {
   const { t } = useTranslation()
   const tabTitle = docTitle ?? (typeof title === "string" ? title : "")
@@ -32,22 +41,29 @@ export function PageHeader({
 
   return (
     <header className="mb-6">
-      {crumbs.length > 0 && (
-        <nav
-          aria-label={t("nav.breadcrumb")}
-          className="mb-1 font-mono text-12 text-muted-foreground"
-        >
-          {crumbs.map((crumb, i) => (
-            <span key={i}>
-              {i > 0 && (
-                <span className="mx-1.5 text-faint" aria-hidden>
-                  ›
+      {(crumbs.length > 0 || back || pager) && (
+        <div className="mb-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+          {back}
+          {crumbs.length > 0 && (
+            <nav
+              aria-label={t("nav.breadcrumb")}
+              // Phone: Back and the pager share the first line, the breadcrumb gets its own
+              className="min-w-0 flex-1 font-mono text-12 text-muted-foreground max-md:order-last max-md:basis-full"
+            >
+              {crumbs.map((crumb, i) => (
+                <span key={i}>
+                  {i > 0 && (
+                    <span className="mx-1.5 text-faint" aria-hidden>
+                      ›
+                    </span>
+                  )}
+                  {crumb.href ? <a href={crumb.href}>{crumb.label}</a> : crumb.label}
                 </span>
-              )}
-              {crumb.href ? <a href={crumb.href}>{crumb.label}</a> : crumb.label}
-            </span>
-          ))}
-        </nav>
+              ))}
+            </nav>
+          )}
+          {pager && <div className="ml-auto">{pager}</div>}
+        </div>
       )}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <h1 className="flex min-w-0 flex-[1_1_16rem] items-center gap-2 text-24 leading-tight font-semibold">
@@ -57,6 +73,22 @@ export function PageHeader({
       </div>
       {children}
     </header>
+  )
+}
+
+/** Back to the page before; opened straight on this page, to `fallback` */
+export function BackButton({ fallback }: { fallback: string }) {
+  const { t } = useTranslation()
+  return (
+    <Button
+      size="xs"
+      variant="ghost"
+      className="-ml-2 max-md:h-11"
+      onClick={() => goBack(fallback)}
+    >
+      <ArrowLeftIcon />
+      {t("nav.back")}
+    </Button>
   )
 }
 

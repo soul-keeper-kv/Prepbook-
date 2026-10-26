@@ -7,10 +7,11 @@ import { ConfirmDialog } from "@/components/confirm-dialog"
 import { LevelBadgeForProblemLevel, OutcomeTag, TopicDot } from "@/components/common/badges"
 import { ConflictList } from "@/components/common/conflicts"
 import { EditableText, FIELD, NoteEditor, SELECT, insertTab } from "@/components/common/editing"
-import { PageHeader, Panel } from "@/components/common/page"
+import { BackButton, PageHeader, Panel } from "@/components/common/page"
 import { PatternPicker } from "@/components/common/pattern-picker"
 import { AttemptForm } from "@/components/problem/attempt-form"
 import { ProblemHelp } from "@/components/problem/problem-help"
+import { ProblemPager } from "@/components/problem/problem-pager"
 import { Tag } from "@/components/tag"
 import { Button } from "@/components/ui/button"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
@@ -23,6 +24,7 @@ import type { Attempt, Conflict, Problem } from "@/notebook/schema"
 import { notebookActions } from "@/notebook/store"
 import { PROBLEM_LEVELS } from "@/pages/inbox-page"
 import { href, navigate } from "@/state/router"
+import { useUiStore } from "@/state/ui"
 
 function AttemptCode({ attempt }: { attempt: Attempt }) {
   const { t } = useTranslation()
@@ -180,6 +182,7 @@ export function ProblemPage({ id }: { id: string }) {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const now = useNow()
   const levelId = useId()
+  const lastPatternId = useUiStore((s) => s.lastPatternId)
   const problem = getLive(nb.problems, id)
   if (!problem) {
     return (
@@ -192,12 +195,13 @@ export function ProblemPage({ id }: { id: string }) {
   }
   const attempts = attemptsOf(nb, problem.id)
   const { dueAt, last } = problemSchedule(attempts)
-  const firstPattern = getLive(nb.patterns, problem.patternIds[0])
-  const topic = getLive(nb.topics, firstPattern?.topicId)
-  const patternNames = problem.patternIds
-    .map((pid) => getLive(nb.patterns, pid)?.name)
-    .filter(Boolean)
-    .join(", ")
+  const patterns = problem.patternIds
+    .map((pid) => getLive(nb.patterns, pid))
+    .filter((p) => p !== undefined)
+  // The breadcrumb and the pager follow the pattern the problem was opened from
+  const pattern = patterns.find((p) => p.id === lastPatternId) ?? patterns[0]
+  const topic = getLive(nb.topics, pattern?.topicId)
+  const patternNames = patterns.map((p) => p.name).join(", ")
   const conflictLabel = (c: Conflict) =>
     c.entityId === problem.id
       ? t("problem.notes")
@@ -208,10 +212,10 @@ export function ProblemPage({ id }: { id: string }) {
       <PageHeader
         crumbs={[
           ...(topic ? [{ label: topic.name, href: href.topic(topic.id) }] : []),
-          ...(firstPattern
-            ? [{ label: firstPattern.name, href: href.pattern(firstPattern.id) }]
-            : []),
+          ...(pattern ? [{ label: pattern.name, href: href.pattern(pattern.id) }] : []),
         ]}
+        back={<BackButton fallback={pattern ? href.pattern(pattern.id) : href.today} />}
+        pager={pattern && <ProblemPager problem={problem} pattern={pattern} />}
         docTitle={problem.title}
         title={
           <EditableText
@@ -278,7 +282,7 @@ export function ProblemPage({ id }: { id: string }) {
         destructive
         onConfirm={() => {
           notebookActions.deleteProblem(problem.id)
-          navigate(firstPattern ? href.pattern(firstPattern.id) : href.today)
+          navigate(pattern ? href.pattern(pattern.id) : href.today)
         }}
       />
 

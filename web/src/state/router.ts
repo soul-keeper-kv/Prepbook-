@@ -58,3 +58,43 @@ export function useRoute(): Route {
 export function navigate(to: string) {
   if (window.location.hash !== to) window.location.hash = to
 }
+
+// Back must know whether the previous history entry is a page of this app or the tab was
+// opened straight on this URL. Each entry is tagged with how many app pages lie before it.
+
+const depthOf = (state: unknown) =>
+  typeof state === "object" && state !== null && "depth" in state && typeof state.depth === "number"
+    ? state.depth
+    : undefined
+
+let depth = 0
+
+if (typeof window !== "undefined") {
+  const known = depthOf(window.history.state)
+  if (known === undefined) window.history.replaceState({ depth }, "")
+  else depth = known
+  window.addEventListener("hashchange", () => {
+    const tagged = depthOf(window.history.state)
+    if (tagged !== undefined) {
+      // Back, forward, or replace()
+      depth = tagged
+    } else {
+      // A new entry: a link, navigate() or a hash typed in the address bar
+      depth += 1
+      window.history.replaceState({ depth }, "")
+    }
+  })
+}
+
+/** Like navigate, but swaps the current history entry instead of adding one */
+export function replace(to: string) {
+  if (window.location.hash === to) return
+  window.history.replaceState({ depth }, "", to)
+  window.dispatchEvent(new HashChangeEvent("hashchange"))
+}
+
+/** Back one app page; when there is none, go to `fallback` without leaving the app */
+export function goBack(fallback: string) {
+  if (depth > 0) window.history.back()
+  else replace(fallback)
+}

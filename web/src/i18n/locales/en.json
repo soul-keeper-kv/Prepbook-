@@ -15,6 +15,7 @@
   "nav": {
     "main": "Main navigation",
     "breadcrumb": "Location",
+    "back": "Back",
     "today": "Today",
     "inbox": "Inbox",
     "review": "Review",
@@ -327,7 +328,13 @@
     "editPatterns": "Edit patterns",
     "notes": "Notes",
     "notesPlaceholder": "What to remember about this problem, beyond any one attempt",
-    "notesEmpty": "No notes yet."
+    "notesEmpty": "No notes yet.",
+    "pager": "Problems in {{name}}",
+    "position": "Problem {{index}} of {{count}}",
+    "prev": "Previous problem",
+    "prevNamed": "Previous problem: {{name}}",
+    "next": "Next problem",
+    "nextNamed": "Next problem: {{name}}"
   },
   "attempt": {
     "title": "Log this attempt",
