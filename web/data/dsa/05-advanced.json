@@ -1,10 +1,10 @@
 {
   "id": "p5",
-  "name": { "vi": "Giai đoạn 5 · Nâng cao", "en": "Phase 5 · Advanced topics" },
+  "name": { "vi": "Giai đoạn 5 · Nâng cao (tùy chọn)", "en": "Phase 5 · Advanced topics (optional)" },
   "items": [
     {
       "id": "p5-rangeq",
-      "title": "Segment Tree (lazy), Fenwick Tree, Sparse Table, Trie",
+      "title": { "vi": "Segment Tree (lazy), Fenwick Tree, Sparse Table", "en": "Segment trees (lazy), Fenwick trees, sparse tables" },
       "problems": [
         { "title": "Range Sum Query - Mutable", "url": "https://leetcode.com/problems/range-sum-query-mutable/", "level": "Medium" },
         { "title": "Count of Smaller Numbers After Self", "url": "https://leetcode.com/problems/count-of-smaller-numbers-after-self/", "level": "Hard" },
@@ -40,7 +40,6 @@
         { "title": "Longest Palindromic Substring", "url": "https://leetcode.com/problems/longest-palindromic-substring/", "level": "Medium" },
         { "title": "Shortest Palindrome", "url": "https://leetcode.com/problems/shortest-palindrome/", "level": "Hard" },
         { "title": "Longest Duplicate Substring", "url": "https://leetcode.com/problems/longest-duplicate-substring/", "level": "Hard" },
-        { "title": "Special String Again", "url": "https://www.hackerrank.com/challenges/special-palindrome-again/problem", "level": "Medium" },
         { "title": "Yet Another KMP Problem", "url": "https://www.hackerrank.com/challenges/kmp-problem/problem", "level": "Hard" }
       ],
       "resources": [
@@ -69,6 +68,20 @@
       ]
     },
     {
+      "id": "p5-bitmask",
+      "title": { "vi": "DP bitmask", "en": "Bitmask DP" },
+      "problems": [
+        { "title": "Can I Win", "url": "https://leetcode.com/problems/can-i-win/", "level": "Medium" },
+        { "title": "Partition to K Equal Sum Subsets", "url": "https://leetcode.com/problems/partition-to-k-equal-sum-subsets/", "level": "Medium" },
+        { "title": "Shortest Path Visiting All Nodes", "url": "https://leetcode.com/problems/shortest-path-visiting-all-nodes/", "level": "Hard" },
+        { "title": "Find the Shortest Superstring", "url": "https://leetcode.com/problems/find-the-shortest-superstring/", "level": "Hard" }
+      ],
+      "resources": [
+        { "type": "article", "title": "USACO Guide: Bitmask DP", "url": "https://usaco.guide/gold/dp-bitmasks" },
+        { "type": "practice", "title": "LeetCode tag: Bitmask", "url": "https://leetcode.com/problem-list/bitmask/" }
+      ]
+    },
+    {
       "id": "p5-misc",
       "title": "Sqrt decomposition, Mo, meet in the middle, max flow",
       "problems": [
@@ -79,33 +92,6 @@
         { "type": "article", "title": "cp-algorithms: Sqrt decomposition", "url": "https://cp-algorithms.com/data_structures/sqrt_decomposition.html" },
         { "type": "article", "title": "cp-algorithms: Max flow (Edmonds-Karp)", "url": "https://cp-algorithms.com/graph/edmonds_karp.html" },
         { "type": "article", "title": "USACO Guide: Meet In The Middle", "url": "https://usaco.guide/gold/meet-in-the-middle" }
-      ]
-    },
-    {
-      "id": "p5-trie",
-      "title": { "vi": "Dạng bài Tries và Bit Manipulation", "en": "Tries and Bit Manipulation problems" },
-      "problems": [
-        { "title": "Implement Trie (Prefix Tree)", "url": "https://leetcode.com/problems/implement-trie-prefix-tree/", "level": "Medium" },
-        { "title": "Design Add and Search Words Data Structure", "url": "https://leetcode.com/problems/design-add-and-search-words-data-structure/", "level": "Medium" },
-        { "title": "Word Search II", "url": "https://leetcode.com/problems/word-search-ii/", "level": "Hard" },
-        { "title": "Single Number", "url": "https://leetcode.com/problems/single-number/", "level": "Easy" },
-        { "title": "Number of 1 Bits", "url": "https://leetcode.com/problems/number-of-1-bits/", "level": "Easy" },
-        { "title": "Counting Bits", "url": "https://leetcode.com/problems/counting-bits/", "level": "Easy" },
-        { "title": "Reverse Bits", "url": "https://leetcode.com/problems/reverse-bits/", "level": "Easy" },
-        { "title": "Missing Number", "url": "https://leetcode.com/problems/missing-number/", "level": "Easy" },
-        { "title": "Sum of Two Integers", "url": "https://leetcode.com/problems/sum-of-two-integers/", "level": "Medium" },
-        { "title": "Lonely Integer", "url": "https://www.hackerrank.com/challenges/lonely-integer/problem", "level": "Easy" },
-        { "title": "Flipping bits", "url": "https://www.hackerrank.com/challenges/flipping-bits/problem", "level": "Easy" },
-        { "title": "Sum vs XOR", "url": "https://www.hackerrank.com/challenges/sum-vs-xor/problem", "level": "Easy" },
-        { "title": "Maximum Xor", "url": "https://www.hackerrank.com/challenges/maximum-xor/problem", "level": "Medium" },
-        { "title": "Contacts", "url": "https://www.hackerrank.com/challenges/contacts/problem", "level": "Medium" },
-        { "title": "No Prefix Set", "url": "https://www.hackerrank.com/challenges/no-prefix-set/problem", "level": "Hard" }
-      ],
-      "resources": [
-        { "type": "article", "title": "Tech Interview Handbook: Trie", "url": "https://www.techinterviewhandbook.org/algorithms/trie/" },
-        { "type": "article", "title": "Tech Interview Handbook: Binary", "url": "https://www.techinterviewhandbook.org/algorithms/binary/" },
-        { "type": "practice", "title": "LeetCode tag: Trie", "url": "https://leetcode.com/problem-list/trie/" },
-        { "type": "practice", "title": "LeetCode tag: Bit Manipulation", "url": "https://leetcode.com/problem-list/bit-manipulation/" }
       ]
     },
     {

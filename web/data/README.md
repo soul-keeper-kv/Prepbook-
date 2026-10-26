@@ -44,7 +44,8 @@ Pattern tạo từ một mục giữ `id` của mục (`pt_<id>`), giai đoạn 
 Nhờ đó trang pattern biết lấy gợi ý ở đâu, và 2 máy cùng thêm 1 mục thì ra 1 pattern. Đổi `id` là mất liên kết với thứ bạn đã thêm.
 
 - Module mới: `id` bắt đầu bằng tên module để khỏi trùng, ví dụ `java-collections`, `java-hashmap`.
-- Module `dsa` giữ `id` cũ (`p0`, `p0-lang`, ...) vì notebook và tiến độ bản cũ đã dùng chúng.
+- Module `dsa` giữ `id` cũ (`p0`, `p0-lang`, ...) vì notebook và tiến độ bản cũ đã dùng chúng. Mục mới của `dsa` đặt `p<số giai đoạn>-<tên>`, ví dụ `p2-fast-slow`.
+  Số đó là giai đoạn lúc tạo mục: chuyển mục sang giai đoạn khác thì giữ nguyên `id` (`p5-trie` giờ nằm ở giai đoạn 3).
 - Đừng đổi tên thư mục `dsa`: code tìm tiến độ bản cũ theo tên này (`LEGACY_MODULE` trong `src/progress/legacy.ts`).
 
 ## module.json

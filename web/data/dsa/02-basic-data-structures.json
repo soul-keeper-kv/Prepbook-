@@ -3,107 +3,66 @@
   "name": { "vi": "Giai đoạn 2 · Cấu trúc dữ liệu cơ bản", "en": "Phase 2 · Basic data structures" },
   "items": [
     {
-      "id": "p2-stackq",
-      "title": { "vi": "Stack, Queue, Deque và monotonic stack/queue", "en": "Stack, Queue, Deque and monotonic stack/queue" },
+      "id": "p2-stack",
+      "title": { "vi": "Stack: ngoặc, biểu thức, mô phỏng", "en": "Stacks: brackets, expressions, simulation" },
       "problems": [
-        { "title": "Next Greater Element I", "url": "https://leetcode.com/problems/next-greater-element-i/", "level": "Easy" },
-        { "title": "Daily Temperatures", "url": "https://leetcode.com/problems/daily-temperatures/", "level": "Medium" },
-        { "title": "Online Stock Span", "url": "https://leetcode.com/problems/online-stock-span/", "level": "Medium" },
-        { "title": "Sliding Window Maximum", "url": "https://leetcode.com/problems/sliding-window-maximum/", "level": "Hard" },
+        { "title": "Valid Parentheses", "url": "https://leetcode.com/problems/valid-parentheses/", "level": "Easy" },
+        { "title": "Evaluate Reverse Polish Notation", "url": "https://leetcode.com/problems/evaluate-reverse-polish-notation/", "level": "Medium" },
+        { "title": "Decode String", "url": "https://leetcode.com/problems/decode-string/", "level": "Medium" },
+        { "title": "Basic Calculator II", "url": "https://leetcode.com/problems/basic-calculator-ii/", "level": "Medium" },
+        { "title": "Simplify Path", "url": "https://leetcode.com/problems/simplify-path/", "level": "Medium" },
+        { "title": "Implement Queue using Stacks", "url": "https://leetcode.com/problems/implement-queue-using-stacks/", "level": "Easy" },
         { "title": "Maximum Element", "url": "https://www.hackerrank.com/challenges/maximum-element/problem", "level": "Easy" },
         { "title": "Queues: A Tale of Two Stacks", "url": "https://www.hackerrank.com/challenges/ctci-queue-using-two-stacks/problem", "level": "Medium" },
-        { "title": "Min Max Riddle", "url": "https://www.hackerrank.com/challenges/min-max-riddle/problem", "level": "Medium" }
+        { "title": "Equal Stacks", "url": "https://www.hackerrank.com/challenges/equal-stacks/problem", "level": "Easy" },
+        { "title": "Balanced Brackets", "url": "https://www.hackerrank.com/challenges/balanced-brackets/problem", "level": "Medium" },
+        { "title": "Simple Text Editor", "url": "https://www.hackerrank.com/challenges/simple-text-editor/problem", "level": "Medium" },
+        { "title": "Waiter", "url": "https://www.hackerrank.com/challenges/waiter/problem", "level": "Medium" }
       ],
       "resources": [
+        { "type": "article", "title": "Tech Interview Handbook: Stack", "url": "https://www.techinterviewhandbook.org/algorithms/stack/" },
         { "type": "visual", "title": "VisuAlgo: Linked List, Stack, Queue, Deque", "url": "https://visualgo.net/en/list" },
+        { "type": "practice", "title": "LeetCode tag: Stack", "url": "https://leetcode.com/problem-list/stack/" }
+      ]
+    },
+    {
+      "id": "p2-stackq",
+      "title": { "vi": "Monotonic stack / queue", "en": "Monotonic stacks and queues" },
+      "problems": [
+        { "title": "Next Greater Element I", "url": "https://leetcode.com/problems/next-greater-element-i/", "level": "Easy" },
+        { "title": "Next Greater Element II", "url": "https://leetcode.com/problems/next-greater-element-ii/", "level": "Medium" },
+        { "title": "Daily Temperatures", "url": "https://leetcode.com/problems/daily-temperatures/", "level": "Medium" },
+        { "title": "Online Stock Span", "url": "https://leetcode.com/problems/online-stock-span/", "level": "Medium" },
+        { "title": "Car Fleet", "url": "https://leetcode.com/problems/car-fleet/", "level": "Medium" },
+        { "title": "Largest Rectangle in Histogram", "url": "https://leetcode.com/problems/largest-rectangle-in-histogram/", "level": "Hard" },
+        { "title": "Sliding Window Maximum", "url": "https://leetcode.com/problems/sliding-window-maximum/", "level": "Hard" },
+        { "title": "Min Max Riddle", "url": "https://www.hackerrank.com/challenges/min-max-riddle/problem", "level": "Medium" },
+        { "title": "Largest Rectangle", "url": "https://www.hackerrank.com/challenges/largest-rectangle/problem", "level": "Medium" },
+        { "title": "Poisonous Plants", "url": "https://www.hackerrank.com/challenges/poisonous-plants/problem", "level": "Hard" }
+      ],
+      "resources": [
         { "type": "article", "title": "cp-algorithms: Minimum stack / Minimum queue", "url": "https://cp-algorithms.com/data_structures/stack_queue_modification.html" },
         { "type": "practice", "title": "LeetCode tag: Monotonic Stack", "url": "https://leetcode.com/problem-list/monotonic-stack/" },
         { "type": "practice", "title": "LeetCode tag: Monotonic Queue", "url": "https://leetcode.com/problem-list/monotonic-queue/" }
       ]
     },
     {
-      "id": "p2-ds",
-      "title": "Linked List, Hash Map, Heap",
-      "problems": [
-        { "title": "Design HashMap", "url": "https://leetcode.com/problems/design-hashmap/", "level": "Easy" },
-        { "title": "Kth Largest Element in a Stream", "url": "https://leetcode.com/problems/kth-largest-element-in-a-stream/", "level": "Easy" },
-        { "title": "Design Linked List", "url": "https://leetcode.com/problems/design-linked-list/", "level": "Medium" },
-        { "title": "LRU Cache", "url": "https://leetcode.com/problems/lru-cache/", "level": "Medium" },
-        { "title": "Insert a node at the head of a linked list", "url": "https://www.hackerrank.com/challenges/insert-a-node-at-the-head-of-a-linked-list/problem", "level": "Easy" },
-        { "title": "Dynamic Array", "url": "https://www.hackerrank.com/challenges/dynamic-array/problem", "level": "Easy" }
-      ],
-      "resources": [
-        { "type": "video", "title": "freeCodeCamp: Data Structures Easy to Advanced Course", "url": "https://www.youtube.com/watch?v=RBSGKlAvoiM" },
-        { "type": "visual", "title": "VisuAlgo: Hash Table", "url": "https://visualgo.net/en/hashtable" },
-        { "type": "visual", "title": "VisuAlgo: Binary Heap", "url": "https://visualgo.net/en/heap" },
-        { "type": "practice", "title": "LeetCode tag: Design", "url": "https://leetcode.com/problem-list/design/" }
-      ]
-    },
-    {
-      "id": "p2-stack",
-      "title": { "vi": "Dạng bài Stack", "en": "Stack problems" },
-      "problems": [
-        { "title": "Valid Parentheses", "url": "https://leetcode.com/problems/valid-parentheses/", "level": "Easy" },
-        { "title": "Min Stack", "url": "https://leetcode.com/problems/min-stack/", "level": "Medium" },
-        { "title": "Evaluate Reverse Polish Notation", "url": "https://leetcode.com/problems/evaluate-reverse-polish-notation/", "level": "Medium" },
-        { "title": "Generate Parentheses", "url": "https://leetcode.com/problems/generate-parentheses/", "level": "Medium" },
-        { "title": "Daily Temperatures", "url": "https://leetcode.com/problems/daily-temperatures/", "level": "Medium" },
-        { "title": "Car Fleet", "url": "https://leetcode.com/problems/car-fleet/", "level": "Medium" },
-        { "title": "Largest Rectangle in Histogram", "url": "https://leetcode.com/problems/largest-rectangle-in-histogram/", "level": "Hard" },
-        { "title": "Equal Stacks", "url": "https://www.hackerrank.com/challenges/equal-stacks/problem", "level": "Easy" },
-        { "title": "Balanced Brackets", "url": "https://www.hackerrank.com/challenges/balanced-brackets/problem", "level": "Medium" },
-        { "title": "Simple Text Editor", "url": "https://www.hackerrank.com/challenges/simple-text-editor/problem", "level": "Medium" },
-        { "title": "Waiter", "url": "https://www.hackerrank.com/challenges/waiter/problem", "level": "Medium" },
-        { "title": "Largest Rectangle", "url": "https://www.hackerrank.com/challenges/largest-rectangle/problem", "level": "Medium" },
-        { "title": "Poisonous Plants", "url": "https://www.hackerrank.com/challenges/poisonous-plants/problem", "level": "Hard" }
-      ],
-      "resources": [
-        { "type": "article", "title": "Tech Interview Handbook: Stack", "url": "https://www.techinterviewhandbook.org/algorithms/stack/" },
-        { "type": "practice", "title": "LeetCode tag: Stack", "url": "https://leetcode.com/problem-list/stack/" }
-      ]
-    },
-    {
-      "id": "p2-bsearch",
-      "title": { "vi": "Dạng bài Binary Search (kèm chặt nhị phân kết quả)", "en": "Binary Search problems (including binary search on the answer)" },
-      "problems": [
-        { "title": "Binary Search", "url": "https://leetcode.com/problems/binary-search/", "level": "Easy" },
-        { "title": "Search a 2D Matrix", "url": "https://leetcode.com/problems/search-a-2d-matrix/", "level": "Medium" },
-        { "title": "Koko Eating Bananas", "url": "https://leetcode.com/problems/koko-eating-bananas/", "level": "Medium" },
-        { "title": "Find Minimum in Rotated Sorted Array", "url": "https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/", "level": "Medium" },
-        { "title": "Search in Rotated Sorted Array", "url": "https://leetcode.com/problems/search-in-rotated-sorted-array/", "level": "Medium" },
-        { "title": "Time Based Key-Value Store", "url": "https://leetcode.com/problems/time-based-key-value-store/", "level": "Medium" },
-        { "title": "Median of Two Sorted Arrays", "url": "https://leetcode.com/problems/median-of-two-sorted-arrays/", "level": "Hard" },
-        { "title": "Climbing the Leaderboard", "url": "https://www.hackerrank.com/challenges/climbing-the-leaderboard/problem", "level": "Medium" },
-        { "title": "Hash Tables: Ice Cream Parlor", "url": "https://www.hackerrank.com/challenges/ctci-ice-cream-parlor/problem", "level": "Medium" },
-        { "title": "Minimum Time Required", "url": "https://www.hackerrank.com/challenges/minimum-time-required/problem", "level": "Medium" }
-      ],
-      "resources": [
-        { "type": "article", "title": "cp-algorithms: Binary search", "url": "https://cp-algorithms.com/num_methods/binary_search.html" },
-        { "type": "article", "title": "USACO Guide: Binary Search", "url": "https://usaco.guide/silver/binary-search" },
-        { "type": "practice", "title": "LeetCode study plan: Binary Search", "url": "https://leetcode.com/studyplan/binary-search/" },
-        { "type": "practice", "title": "LeetCode tag: Binary Search", "url": "https://leetcode.com/problem-list/binary-search/" }
-      ]
-    },
-    {
       "id": "p2-list",
-      "title": { "vi": "Dạng bài Linked List (đảo, phát hiện chu trình, trộn)", "en": "Linked List problems (reverse, cycle detection, merge)" },
+      "title": { "vi": "Linked list: đảo, gộp, nối lại tại chỗ", "en": "Linked lists: reverse, merge, rewire in place" },
       "problems": [
         { "title": "Reverse Linked List", "url": "https://leetcode.com/problems/reverse-linked-list/", "level": "Easy" },
         { "title": "Merge Two Sorted Lists", "url": "https://leetcode.com/problems/merge-two-sorted-lists/", "level": "Easy" },
-        { "title": "Linked List Cycle", "url": "https://leetcode.com/problems/linked-list-cycle/", "level": "Easy" },
+        { "title": "Reverse Linked List II", "url": "https://leetcode.com/problems/reverse-linked-list-ii/", "level": "Medium" },
         { "title": "Reorder List", "url": "https://leetcode.com/problems/reorder-list/", "level": "Medium" },
         { "title": "Remove Nth Node From End of List", "url": "https://leetcode.com/problems/remove-nth-node-from-end-of-list/", "level": "Medium" },
         { "title": "Copy List with Random Pointer", "url": "https://leetcode.com/problems/copy-list-with-random-pointer/", "level": "Medium" },
         { "title": "Add Two Numbers", "url": "https://leetcode.com/problems/add-two-numbers/", "level": "Medium" },
-        { "title": "Find the Duplicate Number", "url": "https://leetcode.com/problems/find-the-duplicate-number/", "level": "Medium" },
-        { "title": "Merge k Sorted Lists", "url": "https://leetcode.com/problems/merge-k-sorted-lists/", "level": "Hard" },
         { "title": "Reverse Nodes in k-Group", "url": "https://leetcode.com/problems/reverse-nodes-in-k-group/", "level": "Hard" },
+        { "title": "Insert a node at the head of a linked list", "url": "https://www.hackerrank.com/challenges/insert-a-node-at-the-head-of-a-linked-list/problem", "level": "Easy" },
         { "title": "Reverse a linked list", "url": "https://www.hackerrank.com/challenges/reverse-a-linked-list/problem", "level": "Easy" },
-        { "title": "Linked Lists: Detect a Cycle", "url": "https://www.hackerrank.com/challenges/ctci-linked-list-cycle/problem", "level": "Easy" },
         { "title": "Merge two sorted linked lists", "url": "https://www.hackerrank.com/challenges/merge-two-sorted-linked-lists/problem", "level": "Easy" },
         { "title": "Delete duplicate-value nodes from a sorted linked list", "url": "https://www.hackerrank.com/challenges/delete-duplicate-value-nodes-from-a-sorted-linked-list/problem", "level": "Easy" },
         { "title": "Get Node Value", "url": "https://www.hackerrank.com/challenges/get-the-value-of-the-node-at-a-specific-position-from-the-tail/problem", "level": "Easy" },
-        { "title": "Find Merge Point of Two Lists", "url": "https://www.hackerrank.com/challenges/find-the-merge-point-of-two-joined-linked-lists/problem", "level": "Easy" },
         { "title": "Reverse a doubly linked list", "url": "https://www.hackerrank.com/challenges/reverse-a-doubly-linked-list/problem", "level": "Easy" },
         { "title": "Inserting a Node Into a Sorted Doubly Linked List", "url": "https://www.hackerrank.com/challenges/insert-a-node-into-a-sorted-doubly-linked-list/problem", "level": "Easy" }
       ],
@@ -114,29 +73,117 @@
       ]
     },
     {
+      "id": "p2-fast-slow",
+      "title": { "vi": "Con trỏ nhanh – chậm (Fast & Slow)", "en": "Fast and slow pointers" },
+      "problems": [
+        { "title": "Linked List Cycle", "url": "https://leetcode.com/problems/linked-list-cycle/", "level": "Easy" },
+        { "title": "Middle of the Linked List", "url": "https://leetcode.com/problems/middle-of-the-linked-list/", "level": "Easy" },
+        { "title": "Palindrome Linked List", "url": "https://leetcode.com/problems/palindrome-linked-list/", "level": "Easy" },
+        { "title": "Happy Number", "url": "https://leetcode.com/problems/happy-number/", "level": "Easy" },
+        { "title": "Intersection of Two Linked Lists", "url": "https://leetcode.com/problems/intersection-of-two-linked-lists/", "level": "Easy" },
+        { "title": "Linked List Cycle II", "url": "https://leetcode.com/problems/linked-list-cycle-ii/", "level": "Medium" },
+        { "title": "Find the Duplicate Number", "url": "https://leetcode.com/problems/find-the-duplicate-number/", "level": "Medium" },
+        { "title": "Linked Lists: Detect a Cycle", "url": "https://www.hackerrank.com/challenges/ctci-linked-list-cycle/problem", "level": "Easy" },
+        { "title": "Find Merge Point of Two Lists", "url": "https://www.hackerrank.com/challenges/find-the-merge-point-of-two-joined-linked-lists/problem", "level": "Easy" }
+      ]
+    },
+    {
+      "id": "p2-ds",
+      "title": { "vi": "Thiết kế cấu trúc dữ liệu: LRU Cache, Min Stack…", "en": "Data structure design: LRU Cache, Min Stack…" },
+      "problems": [
+        { "title": "Design HashMap", "url": "https://leetcode.com/problems/design-hashmap/", "level": "Easy" },
+        { "title": "Min Stack", "url": "https://leetcode.com/problems/min-stack/", "level": "Medium" },
+        { "title": "Design Linked List", "url": "https://leetcode.com/problems/design-linked-list/", "level": "Medium" },
+        { "title": "Insert Delete GetRandom O(1)", "url": "https://leetcode.com/problems/insert-delete-getrandom-o1/", "level": "Medium" },
+        { "title": "LRU Cache", "url": "https://leetcode.com/problems/lru-cache/", "level": "Medium" },
+        { "title": "Design Twitter", "url": "https://leetcode.com/problems/design-twitter/", "level": "Medium" },
+        { "title": "LFU Cache", "url": "https://leetcode.com/problems/lfu-cache/", "level": "Hard" },
+        { "title": "Dynamic Array", "url": "https://www.hackerrank.com/challenges/dynamic-array/problem", "level": "Easy" }
+      ],
+      "resources": [
+        { "type": "video", "title": "freeCodeCamp: Data Structures Easy to Advanced Course", "url": "https://www.youtube.com/watch?v=RBSGKlAvoiM" },
+        { "type": "practice", "title": "LeetCode tag: Design", "url": "https://leetcode.com/problem-list/design/" }
+      ]
+    },
+    {
+      "id": "p2-bsearch",
+      "title": { "vi": "Binary search trên mảng đã sắp xếp hoặc bị xoay", "en": "Binary search on sorted or rotated arrays" },
+      "problems": [
+        { "title": "Binary Search", "url": "https://leetcode.com/problems/binary-search/", "level": "Easy" },
+        { "title": "Search Insert Position", "url": "https://leetcode.com/problems/search-insert-position/", "level": "Easy" },
+        { "title": "Find First and Last Position of Element in Sorted Array", "url": "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/", "level": "Medium" },
+        { "title": "Search a 2D Matrix", "url": "https://leetcode.com/problems/search-a-2d-matrix/", "level": "Medium" },
+        { "title": "Find Minimum in Rotated Sorted Array", "url": "https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/", "level": "Medium" },
+        { "title": "Search in Rotated Sorted Array", "url": "https://leetcode.com/problems/search-in-rotated-sorted-array/", "level": "Medium" },
+        { "title": "Time Based Key-Value Store", "url": "https://leetcode.com/problems/time-based-key-value-store/", "level": "Medium" },
+        { "title": "Median of Two Sorted Arrays", "url": "https://leetcode.com/problems/median-of-two-sorted-arrays/", "level": "Hard" },
+        { "title": "Climbing the Leaderboard", "url": "https://www.hackerrank.com/challenges/climbing-the-leaderboard/problem", "level": "Medium" },
+        { "title": "Hash Tables: Ice Cream Parlor", "url": "https://www.hackerrank.com/challenges/ctci-ice-cream-parlor/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "cp-algorithms: Binary search", "url": "https://cp-algorithms.com/num_methods/binary_search.html" },
+        { "type": "article", "title": "USACO Guide: Binary Search", "url": "https://usaco.guide/silver/binary-search" },
+        { "type": "practice", "title": "LeetCode study plan: Binary Search", "url": "https://leetcode.com/studyplan/binary-search/" },
+        { "type": "practice", "title": "LeetCode tag: Binary Search", "url": "https://leetcode.com/problem-list/binary-search/" }
+      ]
+    },
+    {
+      "id": "p2-bsearch-answer",
+      "title": { "vi": "Binary search trên đáp án", "en": "Binary search on the answer" },
+      "problems": [
+        { "title": "Koko Eating Bananas", "url": "https://leetcode.com/problems/koko-eating-bananas/", "level": "Medium" },
+        { "title": "Capacity To Ship Packages Within D Days", "url": "https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/", "level": "Medium" },
+        { "title": "Minimum Number of Days to Make m Bouquets", "url": "https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/", "level": "Medium" },
+        { "title": "Split Array Largest Sum", "url": "https://leetcode.com/problems/split-array-largest-sum/", "level": "Hard" },
+        { "title": "Minimum Time Required", "url": "https://www.hackerrank.com/challenges/minimum-time-required/problem", "level": "Medium" }
+      ],
+      "resources": [
+        { "type": "article", "title": "USACO Guide: Binary Search", "url": "https://usaco.guide/silver/binary-search" }
+      ]
+    },
+    {
       "id": "p2-heap",
-      "title": { "vi": "Dạng bài Heap / Priority Queue (top-K, trộn K list)", "en": "Heap / Priority Queue problems (top-K, merge K lists)" },
+      "title": { "vi": "Top-K với heap", "en": "Top-K with a heap" },
       "problems": [
         { "title": "Kth Largest Element in a Stream", "url": "https://leetcode.com/problems/kth-largest-element-in-a-stream/", "level": "Easy" },
         { "title": "Last Stone Weight", "url": "https://leetcode.com/problems/last-stone-weight/", "level": "Easy" },
         { "title": "K Closest Points to Origin", "url": "https://leetcode.com/problems/k-closest-points-to-origin/", "level": "Medium" },
         { "title": "Kth Largest Element in an Array", "url": "https://leetcode.com/problems/kth-largest-element-in-an-array/", "level": "Medium" },
+        { "title": "Top K Frequent Elements", "url": "https://leetcode.com/problems/top-k-frequent-elements/", "level": "Medium" },
         { "title": "Task Scheduler", "url": "https://leetcode.com/problems/task-scheduler/", "level": "Medium" },
-        { "title": "Design Twitter", "url": "https://leetcode.com/problems/design-twitter/", "level": "Medium" },
-        { "title": "Find Median from Data Stream", "url": "https://leetcode.com/problems/find-median-from-data-stream/", "level": "Hard" },
         { "title": "QHEAP1", "url": "https://www.hackerrank.com/challenges/qheap1/problem", "level": "Easy" },
-        { "title": "Jesse and Cookies", "url": "https://www.hackerrank.com/challenges/jesse-and-cookies/problem", "level": "Easy" },
-        { "title": "Find the Running Median", "url": "https://www.hackerrank.com/challenges/find-the-running-median/problem", "level": "Hard" }
+        { "title": "Jesse and Cookies", "url": "https://www.hackerrank.com/challenges/jesse-and-cookies/problem", "level": "Easy" }
       ],
       "resources": [
         { "type": "article", "title": "Tech Interview Handbook: Heap", "url": "https://www.techinterviewhandbook.org/algorithms/heap/" },
+        { "type": "visual", "title": "VisuAlgo: Binary Heap", "url": "https://visualgo.net/en/heap" },
         { "type": "docs", "title": "Java docs: PriorityQueue", "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/PriorityQueue.html" },
         { "type": "practice", "title": "LeetCode tag: Heap (Priority Queue)", "url": "https://leetcode.com/problem-list/heap-priority-queue/" }
       ]
     },
     {
+      "id": "p2-two-heaps",
+      "title": { "vi": "Hai heap: trung vị động", "en": "Two heaps: running median" },
+      "problems": [
+        { "title": "Find Median from Data Stream", "url": "https://leetcode.com/problems/find-median-from-data-stream/", "level": "Hard" },
+        { "title": "Sliding Window Median", "url": "https://leetcode.com/problems/sliding-window-median/", "level": "Hard" },
+        { "title": "IPO", "url": "https://leetcode.com/problems/ipo/", "level": "Hard" },
+        { "title": "Find the Running Median", "url": "https://www.hackerrank.com/challenges/find-the-running-median/problem", "level": "Hard" }
+      ]
+    },
+    {
+      "id": "p2-kway",
+      "title": { "vi": "Gộp K danh sách (K-way merge)", "en": "K-way merge" },
+      "problems": [
+        { "title": "Merge k Sorted Lists", "url": "https://leetcode.com/problems/merge-k-sorted-lists/", "level": "Hard" },
+        { "title": "Kth Smallest Element in a Sorted Matrix", "url": "https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/", "level": "Medium" },
+        { "title": "Find K Pairs with Smallest Sums", "url": "https://leetcode.com/problems/find-k-pairs-with-smallest-sums/", "level": "Medium" },
+        { "title": "Smallest Range Covering Elements from K Lists", "url": "https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/", "level": "Hard" }
+      ]
+    },
+    {
       "id": "p2-contest",
-      "title": { "vi": "Bắt đầu thi contest hằng tuần", "en": "Start doing weekly contests" },
+      "title": { "vi": "Bắt đầu thi contest hằng tuần (tùy chọn)", "en": "Start doing weekly contests (optional)" },
       "resources": [
         { "type": "practice", "title": "LeetCode Contest", "url": "https://leetcode.com/contest/" },
         { "type": "practice", "title": "Codeforces Contests", "url": "https://codeforces.com/contests" },
