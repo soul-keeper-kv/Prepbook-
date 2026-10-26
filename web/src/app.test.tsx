@@ -123,6 +123,16 @@ describe("App", () => {
     const names = liveValues(saved().patterns).map((p) => p.name)
     expect(names).toHaveLength(firstPhase.items.length)
     expect(screen.getByRole("button", { name: /^Thêm tất cả/ })).toBeInTheDocument()
+    // Sidebar rows are cut to fit: hovering shows the whole name, and what is inside
+    const phaseRow = screen.getByRole("treeitem", { name: phaseName })
+    expect(phaseRow).toHaveAttribute("title", `${phaseName} · ${names.length} pattern`)
+    // A pattern row adds its level
+    await user.click(phaseRow)
+    const longest = [...names].sort((x, y) => y.length - x.length)[0]!
+    expect(await screen.findByRole("treeitem", { name: longest })).toHaveAttribute(
+      "title",
+      `${longest} · Chưa học`
+    )
   })
 
   it("switches the app to English from the settings", async () => {

@@ -24,6 +24,8 @@
     "settings": "Settings"
   },
   "tree": {
+    "patterns_one": "{{count}} pattern",
+    "patterns_other": "{{count}} patterns",
     "title": "Topics and patterns",
     "label": "Topics, phases and patterns. Drag and drop to reorder the roadmap.",
     "due_one": "{{count}} item due for review",

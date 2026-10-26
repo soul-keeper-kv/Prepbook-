@@ -199,10 +199,25 @@ export function TopicTree({ onNavigate }: { onNavigate?: () => void }) {
         const level = item.getItemMeta().level
         const active = node.id === activeId
         const count = node.kind === "phase" ? (model.children.get(node.id)?.length ?? 0) : null
+        // Long names are cut to fit the sidebar: hovering shows the whole name (and, for a
+        // pattern, its level and what is due)
+        const tooltip =
+          node.kind === "pattern"
+            ? [
+                node.name,
+                t(`level.${node.level}`),
+                node.due ? t("tree.due", { count: node.due }) : "",
+              ]
+                .filter(Boolean)
+                .join(" · ")
+            : node.kind === "phase"
+              ? `${node.name} · ${t("tree.patterns", { count: count ?? 0 })}`
+              : node.name
         return (
           <div
             {...item.getProps()}
             key={item.getId()}
+            title={tooltip}
             className={cn(
               "flex h-7 cursor-pointer items-center gap-1.5 pr-2 text-13 outline-none select-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
               active && "bg-info-bg text-link hover:bg-info-bg",
@@ -229,12 +244,7 @@ export function TopicTree({ onNavigate }: { onNavigate?: () => void }) {
               {node.name}
             </span>
             {node.kind === "pattern" && node.due > 0 && (
-              <span
-                className="font-mono text-11 text-warn"
-                title={t("tree.due", { count: node.due })}
-              >
-                {node.due}
-              </span>
+              <span className="font-mono text-11 text-warn">{node.due}</span>
             )}
             {count !== null && <span className="font-mono text-11 text-faint">{count}</span>}
           </div>

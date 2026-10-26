@@ -53,13 +53,23 @@ export function SyncStatusLine() {
 export function SyncBadge({ className }: { className?: string }) {
   const { t } = useTranslation()
   const lang = useLang()
-  const { status, syncedAt } = useSyncStore()
+  const { status, error, syncedAt } = useSyncStore()
   const text =
     status === "synced" && syncedAt
       ? t("sync.short.synced", { time: formatTime(syncedAt, lang) })
       : t(`sync.short.${status}`)
+  // The few words may be cut off: hovering shows the full sentence
+  const full =
+    status === "synced" && syncedAt
+      ? t("sync.synced", { time: formatTime(syncedAt, lang) })
+      : status === "error"
+        ? t("sync.error", { message: errorText(error, t) })
+        : t(`sync.${status === "synced" ? "syncing" : status}`)
   return (
-    <span className={cn("flex min-w-0 items-center gap-2 font-mono text-12", className)}>
+    <span
+      title={full}
+      className={cn("flex min-w-0 items-center gap-2 font-mono text-12", className)}
+    >
       <Dot status={status} />
       <span className="truncate">{text}</span>
     </span>

@@ -24,6 +24,7 @@
     "settings": "Cài đặt"
   },
   "tree": {
+    "patterns_other": "{{count}} pattern",
     "title": "Chủ đề và pattern",
     "label": "Chủ đề, giai đoạn và pattern. Kéo thả để sắp xếp lộ trình.",
     "due_other": "{{count}} mục đến hạn ôn"
