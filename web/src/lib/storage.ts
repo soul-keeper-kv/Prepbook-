@@ -9,6 +9,8 @@ export const KEYS = {
   notebookBase: "prep_drive_base",
   /** Folders open in the sidebar tree (this device only) */
   treeExpanded: "prep_tree_expanded",
+  /** Sort of the pattern pages' problem tables (this device only) */
+  problemSort: "prep_problem_sort",
   // Progress of the old roadmap: read once to carry it into the notebook, then left alone
   progress: "dsa_progress_v3",
   driveSync: "dsa_drive_sync",

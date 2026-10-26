@@ -12,6 +12,7 @@ import { liveValues } from "@/notebook/logic"
 import { withDefaultTopics } from "@/notebook/migrate"
 import { emptyNotebook, type Notebook } from "@/notebook/schema"
 import { notebookActions } from "@/notebook/store"
+import { uiActions } from "@/state/ui"
 
 const content = buildContent(dataFiles)
 
@@ -35,6 +36,8 @@ const saved = () => storage.get(KEYS.notebook) as Notebook
 beforeEach(async () => {
   await i18n.changeLanguage("vi")
   notebookActions.init(withDefaultTopics(emptyNotebook(), "vi"))
+  uiActions.setProblemSort([])
+  uiActions.setProblemFilters([])
   window.location.hash = ""
 })
 
@@ -91,6 +94,130 @@ describe("App", () => {
     expect(screen.getByText("Đã giải · cần gợi ý")).toBeInTheDocument()
     expect(screen.getByText("1 lần làm")).toBeInTheDocument()
     expect(screen.getByText("Làm lại: sau 3 ngày")).toBeInTheDocument()
+  })
+
+  it("sorts a pattern's problem table, and the problem page steps in that order", async () => {
+    const user = userEvent.setup()
+    const pattern = notebookActions.addPattern("t_dsa", null, "Two Pointers")
+    const lc = (slug: string) => `https://leetcode.com/problems/${slug}/`
+    const [twoSum] = notebookActions.addProblems([
+      { url: lc("two-sum"), title: "Two Sum", level: "easy", patternIds: [pattern] },
+      { url: lc("4sum"), title: "4Sum", patternIds: [pattern] },
+      { url: lc("3sum"), title: "3Sum", level: "medium", patternIds: [pattern] },
+    ])
+    renderApp()
+    await go(`#/pattern/${pattern}`)
+    const table = await screen.findByRole("table")
+    const order = () =>
+      within(screen.getByRole("table"))
+        .getAllByRole("link")
+        .map((link) => link.textContent)
+    expect(order()).toEqual(["Two Sum", "4Sum", "3Sum"]) // the order added
+
+    // Ascending, descending, then the order added again
+    const byTitle = within(table).getByRole("button", { name: "Bài" })
+    await user.click(byTitle)
+    expect(order()).toEqual(["3Sum", "4Sum", "Two Sum"])
+    expect(byTitle.closest("th")).toHaveAttribute("aria-sort", "ascending")
+    await user.click(byTitle)
+    expect(order()).toEqual(["Two Sum", "4Sum", "3Sum"])
+    expect(byTitle.closest("th")).toHaveAttribute("aria-sort", "descending")
+    await user.click(byTitle)
+    expect(byTitle.closest("th")).not.toHaveAttribute("aria-sort")
+
+    // A problem with no level goes last, both ways
+    const byLevel = within(table).getByRole("button", { name: "Mức" })
+    await user.click(byLevel)
+    expect(order()).toEqual(["Two Sum", "3Sum", "4Sum"])
+    await user.click(byLevel)
+    expect(order()).toEqual(["3Sum", "Two Sum", "4Sum"])
+    expect(storage.get(KEYS.problemSort)).toEqual([{ id: "level", desc: true }])
+
+    // The arrows on the problem page follow the sorted table
+    await go(`#/problem/${twoSum}`)
+    await screen.findByRole("heading", { level: 1, name: /Two Sum/ })
+    expect(screen.getByRole("button", { name: "Bài trước: 3Sum" })).toBeEnabled()
+    expect(screen.getByRole("button", { name: "Bài sau: 4Sum" })).toBeEnabled()
+
+    await go(`#/pattern/${pattern}`)
+    await user.click(await screen.findByRole("button", { name: "Về thứ tự đã thêm" }))
+    expect(order()).toEqual(["Two Sum", "4Sum", "3Sum"])
+    expect(screen.queryByRole("button", { name: "Về thứ tự đã thêm" })).not.toBeInTheDocument()
+  })
+
+  it("filters the problem table by level and status, and the arrows follow", async () => {
+    const user = userEvent.setup()
+    const pattern = notebookActions.addPattern("t_dsa", null, "Two Pointers")
+    const lc = (slug: string) => `https://leetcode.com/problems/${slug}/`
+    const [alpha, beta, gamma] = notebookActions.addProblems([
+      { url: lc("alpha"), title: "Alpha", level: "easy", patternIds: [pattern] },
+      // Capitalised, as the old roadmap writes it
+      { url: lc("beta"), title: "Beta", level: "Medium", patternIds: [pattern] },
+      { url: lc("gamma"), title: "Gamma", level: "medium", patternIds: [pattern] },
+      { url: lc("delta"), title: "Delta", patternIds: [pattern] },
+    ])
+    const attempt = (id: string | undefined, outcome: "alone" | "hint") =>
+      notebookActions.logAttempt(id!, {
+        outcome,
+        minutes: null,
+        mistakes: [],
+        note: "",
+        code: "",
+        lang: "",
+      })
+    attempt(alpha, "alone")
+    attempt(beta, "hint")
+    renderApp()
+    await go(`#/pattern/${pattern}`)
+    await screen.findByRole("table")
+    const order = () =>
+      within(screen.getByRole("table"))
+        .getAllByRole("link")
+        .map((link) => link.textContent)
+    // The filters sit in the column titles: a funnel opens a menu of values
+    const openFilter = async (name: RegExp) => {
+      await user.click(screen.getByRole("button", { name }))
+      return screen.findByRole("menu")
+    }
+    const option = (menu: HTMLElement, name: RegExp) =>
+      within(menu).getByRole("menuitemcheckbox", { name })
+
+    let menu = await openFilter(/^Lọc theo mức/)
+    await user.click(option(menu, /^Medium/))
+    // The menu stays open, so several values can be picked in a row
+    expect(option(menu, /^Medium/)).toHaveAttribute("aria-checked", "true")
+    await user.keyboard("{Escape}")
+    expect(order()).toEqual(["Beta", "Gamma"])
+    expect(screen.getByText("Hiện 2/4 bài")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Lọc theo mức (đang chọn 1)" })).toBeInTheDocument()
+
+    // The status counts only count what the level filter keeps
+    menu = await openFilter(/^Lọc theo trạng thái/)
+    expect(option(menu, /^Tự làm được/)).toHaveTextContent(/0$/)
+    expect(option(menu, /^Cần gợi ý/)).toHaveTextContent(/1$/)
+    await user.click(option(menu, /^Chưa làm/))
+    await user.keyboard("{Escape}")
+    expect(order()).toEqual(["Gamma"])
+
+    menu = await openFilter(/^Lọc theo mức/)
+    await user.click(within(menu).getByRole("menuitem", { name: "Bỏ lọc cột này" }))
+    expect(order()).toEqual(["Gamma", "Delta"])
+
+    // The arrows on the problem page step through the filtered rows only
+    await go(`#/problem/${gamma}`)
+    await screen.findByRole("heading", { level: 1, name: /Gamma/ })
+    expect(
+      screen.getByRole("navigation", { name: "Các bài trong Two Pointers" })
+    ).toHaveTextContent("1 / 2")
+    expect(screen.getByRole("button", { name: "Bài sau: Delta" })).toBeEnabled()
+    // Solved now, so Gamma no longer matches "not done"; the arrows still go on to Delta
+    await user.click(screen.getByRole("radio", { name: /Tự làm được/ }))
+    await user.click(screen.getByRole("button", { name: "Lưu lần làm" }))
+    expect(screen.getByRole("button", { name: "Bài sau: Delta" })).toBeEnabled()
+
+    await go(`#/pattern/${pattern}`)
+    await user.click(await screen.findByRole("button", { name: "Bỏ lọc" }))
+    expect(order()).toEqual(["Alpha", "Beta", "Gamma", "Delta"])
   })
 
   it("steps through a pattern's problems, then goes back to the pattern", async () => {

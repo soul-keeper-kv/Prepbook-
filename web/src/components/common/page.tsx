@@ -137,8 +137,13 @@ export function DocSection({
     <section id={id} className="scroll-mt-4 border-t pt-4">
       <div className="mb-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <h2 className="text-15 font-semibold">{title}</h2>
-        {hint && <p className="min-w-0 flex-1 text-12 text-faint">{hint}</p>}
-        {actions}
+        {/* Phone: the title and actions share the first line, the hint gets its own */}
+        {hint && (
+          <p className="min-w-0 flex-1 text-12 text-faint max-md:order-last max-md:basis-full">
+            {hint}
+          </p>
+        )}
+        {actions && <div className="max-md:ml-auto">{actions}</div>}
       </div>
       {children}
     </section>

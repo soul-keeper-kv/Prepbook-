@@ -104,8 +104,16 @@ and Related patterns. The DSA section template, in order:
 1. Recognition (signals in the problem statement)
 2. Idea and template code (tabs per language)
 3. Pitfalls I hit, each linked to the problem where it happened
-4. Problems done: a table of problem, level, outcome and redo date. The row due today is
-   highlighted.
+4. Problems done: a table of problem, level, status (latest outcome), attempt count, last
+   tried and redo date. The row due today is highlighted. Every column sorts from its
+   header: ascending, descending, then back to the order added. Empty values go last
+   either way. One sort applies to every pattern and is remembered on this device
+   (`problemSort` in `state/ui.ts`). The Level and Status titles also hold a funnel that
+   opens a menu of values to keep (pick any number; the menu stays open). Each value shows
+   how many rows it would keep, counting what the other filter keeps. Only values the
+   pattern has are offered. While filtering, the section title shows "Showing x of y" and
+   Clear filters. The filters are shared by every
+   pattern but kept only until the app is closed (`problemFilters`).
 5. Material read: link plus "what I took away"
 6. My interview questions: answer aloud first, then reveal
 
@@ -127,8 +135,11 @@ yet", or "Solved · alone / with a hint / read the solution" by the latest attem
 attempt count and the redo date. There is no hand-set status.
 
 The breadcrumb row holds a Back button and `‹ n / N ›` arrows. The arrows step through the
-problem table of the pattern the problem was opened from (`lastPatternId` in `state/ui.ts`)
-and replace the history entry, so Back returns to where the problems were opened from.
+problem table, with its current sort and filters, of the pattern the problem was opened
+from (`lastPatternId` in `state/ui.ts`). A funnel icon shows when filters apply. A problem
+that stops matching after a new attempt stays in the list, so the arrows go on to its
+neighbours that still match. The arrows replace the history entry, so Back returns to where
+the problems were opened from.
 
 Later: a timer that fills in the minutes.
 
@@ -153,6 +164,9 @@ Libraries (installed):
 - graph: `react-force-graph-2d` (canvas, force layout), lazy-loaded by `pages/graph-page.tsx`
 - tree: `@headless-tree/react` + `@headless-tree/core` (headless, so it takes the app's own
   Tailwind styling; it has drag and drop), in `components/shell/topic-tree.tsx`
+- table: `@tanstack/react-table` v9 (headless; features are registered per table), in
+  `components/pattern/problem-table.tsx`. The table and the problem page's arrows both use
+  `useProblemTable`, so the sort rule exists once.
 
 The graph canvas cannot read Tailwind classes. Read the colour tokens with
 `getComputedStyle(document.documentElement)` and redraw when the theme changes.
@@ -211,7 +225,8 @@ Type and shape:
 ## Components
 
 - Reuse `web/src/components/ui/` (shadcn on Radix, restyled to VS Code): alert-dialog,
-  button, checkbox, collapsible, dialog, progress, sonner, textarea, toggle-group, toggle.
+  button, checkbox, collapsible, dialog, dropdown-menu, progress, sonner, textarea,
+  toggle-group, toggle.
 - Reuse the app components in `web/src/components/`: `Tag`, `Segmented`, `Section`,
   `CodeBlock`, `CopyButton`, `FileTabs`, `ConfirmDialog`, `InlineText`.
 - To add a shadcn component: `npx shadcn@latest add <name>`, then change

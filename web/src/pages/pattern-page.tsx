@@ -10,7 +10,7 @@ import { EditableText, NoteEditor } from "@/components/common/editing"
 import { DocSection, PageHeader, Panel } from "@/components/common/page"
 import { CardList } from "@/components/pattern/card-list"
 import { PatternLinks } from "@/components/pattern/pattern-links"
-import { ProblemList } from "@/components/pattern/problem-list"
+import { ProblemList, ProblemTableActions } from "@/components/pattern/problem-list"
 import { ResourceList } from "@/components/pattern/resource-list"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -289,6 +289,7 @@ export function PatternPage({ id }: { id: string }) {
               id="problems"
               title={`${sections.length + 1}. ${t("pattern.problems")}`}
               hint={t("pattern.problemsHint")}
+              actions={<ProblemTableActions pattern={pattern} />}
             >
               <ProblemList pattern={pattern} now={now} />
             </DocSection>
