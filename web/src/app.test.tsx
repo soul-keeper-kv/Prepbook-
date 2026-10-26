@@ -80,12 +80,16 @@ describe("App", () => {
     // Log an attempt on the problem's page
     await go(`#/problem/${problem.id}`)
     await screen.findByRole("heading", { level: 1, name: /Longest Substring/ })
+    expect(screen.getByText("Chưa làm")).toBeInTheDocument()
     await user.click(screen.getByRole("radio", { name: /Cần gợi ý/ }))
     await user.type(screen.getByRole("spinbutton", { name: "Số phút" }), "35")
     await user.click(screen.getByRole("button", { name: "Lưu lần làm" }))
     const attempts = liveValues(saved().attempts)
     expect(attempts).toHaveLength(1)
     expect(attempts[0]).toMatchObject({ outcome: "hint", minutes: 35 })
+    // The status comes from the attempts: done, and how the latest one went
+    expect(screen.getByText("Đã giải · cần gợi ý")).toBeInTheDocument()
+    expect(screen.getByText("1 lần làm")).toBeInTheDocument()
     expect(screen.getByText("Làm lại: sau 3 ngày")).toBeInTheDocument()
   })
 

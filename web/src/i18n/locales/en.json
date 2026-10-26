@@ -62,6 +62,12 @@
     "solution": "Read the solution",
     "todo": "Not tried"
   },
+  "problemStatus": {
+    "alone": "Solved · alone",
+    "hint": "Solved · with a hint",
+    "solution": "Solved · read the solution",
+    "todo": "Not done yet"
+  },
   "mistake": {
     "pattern": "Did not recognise the pattern",
     "boundary": "Boundary, off-by-one",
@@ -323,7 +329,8 @@
     "deleteText": "Removes it from every pattern, with its attempts and notes.",
     "deleteAction": "Delete problem",
     "redo": "Redo: {{when}}",
-    "notTried": "Not tried yet",
+    "attemptCount_one": "{{count}} attempt",
+    "attemptCount_other": "{{count}} attempts",
     "patterns": "Patterns:",
     "editPatterns": "Edit patterns",
     "notes": "Notes",

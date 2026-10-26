@@ -122,6 +122,10 @@ Other topics get their own template. Proposed, not settled:
   code and note
 - a "Stuck?" panel with solution links and AI prompts
 
+Under the title, `ProblemStatusTag` shows the status derived from the attempts: "Not done
+yet", or "Solved · alone / with a hint / read the solution" by the latest attempt, then the
+attempt count and the redo date. There is no hand-set status.
+
 The breadcrumb row holds a Back button and `‹ n / N ›` arrows. The arrows step through the
 problem table of the pattern the problem was opened from (`lastPatternId` in `state/ui.ts`)
 and replace the history entry, so Back returns to where the problems were opened from.

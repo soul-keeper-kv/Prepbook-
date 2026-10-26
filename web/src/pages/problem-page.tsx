@@ -4,7 +4,12 @@ import { ChevronRightIcon, ExternalLinkIcon, PencilIcon, Trash2Icon } from "luci
 import { useTranslation } from "react-i18next"
 import { CodeBlock } from "@/components/code-block"
 import { ConfirmDialog } from "@/components/confirm-dialog"
-import { LevelBadgeForProblemLevel, OutcomeTag, TopicDot } from "@/components/common/badges"
+import {
+  LevelBadgeForProblemLevel,
+  OutcomeTag,
+  ProblemStatusTag,
+  TopicDot,
+} from "@/components/common/badges"
 import { ConflictList } from "@/components/common/conflicts"
 import { EditableText, FIELD, NoteEditor, SELECT, insertTab } from "@/components/common/editing"
 import { BackButton, PageHeader, Panel } from "@/components/common/page"
@@ -245,6 +250,19 @@ export function ProblemPage({ id }: { id: string }) {
         }
       >
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+          <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <ProblemStatusTag outcome={last?.outcome ?? "todo"} />
+            {last && (
+              <>
+                <span className="font-mono text-12 text-muted-foreground">
+                  {t("problem.attemptCount", { count: attempts.length })}
+                </span>
+                <span className={cn("text-14", isDue(dueAt, now) && "font-semibold text-warn")}>
+                  {t("problem.redo", { when: dueText(dueAt, t, now) })}
+                </span>
+              </>
+            )}
+          </span>
           <span className="flex items-center gap-2">
             <label htmlFor={levelId} className="text-13 text-muted-foreground">
               {t("problem.level")}
@@ -263,9 +281,6 @@ export function ProblemPage({ id }: { id: string }) {
               ))}
             </select>
             <LevelBadgeForProblemLevel level={problem.level} />
-          </span>
-          <span className={cn("text-14", isDue(dueAt, now) && "font-semibold text-warn")}>
-            {last ? t("problem.redo", { when: dueText(dueAt, t, now) }) : t("problem.notTried")}
           </span>
         </div>
         <div className="mt-3">

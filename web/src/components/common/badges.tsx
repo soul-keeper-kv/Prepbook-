@@ -1,3 +1,4 @@
+import { CircleCheckIcon, CircleDashedIcon } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { Tag, type Tone } from "@/components/tag"
 import type { Level } from "@/notebook/logic"
@@ -76,6 +77,21 @@ export function OutcomeTag({
   return (
     <Tag shape="pill" tone={OUTCOME_TONE[outcome]} className={className}>
       {t(`outcome.${outcome}`)}
+    </Tag>
+  )
+}
+
+/** Whether a problem is done yet, and how its latest attempt went: derived, never set by hand */
+export function ProblemStatusTag({ outcome }: { outcome: Outcome | "todo" }) {
+  const { t } = useTranslation()
+  const Icon = outcome === "todo" ? CircleDashedIcon : CircleCheckIcon
+  return (
+    <Tag
+      tone={OUTCOME_TONE[outcome]}
+      className="inline-flex items-center gap-1.5 px-2 py-0.5 text-13 font-semibold"
+    >
+      <Icon className="size-3.5" aria-hidden />
+      {t(`problemStatus.${outcome}`)}
     </Tag>
   )
 }

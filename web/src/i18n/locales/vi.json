@@ -59,6 +59,12 @@
     "solution": "Xem lời giải",
     "todo": "Chưa làm"
   },
+  "problemStatus": {
+    "alone": "Đã giải · tự làm",
+    "hint": "Đã giải · cần gợi ý",
+    "solution": "Đã giải · xem lời giải",
+    "todo": "Chưa làm"
+  },
   "mistake": {
     "pattern": "Không nhận ra pattern",
     "boundary": "Sai biên, lệch 1 (off-by-one)",
@@ -311,7 +317,7 @@
     "deleteText": "Xoá bài khỏi mọi pattern, cùng lịch sử làm bài và ghi chú.",
     "deleteAction": "Xoá bài",
     "redo": "Làm lại: {{when}}",
-    "notTried": "Chưa làm lần nào",
+    "attemptCount_other": "{{count}} lần làm",
     "patterns": "Pattern:",
     "editPatterns": "Sửa pattern",
     "notes": "Ghi chú chung",
