@@ -247,7 +247,7 @@ function ColumnHeader({ column, table }: { column: ProblemColumn; table: Problem
   return (
     <th
       aria-sort={dir === "asc" ? "ascending" : dir === "desc" ? "descending" : undefined}
-      className={cn("px-1.5 py-1 font-medium", meta?.align === "end" && "text-right")}
+      className={cn("px-0.5 py-1 font-medium", meta?.align === "end" && "text-right")}
     >
       <span className="inline-flex items-center">
         <button
@@ -308,7 +308,13 @@ export function ProblemList({ pattern, now }: { pattern: Pattern; now: number })
       {/* relative: the sr-only header cell is absolutely placed and must stay in the scroll box */}
       {table.getCoreRowModel().rows.length > 0 ? (
         <div className="relative overflow-x-auto rounded-md border">
-          <table className="w-full min-w-150 text-left text-14">
+          <table className="w-full min-w-150 table-fixed text-left text-14 max-md:min-w-180">
+            <colgroup>
+              {table.getAllLeafColumns().map((column) => (
+                <col key={column.id} className={column.columnDef.meta?.width} />
+              ))}
+              <col className="w-9 max-md:w-13" />
+            </colgroup>
             <thead className="bg-background text-12 text-muted-foreground">
               {headers.map((group) => (
                 <tr key={group.id}>
@@ -331,7 +337,7 @@ export function ProblemList({ pattern, now }: { pattern: Pattern; now: number })
                     <td
                       key={cell.id}
                       className={cn(
-                        "px-3 py-2",
+                        "px-2 py-2",
                         cell.column.columnDef.meta?.className,
                         cell.column.columnDef.meta?.align === "end" && "text-right"
                       )}

@@ -59,7 +59,7 @@
   "outcome": {
     "alone": "Solved alone",
     "hint": "Needed a hint",
-    "solution": "Read the solution",
+    "solution": "Read solution",
     "todo": "Not tried"
   },
   "problemStatus": {

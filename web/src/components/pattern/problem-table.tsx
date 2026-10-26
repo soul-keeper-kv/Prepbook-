@@ -48,6 +48,11 @@ interface ColumnMeta {
   align?: "end"
   /** Classes for the column's cells */
   className?: string
+  /**
+   * Fixed width, so sorting and filtering never move the columns. Wider on phones, where
+   * the funnel is a 44px target. The problem column has none: it takes what is left.
+   */
+  width?: string
 }
 
 const features = tableFeatures({
@@ -113,7 +118,8 @@ function StatusCell({ last }: { last: Attempt | null }) {
   const { t } = useTranslation()
   return (
     <>
-      <OutcomeTag outcome={last?.outcome ?? "todo"} />
+      {/* Wraps rather than spill into the next column if a label is too long */}
+      <OutcomeTag outcome={last?.outcome ?? "todo"} className="max-w-full whitespace-normal" />
       {last?.imported && <span className="ml-1 text-11 text-faint">{t("attempt.imported")}</span>}
     </>
   )
@@ -140,7 +146,7 @@ function RedoCell({ row }: { row: ProblemRow }) {
   )
 }
 
-const MONO = "font-mono text-12 whitespace-nowrap text-muted-foreground"
+const MONO = "font-mono text-12 text-muted-foreground"
 const helper = createColumnHelper<typeof features, ProblemRow>()
 
 // Empty values (no level, never tried) go last in both directions; ties keep the order added
@@ -149,7 +155,7 @@ export const problemColumns = helper.columns([
     id: "title",
     sortFn: byText,
     enableColumnFilter: false,
-    meta: { label: "problem.colProblem" },
+    meta: { label: "problem.colProblem", className: "wrap-break-word" },
     cell: ({ row }) => <TitleCell problem={row.original.problem} />,
   }),
   helper.accessor((r) => levelRank(r.problem.level), {
@@ -158,7 +164,7 @@ export const problemColumns = helper.columns([
     sortUndefined: "last",
     getUniqueValues: (r) => [levelKey(r.problem.level)],
     filterFn: inKeys,
-    meta: { label: "problem.colLevel" },
+    meta: { label: "problem.colLevel", width: "w-21 max-md:w-26" },
     cell: ({ row }) => <LevelBadgeForProblemLevel level={row.original.problem.level} />,
   }),
   helper.accessor((r) => STATUS_RANK[r.last?.outcome ?? "todo"], {
@@ -166,14 +172,14 @@ export const problemColumns = helper.columns([
     sortFn: byNumber,
     getUniqueValues: (r) => [r.last?.outcome ?? "todo"],
     filterFn: inKeys,
-    meta: { label: "problem.colStatus", className: "whitespace-nowrap" },
+    meta: { label: "problem.colStatus", width: "w-30 max-md:w-35" },
     cell: ({ row }) => <StatusCell last={row.original.last} />,
   }),
   helper.accessor((r) => r.attempts.length, {
     id: "attempts",
     sortFn: byNumber,
     enableColumnFilter: false,
-    meta: { label: "problem.colAttempts", align: "end", className: MONO },
+    meta: { label: "problem.colAttempts", align: "end", className: MONO, width: "w-21" },
     cell: ({ getValue }) => getValue(),
   }),
   helper.accessor((r) => time(r.last?.at), {
@@ -181,7 +187,7 @@ export const problemColumns = helper.columns([
     sortFn: byNumber,
     enableColumnFilter: false,
     sortUndefined: "last",
-    meta: { label: "problem.colLast", className: MONO },
+    meta: { label: "problem.colLast", className: cn(MONO, "whitespace-nowrap"), width: "w-22" },
     cell: ({ row }) => <LastCell last={row.original.last} />,
   }),
   helper.accessor((r) => time(r.dueAt), {
@@ -189,7 +195,7 @@ export const problemColumns = helper.columns([
     sortFn: byNumber,
     enableColumnFilter: false,
     sortUndefined: "last",
-    meta: { label: "problem.colRedo", className: MONO },
+    meta: { label: "problem.colRedo", className: MONO, width: "w-31" },
     cell: ({ row }) => <RedoCell row={row.original} />,
   }),
 ])

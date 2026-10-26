@@ -137,13 +137,15 @@ export function DocSection({
     <section id={id} className="scroll-mt-4 border-t pt-4">
       <div className="mb-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <h2 className="text-15 font-semibold">{title}</h2>
-        {/* Phone: the title and actions share the first line, the hint gets its own */}
+        {/* Phone: the title and actions share the first line, the hint gets its own.
+            Wider: the hint keeps 15rem, and actions that no longer fit move to a line
+            of their own on the right instead of squeezing it */}
         {hint && (
-          <p className="min-w-0 flex-1 text-12 text-faint max-md:order-last max-md:basis-full">
+          <p className="min-w-60 flex-1 text-12 text-faint max-md:order-last max-md:basis-full">
             {hint}
           </p>
         )}
-        {actions && <div className="max-md:ml-auto">{actions}</div>}
+        {actions && <div className="ml-auto">{actions}</div>}
       </div>
       {children}
     </section>

@@ -105,7 +105,9 @@ and Related patterns. The DSA section template, in order:
 2. Idea and template code (tabs per language)
 3. Pitfalls I hit, each linked to the problem where it happened
 4. Problems done: a table of problem, level, status (latest outcome), attempt count, last
-   tried and redo date. The row due today is highlighted. Every column sorts from its
+   tried and redo date. The row due today is highlighted. Columns have fixed widths
+   (`meta.width`, table-fixed), so sorting and filtering never move them; only the
+   problem column flexes. Every column sorts from its
    header: ascending, descending, then back to the order added. Empty values go last
    either way. One sort applies to every pattern and is remembered on this device
    (`problemSort` in `state/ui.ts`). The Level and Status titles also hold a funnel that
