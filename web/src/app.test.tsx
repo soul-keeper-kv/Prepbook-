@@ -38,6 +38,9 @@ beforeEach(async () => {
   notebookActions.init(withDefaultTopics(emptyNotebook(), "vi"))
   uiActions.setProblemSort([])
   uiActions.setProblemFilters([])
+  uiActions.setSuggestSort("order")
+  uiActions.setSuggestFilter("platform", [])
+  uiActions.setSuggestFilter("level", [])
   window.location.hash = ""
 })
 
@@ -260,6 +263,44 @@ describe("App", () => {
     await user.keyboard("{Escape}")
     expect(order()).toEqual(["Pairs"])
     expect(screen.getByText("Hiện 1/4 bài")).toBeInTheDocument()
+  })
+
+  it("filters and sorts the suggested problems, and adds only those shown", async () => {
+    const user = userEvent.setup()
+    const entry = [...content.items.values()].find((e) => {
+      const sites = new Set(e.item.problems?.map((p) => new URL(p.url).hostname))
+      return sites.has("leetcode.com") && sites.has("www.hackerrank.com")
+    })!
+    const id = notebookActions.addSuggestedPattern(content, entry.item.id, "vi")!
+    const fromLeetCode = entry.item.problems!.filter((p) => p.url.includes("leetcode.com"))
+    renderApp()
+    await go(`#/pattern/${id}`)
+    await screen.findByRole("heading", { level: 1 })
+    const total = entry.item.problems!.length + (entry.item.resources?.length ?? 0)
+    expect(screen.getByRole("button", { name: `Thêm tất cả (${total})` })).toBeInTheDocument()
+
+    await user.click(screen.getByRole("button", { name: "Nền tảng" }))
+    const menu = await screen.findByRole("menu")
+    await user.click(within(menu).getByRole("menuitemcheckbox", { name: /^LeetCode/ }))
+    await user.keyboard("{Escape}")
+    expect(
+      screen.getByText(`Hiện ${fromLeetCode.length}/${entry.item.problems!.length} bài`)
+    ).toBeInTheDocument()
+    expect(screen.queryByText(/^HackerRank/)).not.toBeInTheDocument()
+
+    // By level: easy first
+    await user.click(screen.getByRole("button", { name: "Sắp xếp" }))
+    await user.click(await screen.findByRole("menuitemradio", { name: "Theo mức" }))
+    const levels = screen.getAllByText(/^LeetCode · /).map((el) => el.textContent)
+    expect(levels[0]).toBe("LeetCode · easy")
+    expect(storage.get(KEYS.suggestSort)).toBe("level")
+
+    // "Add all" adds what is shown: the LeetCode problems, plus the links
+    const added = fromLeetCode.length + (entry.item.resources?.length ?? 0)
+    await user.click(screen.getByRole("button", { name: `Thêm tất cả (${added})` }))
+    const problems = liveValues(saved().problems)
+    expect(problems).toHaveLength(fromLeetCode.length)
+    expect(problems.every((p) => p.url.includes("leetcode.com"))).toBe(true)
   })
 
   it("steps through a pattern's problems, then goes back to the pattern", async () => {

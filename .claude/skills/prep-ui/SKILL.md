@@ -124,6 +124,10 @@ and Related patterns. The DSA section template, in order:
    pattern has are offered. While filtering, the section title shows "Showing x of y" and
    Clear filters. The filters are shared by every
    pattern but kept only until the app is closed (`problemFilters`).
+   The suggested problems in the aside get the same kind of Platform and Level menus plus
+   a Sort menu (suggested order, by level, by platform); "Add all" adds only what they
+   show. Their sort is remembered on this device (`suggestSort`), their filters until the
+   app is closed (`suggestFilters`).
 5. Material read: link plus "what I took away"
 6. My interview questions: answer aloud first, then reveal
 

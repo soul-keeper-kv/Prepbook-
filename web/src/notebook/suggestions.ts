@@ -1,5 +1,6 @@
 import type { Content, Module } from "@/content/load"
 import { localize } from "@/content/localize"
+import { platformKey } from "@/content/problems"
 import type { Item, NoteText, ResourceType } from "@/content/schema"
 import type { Lang } from "@/i18n/languages"
 import { normalizeUrl, problemIdFor } from "@/notebook/ids"
@@ -29,6 +30,8 @@ export interface SuggestedProblem {
   url: string
   title: string
   level: string
+  /** "LeetCode", "HackerRank"... or "none" */
+  platform: string
 }
 
 export interface SuggestedResource {
@@ -68,6 +71,7 @@ export function suggestedProblems(item: Item, lang: Lang): SuggestedProblem[] {
     url: p.url,
     title: plain(localize(p.title, lang)),
     level: (p.level ?? "").toLowerCase(),
+    platform: platformKey(p.url),
   }))
 }
 
@@ -124,6 +128,52 @@ export function patternSuggestions(content: Content, nb: Notebook, pattern: Patt
     notes,
     problems: suggestedProblems(entry.item, lang).filter((p) => !linked.has(problemIdFor(p.url))),
     resources: suggestedResources(entry.item, lang).filter((r) => !read.has(normalizeUrl(r.url))),
+  }
+}
+
+export interface ProblemFilters {
+  platform: string[]
+  level: string[]
+}
+
+const levelOf = (p: SuggestedProblem) => p.level || "none"
+const LEVEL_RANK: Record<string, number> = { easy: 0, medium: 1, hard: 2, advanced: 3, expert: 4 }
+const collator = new Intl.Collator(undefined, { sensitivity: "base" })
+
+/**
+ * The suggested problems a pattern page shows: those matching both filters (an empty filter
+ * keeps all), in the order asked; ties keep the suggested order. The counts say how many
+ * each platform or level would show, given the other filter, like the problem table's.
+ */
+export function pickSuggestedProblems(
+  problems: SuggestedProblem[],
+  filters: ProblemFilters,
+  sort: "order" | "level" | "platform"
+) {
+  const fits = (p: SuggestedProblem, skip?: keyof ProblemFilters) =>
+    (skip === "platform" || !filters.platform.length || filters.platform.includes(p.platform)) &&
+    (skip === "level" || !filters.level.length || filters.level.includes(levelOf(p)))
+  const counts = (kind: keyof ProblemFilters, keyOf: (p: SuggestedProblem) => string) => {
+    const map = new Map<string, number>(problems.map((p) => [keyOf(p), 0]))
+    for (const p of problems) if (fits(p, kind)) map.set(keyOf(p), (map.get(keyOf(p)) ?? 0) + 1)
+    return map
+  }
+  const last = (key: string) => (key === "none" ? 1 : 0)
+  const shown = problems.filter((p) => fits(p))
+  if (sort === "level")
+    shown.sort(
+      (a, b) =>
+        last(levelOf(a)) - last(levelOf(b)) ||
+        (LEVEL_RANK[a.level] ?? 5) - (LEVEL_RANK[b.level] ?? 5)
+    )
+  if (sort === "platform")
+    shown.sort(
+      (a, b) => last(a.platform) - last(b.platform) || collator.compare(a.platform, b.platform)
+    )
+  return {
+    shown,
+    platforms: counts("platform", (p) => p.platform),
+    levels: counts("level", levelOf),
   }
 }
 

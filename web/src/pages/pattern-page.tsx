@@ -1,17 +1,27 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, type ReactNode } from "react"
 import { useNow } from "@/lib/clock"
-import { ClipboardPasteIcon, ListPlusIcon, PlusIcon, Trash2Icon } from "lucide-react"
+import {
+  ArrowUpDownIcon,
+  ClipboardPasteIcon,
+  FunnelIcon,
+  ListPlusIcon,
+  PlusIcon,
+  Trash2Icon,
+  XIcon,
+} from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { LevelTag, OutcomeBar } from "@/components/common/badges"
 import { ConflictList } from "@/components/common/conflicts"
 import { EditableText, NoteEditor } from "@/components/common/editing"
+import { FilterMenu, levelLabel, platformLabel } from "@/components/common/filter-menu"
 import { Markdown } from "@/components/common/markdown"
 import { DocSection, PageHeader, Panel } from "@/components/common/page"
 import { CardList } from "@/components/pattern/card-list"
 import { PatternLinks } from "@/components/pattern/pattern-links"
 import { ProblemList, ProblemTableActions } from "@/components/pattern/problem-list"
+import { orderLevelKeys, orderPlatformKeys } from "@/components/pattern/problem-table"
 import { ResourceList } from "@/components/pattern/resource-list"
 import { LABEL } from "@/components/section"
 import { Tag } from "@/components/tag"
@@ -26,6 +36,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { useContent } from "@/content/context"
 import { localize } from "@/content/localize"
 import { useLang, useNotebook } from "@/notebook/hooks"
@@ -40,10 +57,15 @@ import {
 } from "@/notebook/logic"
 import type { Conflict, Pattern } from "@/notebook/schema"
 import { notebookActions } from "@/notebook/store"
-import { patternSuggestions, withNote, type SuggestedNote } from "@/notebook/suggestions"
+import {
+  patternSuggestions,
+  pickSuggestedProblems,
+  withNote,
+  type SuggestedNote,
+} from "@/notebook/suggestions"
 import { CODE_SECTIONS, SECTION_TEMPLATES } from "@/notebook/templates"
 import { href, navigate } from "@/state/router"
-import { uiActions } from "@/state/ui"
+import { SUGGEST_SORTS, uiActions, useUiStore, type SuggestSort } from "@/state/ui"
 import { cn } from "@/lib/utils"
 
 function MasteryStrip({ pattern, status }: { pattern: Pattern; status: PatternStatus }) {
@@ -165,19 +187,122 @@ function NoteSuggestion({ pattern, note }: { pattern: Pattern; note: SuggestedNo
   )
 }
 
+const SORT_LABEL = {
+  order: "suggest.sortOrder",
+  level: "suggest.sortLevel",
+  platform: "suggest.sortPlatform",
+} as const
+
+/** Above the suggested problems: platform and level filters, and their order */
+function SuggestionTools({
+  platforms,
+  levels,
+  children,
+}: {
+  platforms: Map<string, number>
+  levels: Map<string, number>
+  children: ReactNode
+}) {
+  const { t } = useTranslation()
+  const filters = useUiStore((s) => s.suggestFilters)
+  const sort = useUiStore((s) => s.suggestSort)
+  // Filters are shared by every pattern: a value chosen elsewhere stays offered, to untick it
+  const menu = (kind: "platform" | "level", counts: Map<string, number>) => {
+    const keys = [...counts.keys(), ...filters[kind]]
+    const ordered = kind === "platform" ? orderPlatformKeys(keys) : orderLevelKeys(keys)
+    const name = t(kind === "platform" ? "suggest.platform" : "suggest.level")
+    const selected = filters[kind]
+    return (
+      <FilterMenu
+        options={ordered.map((key) => ({
+          key,
+          label: kind === "platform" ? platformLabel(key, t) : levelLabel(key, t),
+          count: counts.get(key) ?? 0,
+        }))}
+        selected={selected}
+        onChange={(keys) => uiActions.setSuggestFilter(kind, keys)}
+        clearLabel={t("problem.filterClear")}
+        trigger={
+          <Button
+            size="xs"
+            variant="outline"
+            className={cn("max-md:h-11", selected.length > 0 && "text-link")}
+          >
+            <FunnelIcon className={cn(selected.length > 0 && "fill-current")} />
+            {selected.length ? t("suggest.filterCount", { name, count: selected.length }) : name}
+          </Button>
+        }
+      />
+    )
+  }
+
+  return (
+    <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
+      {menu("platform", platforms)}
+      {menu("level", levels)}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            size="xs"
+            variant="outline"
+            className={cn("max-md:h-11", sort !== "order" && "text-link")}
+          >
+            <ArrowUpDownIcon />
+            {t("suggest.sort")}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="min-w-48">
+          <DropdownMenuRadioGroup
+            value={sort}
+            onValueChange={(value) => uiActions.setSuggestSort(value as SuggestSort)}
+          >
+            {SUGGEST_SORTS.map((key) => (
+              <DropdownMenuRadioItem key={key} value={key} className="text-13">
+                {t(SORT_LABEL[key])}
+              </DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {children && (
+        <span className="flex items-center gap-1 text-12 text-muted-foreground">
+          {children}
+          <Button
+            size="xs"
+            variant="ghost"
+            className="max-md:h-11"
+            onClick={() => {
+              uiActions.setSuggestFilter("platform", [])
+              uiActions.setSuggestFilter("level", [])
+            }}
+          >
+            <XIcon />
+            {t("problem.filterClear")}
+          </Button>
+        </span>
+      )}
+    </div>
+  )
+}
+
 function PatternSuggestions({ pattern }: { pattern: Pattern }) {
   const { t } = useTranslation()
   const content = useContent()
   const nb = useNotebook()
   const lang = useLang()
+  const filters = useUiStore((s) => s.suggestFilters)
+  const sort = useUiStore((s) => s.suggestSort)
   const { module, notes, problems, resources } = patternSuggestions(content, nb, pattern, lang)
   if (!module || (!notes.length && !problems.length && !resources.length)) return null
-  const items = problems.length + resources.length
+  const { shown, platforms, levels } = pickSuggestedProblems(problems, filters, sort)
+  const filtered = filters.platform.length + filters.level.length > 0
+  // "Add all" adds what the filters show
+  const items = shown.length + resources.length
 
   // Every suggested problem and link in one change, with Undo
   function addAll() {
     const problemIds = notebookActions.addProblems(
-      problems.map((p) => ({
+      shown.map((p) => ({
         url: p.url,
         title: p.title,
         level: p.level,
@@ -224,19 +349,32 @@ function PatternSuggestions({ pattern }: { pattern: Pattern }) {
       {items > 0 && notes.length > 0 && (
         <h3 className={cn(LABEL, "mb-1")}>{t("suggest.itemsTitle")}</h3>
       )}
-      {problems.length > 0 && (
+      {problems.length > 1 && (
+        <SuggestionTools platforms={platforms} levels={levels}>
+          {filtered && t("problem.filterShown", { shown: shown.length, total: problems.length })}
+        </SuggestionTools>
+      )}
+      {problems.length > 0 && shown.length === 0 && (
+        <p className="border-t py-2 text-13 text-faint">{t("problem.filterEmpty")}</p>
+      )}
+      {shown.length > 0 && (
         <ul className="mb-2">
-          {problems.map((p) => (
+          {shown.map((p) => (
             <li key={p.url} className="flex items-center gap-2 border-t py-1.5 text-13">
-              <a
-                href={p.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="min-w-0 flex-1 truncate"
-              >
-                {p.title}
-              </a>
-              {p.level && <span className="font-mono text-11 text-faint">{p.level}</span>}
+              <div className="min-w-0 flex-1">
+                <a
+                  href={p.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block truncate"
+                >
+                  {p.title}
+                </a>
+                <span className="block font-mono text-11 text-faint">
+                  {platformLabel(p.platform, t)}
+                  {p.level && ` · ${p.level}`}
+                </span>
+              </div>
               <Button
                 size="xs"
                 variant="outline"

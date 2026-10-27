@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 import { buildContent } from "@/content/load"
 import { EPOCH, patternFromItem, withDefaultTopics } from "@/notebook/migrate"
 import { emptyNotebook, type Notebook } from "@/notebook/schema"
-import { patternSuggestions, withNote } from "@/notebook/suggestions"
+import { patternSuggestions, pickSuggestedProblems, withNote } from "@/notebook/suggestions"
 
 const content = buildContent(
   new Map<string, unknown>([
@@ -62,5 +62,62 @@ describe("withNote", () => {
     expect(withNote("", "B")).toBe("B")
     expect(withNote("  \n", "B")).toBe("B")
     expect(withNote("A\n\n", "B")).toBe("A\n\nB")
+  })
+})
+
+describe("pickSuggestedProblems", () => {
+  const p = (title: string, platform: string, level: string) => ({
+    url: title,
+    title,
+    platform,
+    level,
+  })
+  const problems = [
+    p("A", "LeetCode", "medium"),
+    p("B", "HackerRank", "easy"),
+    p("C", "CSES", ""),
+    p("D", "LeetCode", "easy"),
+    p("E", "none", "hard"),
+  ]
+  const none = { platform: [], level: [] }
+  const titles = (list: { title: string }[]) => list.map((x) => x.title)
+
+  it("keeps what both filters allow, and counts each choice against the other filter", () => {
+    const picked = pickSuggestedProblems(
+      problems,
+      { platform: ["LeetCode"], level: ["easy"] },
+      "order"
+    )
+    expect(titles(picked.shown)).toEqual(["D"])
+    // Platform counts follow the level filter, level counts follow the platform filter
+    expect(picked.platforms.get("LeetCode")).toBe(1)
+    expect(picked.platforms.get("HackerRank")).toBe(1)
+    expect(picked.platforms.get("CSES")).toBe(0)
+    expect(picked.levels.get("medium")).toBe(1)
+    expect(picked.levels.get("none")).toBe(0)
+  })
+
+  it("sorts by level or platform, unknown last, ties in the suggested order", () => {
+    expect(titles(pickSuggestedProblems(problems, none, "order").shown)).toEqual([
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+    ])
+    expect(titles(pickSuggestedProblems(problems, none, "level").shown)).toEqual([
+      "B",
+      "D",
+      "A",
+      "E",
+      "C",
+    ])
+    expect(titles(pickSuggestedProblems(problems, none, "platform").shown)).toEqual([
+      "C",
+      "B",
+      "A",
+      "D",
+      "E",
+    ])
   })
 })

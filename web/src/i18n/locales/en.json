@@ -501,7 +501,14 @@
     "noteCopiedTo": "Copied into {{section}}.",
     "noteTitle": "{{name}} · suggestion",
     "noteHint": "Copy in puts this into your {{section}} section, below what you already wrote. Then rewrite it in your own words.",
-    "close": "Close"
+    "close": "Close",
+    "platform": "Platform",
+    "level": "Level",
+    "filterCount": "{{name}} ({{count}})",
+    "sort": "Sort",
+    "sortOrder": "Suggested order",
+    "sortLevel": "By level",
+    "sortPlatform": "By platform"
   },
   "graph": {
     "intro": "Each dot is a topic, a pattern or a problem. The more solid a pattern, the better you know it; arrows mean “learn first”. Click a dot to open it.",

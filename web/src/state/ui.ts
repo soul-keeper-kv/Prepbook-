@@ -16,6 +16,17 @@ interface UiState {
   problemSort: SortingState
   /** Platform, level and status filters of the problem tables; kept until the app is closed */
   problemFilters: ColumnFiltersState
+  /** Order of the suggested problems on a pattern page, shared by every pattern */
+  suggestSort: SuggestSort
+  /** Platforms and levels of suggested problems to show; kept until the app is closed */
+  suggestFilters: SuggestFilters
+}
+
+export const SUGGEST_SORTS = ["order", "level", "platform"] as const
+export type SuggestSort = (typeof SUGGEST_SORTS)[number]
+export interface SuggestFilters {
+  platform: string[]
+  level: string[]
 }
 
 const savedCodeLang = storage.get(KEYS.codeLang)
@@ -41,6 +52,8 @@ export const useUiStore = create<UiState>()(() => ({
   lastPatternId: null,
   problemSort: readSorting(KEYS.problemSort),
   problemFilters: [],
+  suggestSort: readChoice(KEYS.suggestSort, SUGGEST_SORTS, "order"),
+  suggestFilters: { platform: [], level: [] },
 }))
 
 const set = useUiStore.setState
@@ -60,4 +73,10 @@ export const uiActions = {
     set({ problemSort })
   },
   setProblemFilters: (problemFilters: ColumnFiltersState) => set({ problemFilters }),
+  setSuggestSort: (suggestSort: SuggestSort) => {
+    storage.set(KEYS.suggestSort, suggestSort)
+    set({ suggestSort })
+  },
+  setSuggestFilter: (kind: keyof SuggestFilters, keys: string[]) =>
+    set((s) => ({ suggestFilters: { ...s.suggestFilters, [kind]: keys } })),
 }

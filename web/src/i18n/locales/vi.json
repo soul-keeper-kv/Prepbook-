@@ -472,7 +472,14 @@
     "noteCopiedTo": "Đã chép vào {{section}}.",
     "noteTitle": "{{name}} · gợi ý",
     "noteHint": "Chép vào thì nội dung này nằm ở mục {{section}}, bên dưới phần bạn đã viết. Sau đó viết lại bằng lời của bạn.",
-    "close": "Đóng"
+    "close": "Đóng",
+    "platform": "Nền tảng",
+    "level": "Mức",
+    "filterCount": "{{name}} ({{count}})",
+    "sort": "Sắp xếp",
+    "sortOrder": "Theo thứ tự gợi ý",
+    "sortLevel": "Theo mức",
+    "sortPlatform": "Theo nền tảng"
   },
   "graph": {
     "intro": "Mỗi chấm là một chủ đề, pattern hoặc bài. Pattern càng đậm càng nắm chắc; mũi tên là “học trước”. Bấm một chấm để mở.",
