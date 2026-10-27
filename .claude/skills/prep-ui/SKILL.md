@@ -108,15 +108,19 @@ and Related patterns. The DSA section template, in order:
 1. Recognition (signals in the problem statement)
 2. Idea and template code (tabs per language)
 3. Pitfalls I hit, each linked to the problem where it happened
-4. Problems done: a table of problem, level, status (latest outcome), attempt count, last
-   tried and redo date. The row due today is highlighted. Columns have fixed widths
+4. Problems done: a table of problem, platform (the site, from the URL: LeetCode,
+   HackerRank...), level, status (latest outcome), attempt count, last tried and redo
+   date. The row due today is highlighted. Columns have fixed widths
    (`meta.width`, table-fixed), so sorting and filtering never move them; only the
-   problem column flexes. Every column sorts from its
+   problem column flexes. The table needs about 756px (840px on phones); narrower, it
+   scrolls sideways in its box. This was chosen over showing the platform under the
+   title. Every column sorts from its
    header: ascending, descending, then back to the order added. Empty values go last
    either way. One sort applies to every pattern and is remembered on this device
-   (`problemSort` in `state/ui.ts`). The Level and Status titles also hold a funnel that
-   opens a menu of values to keep (pick any number; the menu stays open). Each value shows
-   how many rows it would keep, counting what the other filter keeps. Only values the
+   (`problemSort` in `state/ui.ts`). The Platform, Level and Status titles also hold a
+   funnel that opens a menu of values to keep (`FilterMenu`; pick any number; the menu
+   stays open). Each value shows how many rows it would keep, counting what the other
+   filters keep. Only values the
    pattern has are offered. While filtering, the section title shows "Showing x of y" and
    Clear filters. The filters are shared by every
    pattern but kept only until the app is closed (`problemFilters`).

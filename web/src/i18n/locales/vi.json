@@ -340,7 +340,10 @@
     "prev": "Bài trước",
     "prevNamed": "Bài trước: {{name}}",
     "next": "Bài sau",
-    "nextNamed": "Bài sau: {{name}}"
+    "nextNamed": "Bài sau: {{name}}",
+    "colPlatform": "Nền tảng",
+    "filterPlatform": "Lọc theo nền tảng",
+    "platformNone": "Không rõ"
   },
   "attempt": {
     "title": "Ghi lần làm này",

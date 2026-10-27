@@ -353,7 +353,10 @@
     "prev": "Previous problem",
     "prevNamed": "Previous problem: {{name}}",
     "next": "Next problem",
-    "nextNamed": "Next problem: {{name}}"
+    "nextNamed": "Next problem: {{name}}",
+    "colPlatform": "Platform",
+    "filterPlatform": "Filter by platform",
+    "platformNone": "Unknown"
   },
   "attempt": {
     "title": "Log this attempt",

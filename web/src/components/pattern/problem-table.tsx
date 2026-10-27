@@ -22,6 +22,7 @@ import {
 import type { ParseKeys } from "i18next"
 import { useTranslation } from "react-i18next"
 import { LevelBadgeForProblemLevel, OutcomeTag } from "@/components/common/badges"
+import { platformKey, sourceOf } from "@/content/problems"
 import { useNow } from "@/lib/clock"
 import { dueText, formatDate, formatShortDate } from "@/lib/time"
 import { cn } from "@/lib/utils"
@@ -31,8 +32,8 @@ import type { Attempt, Outcome, Problem } from "@/notebook/schema"
 import { href } from "@/state/router"
 import { uiActions, useUiStore } from "@/state/ui"
 
-// A pattern's problem table: its columns, how each one sorts, and the level and status
-// filters. The problem page's previous / next arrows read the same table, so "next" is
+// A pattern's problem table: its columns, how each one sorts, and the platform, level and
+// status filters. The problem page's previous / next arrows read the same table, so "next" is
 // always the row below.
 
 export interface ProblemRow {
@@ -87,6 +88,21 @@ const time = (iso: string | null | undefined) => (iso ? Date.parse(iso) : undefi
 export const levelKey = (level: string) => (level ? level.toLowerCase() : "none")
 export const LEVEL_KEYS = ["easy", "medium", "hard"]
 export const STATUS_KEYS = ["todo", "alone", "hint", "solution"] as const
+
+/** Filter choices in menu order: easy, medium, hard, other levels A-Z, then no level */
+export const orderLevelKeys = (keys: Iterable<string>) => {
+  const present = new Set(keys)
+  const others = [...present].filter((k) => k !== "none" && !LEVEL_KEYS.includes(k)).sort()
+  return [...LEVEL_KEYS, ...others, "none"].filter((k) => present.has(k))
+}
+
+/** Filter choices in menu order: platforms A-Z, then "none" */
+export const orderPlatformKeys = (keys: Iterable<string>) => {
+  const present = [...new Set(keys)]
+  return [...present.filter((k) => k !== "none").sort(collator.compare), "none"].filter((k) =>
+    present.includes(k)
+  )
+}
 
 /**
  * Keeps a row whose key is one of the chosen ones. The key is the column's getUniqueValues,
@@ -157,6 +173,19 @@ export const problemColumns = helper.columns([
     enableColumnFilter: false,
     meta: { label: "problem.colProblem", className: "wrap-break-word" },
     cell: ({ row }) => <TitleCell problem={row.original.problem} />,
+  }),
+  helper.accessor((r) => sourceOf(r.problem.url) || undefined, {
+    id: "platform",
+    sortFn: byText,
+    sortUndefined: "last",
+    getUniqueValues: (r) => [platformKey(r.problem.url)],
+    filterFn: inKeys,
+    meta: {
+      label: "problem.colPlatform",
+      className: "text-13 text-muted-foreground wrap-break-word",
+      width: "w-27 max-md:w-32",
+    },
+    cell: ({ getValue }) => getValue<string | undefined>() ?? "—",
   }),
   helper.accessor((r) => levelRank(r.problem.level), {
     id: "level",

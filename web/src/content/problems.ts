@@ -10,6 +10,9 @@ const SOURCES: Record<string, string> = {
   "cses.fi": "CSES",
   "atcoder.jp": "AtCoder",
   "codeforces.com": "Codeforces",
+  "neetcode.io": "NeetCode",
+  "lintcode.com": "LintCode",
+  "geeksforgeeks.org": "GeeksforGeeks",
 }
 
 /** "LeetCode" for https://leetcode.com/problems/..., the host name for unknown sites */
@@ -21,6 +24,9 @@ export function sourceOf(url: string): string {
     return ""
   }
 }
+
+/** Filter key of a problem's site: its name, or "none" for a link that is not a URL */
+export const platformKey = (url: string) => sourceOf(url) || "none"
 
 type SolutionPageKey = "help.editorial" | "help.solutions" | "help.discussions"
 

@@ -11,22 +11,16 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { INPUT, SELECT } from "@/components/common/editing"
+import { FilterMenu, levelLabel, platformLabel } from "@/components/common/filter-menu"
 import {
-  LEVEL_KEYS,
   STATUS_KEYS,
+  orderLevelKeys,
+  orderPlatformKeys,
   useProblemTable,
   type ProblemColumn,
   type ProblemTable,
 } from "@/components/pattern/problem-table"
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { useContent } from "@/content/context"
 import { cn } from "@/lib/utils"
 import { isHttpUrl, toHref } from "@/notebook/ids"
@@ -149,48 +143,48 @@ const selectedKeys = (column: ProblemColumn) => {
   return Array.isArray(value) ? (value as string[]) : []
 }
 
+const FILTER_NAME = {
+  platform: "problem.filterPlatform",
+  level: "problem.filterLevel",
+  status: "problem.filterStatus",
+} as const
+
 /** A funnel in a column title: a menu of the column's values to keep, with their counts */
 function HeaderFilter({ column, table }: { column: ProblemColumn; table: ProblemTable }) {
   const { t } = useTranslation()
   const selected = selectedKeys(column)
-  // Counts follow the other column's filter; only values this pattern has are offered
+  // Counts follow the other columns' filters; only values this pattern has are offered
   const counts = column.getFacetedUniqueValues()
-  const present = new Set([
+  const present = [
     ...table.getCoreRowModel().rows.flatMap((row) => row.getUniqueValues<string>(column.id)),
     ...selected,
-  ])
-  const options =
+  ]
+  const keys =
     column.id === "status"
-      ? STATUS_KEYS.filter((k) => present.has(k)).map((key) => ({
-          key,
-          label: t(`outcome.${key}`),
-        }))
-      : [
-          ...LEVEL_KEYS,
-          ...[...present].filter((k) => k !== "none" && !LEVEL_KEYS.includes(k)).sort(),
-          "none",
-        ]
-          .filter((k) => present.has(k))
-          .map((key) => ({
-            key,
-            label:
-              key === "none"
-                ? t("problem.levelNone")
-                : LEVEL_KEYS.includes(key)
-                  ? t(`problemLevel.${key}` as "problemLevel.easy")
-                  : key.charAt(0).toUpperCase() + key.slice(1),
-          }))
-  const name = t(column.id === "status" ? "problem.filterStatus" : "problem.filterLevel")
+      ? STATUS_KEYS.filter((k) => present.includes(k))
+      : column.id === "platform"
+        ? orderPlatformKeys(present)
+        : orderLevelKeys(present)
+  const options = keys.map((key) => ({
+    key,
+    label:
+      column.id === "status"
+        ? t(`outcome.${key as (typeof STATUS_KEYS)[number]}`)
+        : column.id === "platform"
+          ? platformLabel(key, t)
+          : levelLabel(key, t),
+    count: counts.get(key) ?? 0,
+  }))
+  const name = t(FILTER_NAME[column.id as keyof typeof FILTER_NAME] ?? "problem.filterLevel")
   const label = selected.length ? t("problem.filterOn", { name, count: selected.length }) : name
-  const toggle = (key: string, on: boolean) =>
-    column.setFilterValue((old: unknown) => {
-      const keys = Array.isArray(old) ? (old as string[]) : []
-      return on ? [...keys, key] : keys.filter((k) => k !== key)
-    })
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+    <FilterMenu
+      options={options}
+      selected={selected}
+      onChange={(next) => column.setFilterValue(next)}
+      clearLabel={t("problem.filterClearColumn")}
+      trigger={
         <button
           type="button"
           aria-label={label}
@@ -205,36 +199,8 @@ function HeaderFilter({ column, table }: { column: ProblemColumn; table: Problem
             aria-hidden
           />
         </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-auto min-w-48">
-        {options.map((option) => {
-          const checked = selected.includes(option.key)
-          const count = counts.get(option.key) ?? 0
-          return (
-            <DropdownMenuCheckboxItem
-              key={option.key}
-              checked={checked}
-              // Stay open: several values can be picked in a row
-              onSelect={(e) => e.preventDefault()}
-              onCheckedChange={(on) => toggle(option.key, on === true)}
-              className={cn("gap-4 text-13", !count && !checked && "text-faint")}
-            >
-              <span className="flex-1">{option.label}</span>
-              <span className="font-mono text-11 text-muted-foreground">{count}</span>
-            </DropdownMenuCheckboxItem>
-          )
-        })}
-        {selected.length > 0 && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-13" onSelect={() => column.setFilterValue([])}>
-              <XIcon />
-              {t("problem.filterClearColumn")}
-            </DropdownMenuItem>
-          </>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      }
+    />
   )
 }
 
@@ -308,7 +274,7 @@ export function ProblemList({ pattern, now }: { pattern: Pattern; now: number })
       {/* relative: the sr-only header cell is absolutely placed and must stay in the scroll box */}
       {table.getCoreRowModel().rows.length > 0 ? (
         <div className="relative overflow-x-auto rounded-md border">
-          <table className="w-full min-w-150 table-fixed text-left text-14 max-md:min-w-180">
+          <table className="w-full min-w-189 table-fixed text-left text-14 max-md:min-w-210">
             <colgroup>
               {table.getAllLeafColumns().map((column) => (
                 <col key={column.id} className={column.columnDef.meta?.width} />

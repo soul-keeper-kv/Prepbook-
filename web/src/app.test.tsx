@@ -220,6 +220,48 @@ describe("App", () => {
     expect(order()).toEqual(["Alpha", "Beta", "Gamma", "Delta"])
   })
 
+  it("sorts and filters the problem table by platform", async () => {
+    const user = userEvent.setup()
+    const pattern = notebookActions.addPattern("t_dsa", null, "Arrays")
+    notebookActions.addProblems([
+      { url: "https://leetcode.com/problems/two-sum/", title: "Two Sum", patternIds: [pattern] },
+      {
+        url: "https://www.hackerrank.com/challenges/pairs/problem",
+        title: "Pairs",
+        patternIds: [pattern],
+      },
+      {
+        url: "https://cses.fi/problemset/task/1068",
+        title: "Weird Algorithm",
+        patternIds: [pattern],
+      },
+      { url: "https://leetcode.com/problems/3sum/", title: "3Sum", patternIds: [pattern] },
+    ])
+    renderApp()
+    await go(`#/pattern/${pattern}`)
+    const table = await screen.findByRole("table")
+    const order = () =>
+      within(table)
+        .getAllByRole("link")
+        .map((link) => link.textContent)
+    expect(within(table).getAllByText("LeetCode")).toHaveLength(2)
+
+    await user.click(within(table).getByRole("button", { name: "Nền tảng" }))
+    expect(order()).toEqual(["Weird Algorithm", "Pairs", "Two Sum", "3Sum"])
+    await user.click(within(table).getByRole("button", { name: "Nền tảng" }))
+    expect(order()).toEqual(["Two Sum", "3Sum", "Pairs", "Weird Algorithm"])
+
+    await user.click(screen.getByRole("button", { name: /^Lọc theo nền tảng/ }))
+    const menu = await screen.findByRole("menu")
+    expect(within(menu).getByRole("menuitemcheckbox", { name: /^LeetCode/ })).toHaveTextContent(
+      /2$/
+    )
+    await user.click(within(menu).getByRole("menuitemcheckbox", { name: /^HackerRank/ }))
+    await user.keyboard("{Escape}")
+    expect(order()).toEqual(["Pairs"])
+    expect(screen.getByText("Hiện 1/4 bài")).toBeInTheDocument()
+  })
+
   it("steps through a pattern's problems, then goes back to the pattern", async () => {
     const user = userEvent.setup()
     const sorting = notebookActions.addPattern("t_dsa", null, "Sorting")

@@ -14,7 +14,7 @@ interface UiState {
   lastPatternId: string | null
   /** Sort of the problem tables, shared by every pattern; empty: the order added */
   problemSort: SortingState
-  /** Level and status filters of the problem tables; kept until the app is closed */
+  /** Platform, level and status filters of the problem tables; kept until the app is closed */
   problemFilters: ColumnFiltersState
 }
 
