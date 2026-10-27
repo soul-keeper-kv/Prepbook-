@@ -1,0 +1,19 @@
+{
+  "id": "java-performance-optimization",
+  "name": { "vi": "Giai đoạn 4 · Performance & Optimization", "en": "Phase 4 · Performance & Optimization" },
+  "items": [
+    {
+      "id": "java-jvm-tuning",
+      "title": { "vi": "JVM tuning, profiling và SLA", "en": "JVM tuning, profiling and SLAs" },
+      "resources": [
+        { "type": "docs", "title": "Java Flight Recorder", "url": "https://docs.oracle.com/en/java/javase/21/docs/api/jdk.jfr/module-summary.html" }
+      ],
+      "notes": { "what": { "vi": ["Đo latency, throughput, allocation rate, CPU profile và memory profile trước khi tối ưu."], "en": ["Measure latency, throughput, allocation rate, CPU profiles and memory profiles before optimizing."] }, "how": { "vi": ["Dùng JFR/JMC và benchmark có warm-up; so sánh trước/sau bằng dữ liệu."], "en": ["Use JFR/JMC and warmed-up benchmarks; compare before and after with data."] }, "when": { "vi": ["Tuning phải phục vụ SLA như p99 latency và giới hạn GC pause."], "en": ["Tuning should serve an SLA such as p99 latency and a GC-pause budget."] }, "pitfalls": { "vi": ["Tối ưu theo cảm giác; benchmark thiếu warm-up hoặc không đại diện production."], "en": ["Optimizing by intuition; using benchmarks without warm-up or production-like workloads."] } }
+    },
+    {
+      "id": "java-object-design-performance",
+      "title": { "vi": "Object design và allocation", "en": "Object design and allocation" },
+      "notes": { "what": { "vi": ["Hiểu chi phí object allocation, boxing, defensive copy, pooling và immutable design."], "en": ["Understand object allocation, boxing, defensive copies, pooling and immutable design costs."] }, "how": { "vi": ["Giảm allocation trong hot path nhưng vẫn ưu tiên code dễ đọc và đo được."], "en": ["Reduce allocation in hot paths while keeping code readable and measurable."] }, "when": { "vi": ["Ưu tiên primitive trong vòng lặp nóng khi profile chứng minh wrapper là bottleneck."], "en": ["Prefer primitives in hot loops when profiling proves wrappers are the bottleneck."] }, "pitfalls": { "vi": ["Pooling mọi thứ; hy sinh correctness để tránh một allocation nhỏ."], "en": ["Pooling everything; sacrificing correctness to avoid a small allocation."] } }
+    }
+  ]
+}

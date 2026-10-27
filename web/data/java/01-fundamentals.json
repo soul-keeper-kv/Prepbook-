@@ -1,0 +1,45 @@
+{
+  "id": "java-fundamentals",
+  "name": { "vi": "Giai đoạn 1 · Java Fundamentals", "en": "Phase 1 · Java Fundamentals" },
+  "items": [
+    {
+      "id": "java-platform-jdk-jre-jvm",
+      "title": { "vi": "JDK, JRE và JVM", "en": "JDK, JRE and JVM" },
+      "resources": [
+        { "type": "docs", "title": "Java Platform, Standard Edition Documentation", "url": "https://docs.oracle.com/en/java/javase/21/" }
+      ],
+      "notes": {
+        "what": { "vi": ["JDK chứa công cụ phát triển; JRE cung cấp runtime; JVM thực thi bytecode.", "Luồng chạy: `.java` → `javac` → `.class` → JVM → machine code."], "en": ["The JDK contains development tools; the JRE provides the runtime; the JVM executes bytecode.", "Flow: `.java` → `javac` → `.class` → JVM → machine code."] },
+        "how": { "vi": ["Cài Java 21 LTS và kiểm tra bằng `java -version` và `javac -version`."], "en": ["Install Java 21 LTS and verify with `java -version` and `javac -version`."] },
+        "when": { "vi": ["Dùng kiến thức này khi debug khác biệt giữa môi trường build và môi trường chạy."], "en": ["Use this when diagnosing differences between the build and runtime environments."] },
+        "pitfalls": { "vi": ["Nhầm JDK với JVM; chạy sai phiên bản Java giữa local, CI và production."], "en": ["Confusing the JDK with the JVM; using different Java versions locally, in CI and in production."] }
+      }
+    },
+    {
+      "id": "java-language-basics",
+      "title": { "vi": "Syntax, kiểu dữ liệu và OOP", "en": "Syntax, types and OOP" },
+      "resources": [
+        { "type": "docs", "title": "The Java Language Specification", "url": "https://docs.oracle.com/javase/specs/jls/se21/html/index.html" }
+      ],
+      "notes": {
+        "what": { "vi": ["Ôn primitive/reference types, casting, class, interface, inheritance, encapsulation và polymorphism."], "en": ["Review primitive/reference types, casting, classes, interfaces, inheritance, encapsulation and polymorphism."] },
+        "how": { "vi": ["Viết một model nhỏ có immutable value object, interface và unit test cho hành vi chính."], "en": ["Build a small model with an immutable value object, an interface and unit tests for its core behavior."] },
+        "when": { "vi": ["Dùng composition thay inheritance khi quan hệ không thật sự là is-a."], "en": ["Prefer composition over inheritance when the relationship is not truly is-a."] },
+        "pitfalls": { "vi": ["So sánh String bằng `==`; mutable field public; bỏ qua nullability và contract của `equals/hashCode`."], "en": ["Comparing strings with `==`; exposing mutable fields; ignoring nullability and the `equals/hashCode` contract."] }
+      }
+    },
+    {
+      "id": "java-collections-generics",
+      "title": { "vi": "Collections và Generics", "en": "Collections and Generics" },
+      "resources": [
+        { "type": "docs", "title": "Java Collections Framework", "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/package-summary.html" }
+      ],
+      "notes": {
+        "what": { "vi": ["Nắm List, Set, Map, Queue; hiểu complexity và trade-off của ArrayList, HashMap, TreeMap, HashSet."], "en": ["Know List, Set, Map and Queue; understand the complexity and trade-offs of ArrayList, HashMap, TreeMap and HashSet."] },
+        "how": { "vi": ["Chọn collection theo thao tác chính, kích thước dữ liệu và yêu cầu ordering."], "en": ["Choose a collection based on dominant operations, data size and ordering requirements."] },
+        "when": { "vi": ["Dùng generic để giữ type-safety và giảm cast ở runtime."], "en": ["Use generics for type safety and fewer runtime casts."] },
+        "pitfalls": { "vi": ["Dùng HashMap khi cần thứ tự; sửa collection trong lúc đang iterate; dùng raw type."], "en": ["Using HashMap when ordering matters; mutating while iterating; using raw types."] }
+      }
+    }
+  ]
+}

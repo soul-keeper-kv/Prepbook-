@@ -1,0 +1,27 @@
+{
+  "id": "java-concurrency",
+  "name": { "vi": "Giai đoạn 3 · Concurrency", "en": "Phase 3 · Concurrency" },
+  "items": [
+    {
+      "id": "java-thread-synchronization",
+      "title": { "vi": "Thread, synchronized và Lock", "en": "Threads, synchronized and Lock" },
+      "resources": [
+        { "type": "docs", "title": "Java Concurrency Utilities", "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/package-summary.html" }
+      ],
+      "notes": { "what": { "vi": ["Hiểu lifecycle, context switching, monitor, synchronized, ReentrantLock, ReadWriteLock và StampedLock."], "en": ["Understand lifecycle, context switching, monitors, synchronized, ReentrantLock, ReadWriteLock and StampedLock."] }, "how": { "vi": ["Viết lab race condition, deadlock và benchmark synchronized so với Lock."], "en": ["Write labs for a race condition, deadlock and a synchronized-versus-Lock benchmark."] }, "when": { "vi": ["Giữ vùng critical section ngắn và có thứ tự lock nhất quán."], "en": ["Keep critical sections short and acquire locks in a consistent order."] }, "pitfalls": { "vi": ["Lock mà không unlock trong finally; giữ lock khi gọi code bên ngoài."], "en": ["Locking without unlocking in finally; holding a lock while calling external code."] } }
+    },
+    {
+      "id": "java-executors-futures",
+      "title": { "vi": "Thread pool, Future và CompletableFuture", "en": "Thread pools, Future and CompletableFuture" },
+      "resources": [
+        { "type": "docs", "title": "ExecutorService API", "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ExecutorService.html" }
+      ],
+      "notes": { "what": { "vi": ["Nắm ThreadPoolExecutor, queue, rejection policy, Future, CompletableFuture và ForkJoinPool."], "en": ["Know ThreadPoolExecutor, queues, rejection policies, Future, CompletableFuture and ForkJoinPool."] }, "how": { "vi": ["Chọn pool theo loại workload, giới hạn queue và shutdown graceful."], "en": ["Choose a pool by workload, bound the queue and implement graceful shutdown."] }, "when": { "vi": ["Dùng CompletableFuture cho pipeline bất đồng bộ có timeout và xử lý lỗi rõ ràng."], "en": ["Use CompletableFuture for asynchronous pipelines with explicit timeouts and error handling."] }, "pitfalls": { "vi": ["Tạo unbounded pool/queue; quên shutdown; block trong common pool."], "en": ["Creating unbounded pools/queues; forgetting shutdown; blocking the common pool."] } }
+    },
+    {
+      "id": "java-concurrent-collections",
+      "title": { "vi": "Concurrent collections", "en": "Concurrent collections" },
+      "notes": { "what": { "vi": ["So sánh ConcurrentHashMap, CopyOnWriteArrayList và BlockingQueue với collection thường."], "en": ["Compare ConcurrentHashMap, CopyOnWriteArrayList and BlockingQueue with ordinary collections."] }, "how": { "vi": ["Chọn theo tỷ lệ read/write và pattern producer-consumer."], "en": ["Choose based on the read/write ratio and producer-consumer pattern."] }, "when": { "vi": ["Dùng BlockingQueue để truyền dữ liệu giữa producer và worker an toàn."], "en": ["Use BlockingQueue to safely pass data between producers and workers."] }, "pitfalls": { "vi": ["Concurrent collection không biến một chuỗi nhiều thao tác thành atomic."], "en": ["A concurrent collection does not make a multi-step sequence atomic."] } }
+    }
+  ]
+}

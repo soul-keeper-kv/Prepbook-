@@ -1,0 +1,27 @@
+{
+  "id": "java-advanced-core",
+  "name": { "vi": "Giai đoạn 5 · Advanced Java Core", "en": "Phase 5 · Advanced Java Core" },
+  "items": [
+    {
+      "id": "java-memory-model",
+      "title": { "vi": "Java Memory Model và happens-before", "en": "Java Memory Model and happens-before" },
+      "resources": [
+        { "type": "docs", "title": "Java Language Specification · Threads and Locks", "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-17.html" }
+      ],
+      "notes": { "what": { "vi": ["JMM giải quyết visibility, ordering và atomicity; happens-before tạo guarantee giữa các thread."], "en": ["The JMM addresses visibility, ordering and atomicity; happens-before creates guarantees between threads."] }, "how": { "vi": ["Phân tích volatile, monitor lock, start/join và vì sao `count++` không atomic."], "en": ["Analyze volatile, monitor locks, start/join and why `count++` is not atomic."] }, "when": { "vi": ["Dùng volatile cho state flag; dùng lock hoặc atomic class cho read-modify-write."], "en": ["Use volatile for state flags; use locks or atomic classes for read-modify-write."] }, "pitfalls": { "vi": ["Nghĩ volatile thay thế synchronized; dựa vào thứ tự chạy quan sát được trong một lần test."], "en": ["Assuming volatile replaces synchronized; relying on an observed order from one test run."] } }
+    },
+    {
+      "id": "java-false-sharing",
+      "title": { "vi": "False sharing và cache line", "en": "False sharing and cache lines" },
+      "notes": { "what": { "vi": ["Hai biến độc lập cùng cache line vẫn có thể gây invalidation giữa các core."], "en": ["Independent variables on one cache line can still cause cross-core invalidation."] }, "how": { "vi": ["Chỉ padding hoặc `@Contended` sau khi profiling chứng minh false sharing."], "en": ["Use padding or `@Contended` only after profiling proves false sharing."] }, "when": { "vi": ["Cân nhắc trong counter/queue hiệu năng rất cao."], "en": ["Consider it for very high-throughput counters or queues."] }, "pitfalls": { "vi": ["Tối ưu cache quá sớm và làm code phức tạp khi bottleneck nằm ở nơi khác."], "en": ["Optimizing cache too early and complicating code when the bottleneck is elsewhere."] } }
+    },
+    {
+      "id": "java-nio-and-proxies",
+      "title": { "vi": "NIO, Reflection và Dynamic Proxy", "en": "NIO, Reflection and Dynamic Proxy" },
+      "resources": [
+        { "type": "docs", "title": "Java NIO API", "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/package-summary.html" }
+      ],
+      "notes": { "what": { "vi": ["Phân biệt blocking/non-blocking, selector, async I/O; hiểu reflection và proxy ở mức runtime."], "en": ["Distinguish blocking/non-blocking, selectors and async I/O; understand reflection and proxies at runtime."] }, "how": { "vi": ["Viết một TCP demo nhỏ với NIO và quan sát selector events."], "en": ["Build a small TCP demo with NIO and observe selector events."] }, "when": { "vi": ["Dùng NIO khi cần phục vụ nhiều connection với ít thread và workload phù hợp."], "en": ["Use NIO when many connections must be served with few threads and a suitable workload."] }, "pitfalls": { "vi": ["Nghĩ non-blocking luôn nhanh hơn; quên xử lý partial read/write."], "en": ["Assuming non-blocking is always faster; forgetting partial reads/writes."] } }
+    }
+  ]
+}

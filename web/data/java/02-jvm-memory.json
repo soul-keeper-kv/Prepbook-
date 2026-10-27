@@ -1,0 +1,22 @@
+{
+  "id": "java-jvm-memory",
+  "name": { "vi": "Giai đoạn 2 · JVM & Memory", "en": "Phase 2 · JVM & Memory" },
+  "items": [
+    {
+      "id": "java-jvm-runtime-data-area",
+      "title": { "vi": "JVM architecture và Runtime Data Areas", "en": "JVM architecture and Runtime Data Areas" },
+      "resources": [
+        { "type": "docs", "title": "Java Virtual Machine Specification", "url": "https://docs.oracle.com/javase/specs/jvms/se21/html/index.html" }
+      ],
+      "notes": { "what": { "vi": ["Hiểu class loader, heap, thread stack, metaspace, PC register, native stack và execution engine."], "en": ["Understand the class loader, heap, thread stacks, metaspace, PC register, native stack and execution engine."] }, "how": { "vi": ["Dùng `jcmd`, `jmap` và thread dump để quan sát process Java."], "en": ["Use `jcmd`, `jmap` and thread dumps to inspect a Java process."] }, "when": { "vi": ["Dùng khi phân tích OOM, stack overflow hoặc class loading issue."], "en": ["Use this when analyzing OOM, stack overflow or class-loading issues."] }, "pitfalls": { "vi": ["Đồng nhất heap với toàn bộ memory của process; bỏ qua native memory và metaspace."], "en": ["Treating the heap as all process memory; ignoring native memory and metaspace."] } }
+    },
+    {
+      "id": "java-garbage-collection",
+      "title": { "vi": "Garbage Collection và đọc GC log", "en": "Garbage Collection and GC logs" },
+      "resources": [
+        { "type": "docs", "title": "Garbage-First Garbage Collector Tuning", "url": "https://docs.oracle.com/en/java/javase/21/gctuning/garbage-first-garbage-collector.html" }
+      ],
+      "notes": { "what": { "vi": ["Theo dõi Eden, Survivor, Old Gen, pause time, allocation rate và promotion."], "en": ["Track Eden, Survivor, Old Gen, pause time, allocation rate and promotion."] }, "how": { "vi": ["Đọc GC log để tìm Full GC, allocation pressure và pause ảnh hưởng SLA."], "en": ["Read GC logs to find Full GC, allocation pressure and pauses affecting the SLA."] }, "when": { "vi": ["Tối ưu allocation trước khi tăng heap một cách mù quáng."], "en": ["Optimize allocation before blindly increasing the heap."] }, "pitfalls": { "vi": ["Gọi `System.gc()` trong production; kết luận chỉ từ một lần GC pause."], "en": ["Calling `System.gc()` in production; drawing conclusions from one GC pause."] } }
+    }
+  ]
+}
