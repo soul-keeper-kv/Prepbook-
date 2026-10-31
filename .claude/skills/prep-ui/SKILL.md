@@ -304,7 +304,8 @@ Type and shape:
   `web/src/i18n/locales/vi.json` and `en.json` (a test checks the key sets match).
 - Vietnamese is the default language.
 - Technical terms stay in English inside Vietnamese copy (Sliding Window, Index,
-  Medium).
+  Medium, brute force, dry run, edge case). The term list, for UI copy and data/ alike,
+  is in `web/data/README.md` ("Viết tiếng Việt: thuật ngữ giữ tiếng Anh").
 - **User-written content is single-language:** notes, titles and links are stored as
   typed, never as `{ vi, en }`.
 - **Tone:** short and concrete. Say what will happen ("Redo after 3 days"), not generic

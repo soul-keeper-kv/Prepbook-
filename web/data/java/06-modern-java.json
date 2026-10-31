@@ -1,0 +1,75 @@
+{
+  "id": "java-modern-language",
+  "name": { "vi": "Giai đoạn 6 · Java hiện đại", "en": "Phase 6 · Modern Java" },
+  "items": [
+    {
+      "id": "java-record-classes",
+      "title": { "vi": "Record và mô hình dữ liệu bất biến", "en": "Records and immutable data models" },
+      "resources": [
+        { "type": "docs", "title": "Record Classes (Java SE 21)", "url": "https://docs.oracle.com/en/java/javase/21/language/records.html" },
+        { "type": "docs", "title": "Record API (Java SE 21)", "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Record.html" }
+      ],
+      "notes": {
+        "what": { "vi": ["Record là lớp mang dữ liệu với constructor, accessor, equals, hashCode và toString được tạo theo component.", "Record chỉ bất biến nông: tham chiếu component là final nhưng object mutable bên trong vẫn có thể thay đổi."], "en": ["A record is a data carrier whose constructor, accessors, equals, hashCode and toString are derived from its components.", "Records are shallowly immutable: component references are final, but referenced mutable objects can still change."] },
+        "how": { "vi": ["Dùng record cho DTO hoặc value object; thêm compact constructor để kiểm tra và chuẩn hóa dữ liệu đầu vào."], "en": ["Use records for DTOs or value objects; add a compact constructor to validate and normalize input."] },
+        "when": { "vi": ["Chọn class thông thường nếu cần kế thừa class khác, trạng thái mutable hoặc kiểm soát lifecycle phức tạp."], "en": ["Choose a regular class when you need to extend another class, hold mutable state or control a complex lifecycle."] },
+        "pitfalls": { "vi": ["Cho rằng record tự làm sâu mọi dữ liệu thành immutable; bỏ qua việc sao chép collection mutable khi cần bảo vệ dữ liệu."], "en": ["Assuming a record makes all nested data deeply immutable; failing to defensively copy mutable collections when required."] }
+      }
+    },
+    {
+      "id": "java-sealed-types",
+      "title": { "vi": "Sealed classes và sealed interfaces", "en": "Sealed classes and interfaces" },
+      "resources": [
+        { "type": "docs", "title": "Sealed Classes (Java SE 21)", "url": "https://docs.oracle.com/en/java/javase/21/language/sealed-classes-and-interfaces.html" }
+      ],
+      "notes": {
+        "what": { "vi": ["Sealed type giới hạn tập lớp được phép extends hoặc implements bằng permits; nhánh con phải khai báo final, sealed hoặc non-sealed."], "en": ["A sealed type restricts which classes may extend or implement it with permits; each direct subtype must be final, sealed or non-sealed."] },
+        "how": { "vi": ["Mô hình hóa tập biến thể hữu hạn như trạng thái đơn hàng hoặc kết quả nghiệp vụ; đặt các kiểu liên quan gần nhau."], "en": ["Model a finite set of variants, such as order states or domain outcomes, and keep related types together."] },
+        "when": { "vi": ["Dùng khi muốn compiler biết đầy đủ các biến thể để kiểm tra switch và biểu diễn domain rõ ràng."], "en": ["Use sealed types when you want the compiler to know all variants for exhaustive switches and clear domain modeling."] },
+        "pitfalls": { "vi": ["Dùng sealed cho hierarchy cần mở rộng tùy ý bởi plugin hoặc module độc lập; không đồng bộ permits với kiểu con."], "en": ["Using sealed hierarchies that must be freely extended by plugins or independent modules; failing to keep permits and subtypes consistent."] }
+      }
+    },
+    {
+      "id": "java-pattern-matching",
+      "title": { "vi": "Pattern matching với instanceof, switch và record", "en": "Pattern matching with instanceof, switch and records" },
+      "resources": [
+        { "type": "docs", "title": "Pattern Matching (Java SE 21)", "url": "https://docs.oracle.com/en/java/javase/21/language/pattern-matching.html" },
+        { "type": "docs", "title": "Pattern Matching for switch (Java SE 21)", "url": "https://docs.oracle.com/en/java/javase/21/language/pattern-matching-switch.html" }
+      ],
+      "notes": {
+        "what": { "vi": ["Pattern matching kết hợp kiểm tra kiểu với trích xuất giá trị; Java 21 hỗ trợ record patterns và pattern matching for switch."], "en": ["Pattern matching combines type checks with value extraction; Java 21 includes record patterns and pattern matching for switch."] },
+        "how": { "vi": ["Kết hợp sealed hierarchy, record pattern và switch expression để xử lý từng biến thể; dùng guard when cho điều kiện bổ sung."], "en": ["Combine sealed hierarchies, record patterns and switch expressions to handle each variant; use a when guard for extra conditions."] },
+        "when": { "vi": ["Dùng khi nhánh xử lý phụ thuộc kiểu hoặc cấu trúc dữ liệu và muốn compiler kiểm tra tính đầy đủ."], "en": ["Use it when branching depends on a value's type or structure and you want the compiler to check exhaustiveness."] },
+        "pitfalls": { "vi": ["Sắp xếp nhánh tổng quát trước nhánh cụ thể gây nhánh sau không thể tới; quên rằng hierarchy thay đổi có thể ảnh hưởng switch đã biên dịch."], "en": ["Putting a broad pattern before a more specific one can make the latter unreachable; changing a hierarchy can affect previously compiled switches."] }
+      }
+    },
+    {
+      "id": "java-text-blocks-switch-expressions",
+      "title": { "vi": "Text blocks và switch expressions", "en": "Text blocks and switch expressions" },
+      "resources": [
+        { "type": "docs", "title": "Java Language Updates (Java SE 21)", "url": "https://docs.oracle.com/en/java/javase/21/language/" },
+        { "type": "docs", "title": "Java Language Changes Summary (Java SE 21)", "url": "https://docs.oracle.com/en/java/javase/21/language/java-language-changes-summary.html" }
+      ],
+      "notes": {
+        "what": { "vi": ["Text block là literal nhiều dòng với quy tắc xử lý indentation; switch expression trả về giá trị và dùng yield trong block khi cần."], "en": ["A text block is a multiline literal with defined indentation processing; a switch expression returns a value and uses yield in a block when needed."] },
+        "how": { "vi": ["Dùng text block cho JSON, SQL hoặc nội dung nhiều dòng; dùng switch expression cho phép ánh xạ rõ ràng giữa giá trị và kết quả."], "en": ["Use text blocks for JSON, SQL or multiline content; use switch expressions for clear value-to-result mappings."] },
+        "when": { "vi": ["Áp dụng để giảm nối chuỗi và tránh switch statement dễ thiếu break hoặc gán biến ở nhiều nhánh."], "en": ["Use them to reduce string concatenation and avoid switch statements with missing breaks or scattered assignments."] },
+        "pitfalls": { "vi": ["Không kiểm tra indentation thực tế của text block; nhầm switch expression với cú pháp switch cũ hoặc bỏ sót nhánh enum."], "en": ["Not checking a text block's resulting indentation; confusing switch expressions with legacy switch syntax or missing an enum case."] }
+      }
+    },
+    {
+      "id": "java-virtual-threads",
+      "title": { "vi": "Virtual threads và xử lý nhiều tác vụ I/O", "en": "Virtual threads and high-volume I/O" },
+      "resources": [
+        { "type": "docs", "title": "Virtual Threads (Java SE 21)", "url": "https://docs.oracle.com/en/java/javase/21/core/virtual-threads.html" },
+        { "type": "docs", "title": "JEP 444: Virtual Threads", "url": "https://openjdk.org/jeps/444" }
+      ],
+      "notes": {
+        "what": { "vi": ["Virtual thread là thread nhẹ do runtime quản lý, giúp mô hình một task mỗi thread mở rộng tốt cho workload thường xuyên chờ I/O.", "Virtual thread vẫn là Thread; chúng không làm tác vụ CPU-bound chạy nhanh hơn."], "en": ["A virtual thread is a lightweight runtime-managed thread that helps a thread-per-task model scale for workloads that frequently wait on I/O.", "Virtual threads are still threads; they do not make CPU-bound work run faster."] },
+        "how": { "vi": ["Dùng Executors.newVirtualThreadPerTaskExecutor cho task độc lập; quản lý giới hạn dịch vụ ngoài bằng semaphore hoặc connection pool."], "en": ["Use Executors.newVirtualThreadPerTaskExecutor for independent tasks; control external service limits with semaphores or connection pools."] },
+        "when": { "vi": ["Phù hợp server có nhiều request đồng thời và phần lớn thời gian chờ database, HTTP hoặc filesystem."], "en": ["They fit servers with many concurrent requests that spend most of their time waiting on databases, HTTP or filesystems."] },
+        "pitfalls": { "vi": ["Không tạo pool virtual thread để giới hạn concurrency; không bỏ qua giới hạn kết nối, rate limit và pinning khi blocking trong synchronized."], "en": ["Do not pool virtual threads to limit concurrency; still account for connection limits, rate limits and pinning when blocking inside synchronized code."] }
+      }
+    }
+  ]
+}

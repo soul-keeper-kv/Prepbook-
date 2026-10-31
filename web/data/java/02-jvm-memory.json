@@ -1,22 +1,298 @@
 {
   "id": "java-jvm-memory",
-  "name": { "vi": "Giai đoạn 2 · JVM & Memory", "en": "Phase 2 · JVM & Memory" },
+  "name": { "vi": "Giai đoạn 2 · JVM và bộ nhớ", "en": "Phase 2 · JVM and Memory" },
   "items": [
     {
       "id": "java-jvm-runtime-data-area",
-      "title": { "vi": "JVM architecture và Runtime Data Areas", "en": "JVM architecture and Runtime Data Areas" },
+      "title": { "vi": "JVM chạy chương trình như thế nào?", "en": "How the JVM runs a program" },
       "resources": [
-        { "type": "docs", "title": "Java Virtual Machine Specification", "url": "https://docs.oracle.com/javase/specs/jvms/se21/html/index.html" }
+        { "type": "docs", "title": "Java Virtual Machine Specification · Java SE 21", "url": "https://docs.oracle.com/javase/specs/jvms/se21/html/index.html" },
+        { "type": "docs", "title": "Class Loading, Linking, and Initialization", "url": "https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-5.html" }
       ],
-      "notes": { "what": { "vi": ["Hiểu class loader, heap, thread stack, metaspace, PC register, native stack và execution engine."], "en": ["Understand the class loader, heap, thread stacks, metaspace, PC register, native stack and execution engine."] }, "how": { "vi": ["Dùng `jcmd`, `jmap` và thread dump để quan sát process Java."], "en": ["Use `jcmd`, `jmap` and thread dumps to inspect a Java process."] }, "when": { "vi": ["Dùng khi phân tích OOM, stack overflow hoặc class loading issue."], "en": ["Use this when analyzing OOM, stack overflow or class-loading issues."] }, "pitfalls": { "vi": ["Đồng nhất heap với toàn bộ memory của process; bỏ qua native memory và metaspace."], "en": ["Treating the heap as all process memory; ignoring native memory and metaspace."] } }
+      "notes": {
+        "what": {
+          "vi": [
+            "**Bức tranh tổng thể:** `javac Hello.java` biên dịch mã nguồn thành bytecode trong `Hello.class`. Khi chạy `java Hello`, JVM tìm class, kiểm tra bytecode, liên kết các class cần thiết, khởi tạo chúng rồi thực thi bytecode bằng interpreter và/hoặc JIT compiler. Bytecode không phải mã máy của một CPU cụ thể.",
+            "**Class loader** chịu trách nhiệm tìm và nạp định nghĩa class. Ba loader thường gặp trong Java hiện đại là bootstrap (các class nền tảng như `java.lang.String`), platform (các API nền tảng bổ sung) và application/system (classpath hoặc module path của ứng dụng). Class loader có thể ủy quyền lên loader cha trước (*parent delegation*), giúp lớp lõi được nạp nhất quán và hạn chế ứng dụng giả mạo `java.lang.String`.",
+            "Một class được nạp theo các bước dễ hình dung: **loading** đọc bytecode và tạo đối tượng `Class`; **linking** gồm verification (kiểm tra cấu trúc/bytecode), preparation (cấp vùng lưu static và giá trị mặc định), resolution (đổi tham chiếu symbolic thành tham chiếu trực tiếp khi cần); **initialization** chạy initializer static và khối `static {}` theo thứ tự.",
+            "**Ví dụ đời thực:** web app có plugin hoặc hot-reload có thể nạp cùng tên `com.example.Plugin` bằng hai class loader. JVM xem chúng là hai kiểu khác nhau vì danh tính kiểu là *tên class + class loader định nghĩa nó*. Ép kiểu giữa hai class ấy có thể lỗi `ClassCastException` dù tên in ra giống nhau.",
+            "**Ví dụ quan sát class loader:** `System.out.println(String.class.getClassLoader())` thường in `null` vì bootstrap loader được biểu diễn như vậy; `System.out.println(MyService.class.getClassLoader())` thường hiện application class loader. `MyService.class.getProtectionDomain().getCodeSource()` giúp xem class được nạp từ vị trí nào.",
+            "**JIT và chạy lần đầu:** JVM có thể thông dịch trước, thu thập thông tin về đường chạy nóng rồi biên dịch một số method thành mã máy tối ưu. Vì vậy lần gọi đầu thường chậm hơn; benchmark cần warm-up và đo nhiều lần, không kết luận hiệu năng chỉ từ một lần chạy."
+          ],
+          "en": [
+            "`javac` turns source into platform-independent bytecode. The JVM loads, verifies, links and initializes classes, then executes bytecode with an interpreter and may compile hot code with the JIT.",
+            "A class is identified by both its binary name and its defining class loader. Two loaders can define distinct types with the same name, which matters in plugin and hot-reload systems.",
+            "Inspect a loader with `SomeClass.class.getClassLoader()` and its origin with `getProtectionDomain().getCodeSource()`. Bootstrap-loaded classes commonly return `null` for their loader."
+          ]
+        },
+        "how": {
+          "vi": [
+            "**Tự thử:** tạo `Hello.java`, biên dịch bằng `javac Hello.java`, xem bytecode với `javap -c Hello`, rồi chạy `java Hello`. Trong kết quả `javap`, nhận ra các lệnh bytecode như `getstatic`, `ldc` và `invokevirtual`.",
+            "**Xem log nạp class:** chạy `java -Xlog:class+load=info Hello`. Log cho biết class nào được nạp và nguồn của nó. Nếu app không tìm thấy class, kiểm tra classpath/module path và nguồn nạp; đừng vội kết luận lỗi bộ nhớ.",
+            "**Quy tắc static:** class được khởi tạo khi có một số thao tác chủ động như tạo instance, gọi static method hoặc đọc static field không phải constant compile-time. Khai báo `static final int LIMIT = 10` có thể được nhúng vào nơi sử dụng; nó không nhất thiết kích hoạt khởi tạo class chứa field.",
+            "**Ví dụ thứ tự khởi tạo:** `class Config { static { System.out.println(\"init\"); } }`; chỉ viết `Config.class` lấy literal class không giống với gọi `Config.load()` hoặc `new Config()`. Tạo chương trình nhỏ ghi log trong static block để quan sát thời điểm initializer chạy."
+          ],
+          "en": [
+            "Compile a small class, inspect it with `javap -c Hello`, and run `java -Xlog:class+load=info Hello` to see class-loading sources.",
+            "Initialization is triggered by active uses such as constructing an instance or invoking a static method. A class literal alone does not have the same effect."
+          ]
+        },
+        "when": {
+          "vi": [
+            "Dùng mô hình class loading khi xử lý `ClassNotFoundException`, `NoClassDefFoundError`, `ClassCastException` khó hiểu, xung đột thư viện, plugin hoặc ứng dụng server chạy lâu.",
+            "Phân biệt lỗi: `ClassNotFoundException` thường là code chủ động tìm class nhưng không tìm được; `NoClassDefFoundError` thường là JVM không thể dùng class cần thiết lúc chạy (có thể thiếu file hoặc class trước đó khởi tạo thất bại). Đọc nguyên nhân gốc ở log trước đó.",
+            "Dùng `-Xlog:class+load=info` khi cần xác nhận class đến từ JAR/version nào; dùng `-Xlog:class+unload=info` để điều tra class unload trong app có class loader dùng một lần."
+          ],
+          "en": [
+            "Use class-loading knowledge to investigate missing classes, class-cast surprises, dependency conflicts, plugins and application-server deployments.",
+            "Enable `-Xlog:class+load=info` to confirm which JAR supplied a class; inspect earlier logs when a `NoClassDefFoundError` follows a failed initialization."
+          ]
+        },
+        "pitfalls": {
+          "vi": [
+            "Nghĩ rằng class loader chỉ tìm file: nó còn định nghĩa danh tính kiểu và ảnh hưởng khả năng unload class. Class loader bị giữ lại bởi thread, `ThreadLocal`, static cache hoặc logger có thể làm class và metaspace không được giải phóng.",
+            "Nhầm `ClassNotFoundException` với `NoClassDefFoundError`; lỗi thứ hai đôi khi là hậu quả sau một exception trong static initializer (`ExceptionInInitializerError`). Tìm exception đầu tiên trong log.",
+            "Cho rằng mọi class đều do application loader nạp hoặc bootstrap loader là một object Java bình thường. Bootstrap loader thường được API biểu diễn bằng `null`.",
+            "Đưa classpath vào chẩn đoán mọi lỗi: class đã được nạp nhưng static initialization lỗi, linkage không tương thích hoặc hai loader khác nhau cũng có thể là nguyên nhân."
+          ],
+          "en": [
+            "A class loader defines type identity and affects class unloading; retained threads, ThreadLocals or static caches can keep a loader alive.",
+            "Distinguish `ClassNotFoundException` from `NoClassDefFoundError` and inspect the first initialization exception in the logs."
+          ]
+        }
+      }
     },
     {
-      "id": "java-garbage-collection",
-      "title": { "vi": "Garbage Collection và đọc GC log", "en": "Garbage Collection and GC logs" },
+      "id": "java-jvm-memory-areas",
+      "title": { "vi": "Heap, thread stack, PC register và native memory", "en": "Heap, thread stacks, PC registers and native memory" },
       "resources": [
-        { "type": "docs", "title": "Garbage-First Garbage Collector Tuning", "url": "https://docs.oracle.com/en/java/javase/21/gctuning/garbage-first-garbage-collector.html" }
+        { "type": "docs", "title": "JVM Runtime Data Areas · JVMS 2.5", "url": "https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-2.html#jvms-2.5" },
+        { "type": "docs", "title": "Java Thread API", "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Thread.html" }
       ],
-      "notes": { "what": { "vi": ["Theo dõi Eden, Survivor, Old Gen, pause time, allocation rate và promotion."], "en": ["Track Eden, Survivor, Old Gen, pause time, allocation rate and promotion."] }, "how": { "vi": ["Đọc GC log để tìm Full GC, allocation pressure và pause ảnh hưởng SLA."], "en": ["Read GC logs to find Full GC, allocation pressure and pauses affecting the SLA."] }, "when": { "vi": ["Tối ưu allocation trước khi tăng heap một cách mù quáng."], "en": ["Optimize allocation before blindly increasing the heap."] }, "pitfalls": { "vi": ["Gọi `System.gc()` trong production; kết luận chỉ từ một lần GC pause."], "en": ["Calling `System.gc()` in production; drawing conclusions from one GC pause."] } }
+      "notes": {
+        "what": {
+          "vi": [
+            "**Heap** là vùng runtime dùng cấp phát object và array; các thread chia sẻ heap. Ví dụ `new Customer(42)` tạo object trên heap, nhưng biến local `customer` trong method là một slot trong frame của thread đang chạy method đó.",
+            "**Thread stack** có stack frame riêng cho mỗi thread. Mỗi lần gọi method tạo frame chứa local variables, operand stack và thông tin để tiếp tục sau khi method trả về. Gọi method lồng nhau làm nhiều frame cùng tồn tại; trả về thì frame được bỏ. Giá trị primitive local nằm trực tiếp trong frame; local kiểu reference giữ tham chiếu đến object, object thường nằm trên heap.",
+            "**Ví dụ phân biệt stack và heap:** `void run() { int count = 3; Person p = new Person(); }` — `count` và slot tham chiếu `p` thuộc frame của `run`; object `Person` được cấp phát trên heap. Khi method kết thúc, frame biến mất; object chỉ được GC thu hồi khi không còn đường tham chiếu sống nào tới nó.",
+            "**PC register** (program counter) là trạng thái riêng của từng thread để theo dõi vị trí bytecode đang thực thi. Thread chạy native method có thể không có giá trị PC bytecode thông thường. Đây là chi tiết hữu ích để hiểu thread dump, không phải nơi ứng dụng thường đọc/ghi.",
+            "**Native method stack** hỗ trợ thực thi native code (ví dụ JNI). Ngoài heap còn có native memory cho thread stack, JIT code cache, direct buffer, thư viện native và cấu trúc runtime. Vì thế RAM process có thể lớn hơn `-Xmx` rất nhiều.",
+            "**StackOverflowError** thường do đệ quy không có điểm dừng hoặc call chain quá sâu. **OutOfMemoryError: Java heap space** nghĩa là không cấp phát được object trong heap; **unable to create native thread** có thể do giới hạn OS/RAM/native stack chứ không phải heap đầy."
+          ],
+          "en": [
+            "The heap is shared and holds objects and arrays. Each thread has its own stack of method frames containing local slots, an operand stack and return state.",
+            "A local reference is in a frame while its referenced object is usually on the heap. A method return removes its frame; the object remains until it is unreachable and collected.",
+            "Process memory also includes thread stacks, JIT code cache, direct buffers and native libraries, so RSS can greatly exceed `-Xmx`."
+          ]
+        },
+        "how": {
+          "vi": [
+            "**Thử StackOverflowError có kiểm soát:** chạy riêng đoạn sau và dừng tiến trình nếu cần: `static void recurse() { recurse(); }` rồi gọi `recurse()`. JVM thường in stack trace lặp lại method. Không chạy trong service đang dùng thật.",
+            "**Thấy frame trong thread dump:** tạo thread đang chờ `Thread.sleep(60_000)` hoặc `CountDownLatch.await()`, chạy `jcmd <pid> Thread.print` (hoặc `jstack <pid>`), tìm tên thread và chuỗi method. Mỗi dòng stack tương ứng call chain; state `WAITING`/`TIMED_WAITING` giải thích thread đang chờ, không tự nó chứng minh deadlock.",
+            "**Ví dụ object còn sống:** `static List<byte[]> cache = new ArrayList<>(); cache.add(new byte[1024 * 1024]);` giữ mảng qua static root; kết thúc method thêm mảng không làm nó thu hồi. Xóa phần tử hoặc bỏ tham chiếu rồi GC mới có thể thu hồi nếu không có đường giữ khác.",
+            "Đọc thống kê process cùng heap: `jcmd <pid> GC.heap_info` xem heap; `jcmd <pid> VM.native_memory summary` xem native memory nếu JVM được khởi chạy với `-XX:NativeMemoryTracking=summary`. Dùng `jcmd <pid> VM.flags` để kiểm tra cờ JVM đang có hiệu lực."
+          ],
+          "en": [
+            "A controlled recursive call demonstrates `StackOverflowError`; inspect live call stacks with `jcmd <pid> Thread.print`.",
+            "Use `jcmd <pid> GC.heap_info` for heap statistics. Native Memory Tracking requires starting the JVM with `-XX:NativeMemoryTracking=summary` before querying it."
+          ]
+        },
+        "when": {
+          "vi": [
+            "Dùng phân biệt heap/stack/native khi đọc lỗi OOM, điều tra thread tăng bất thường, stack overflow, RSS tăng dù heap ổn định, hoặc so sánh memory giữa container và JVM.",
+            "Nếu heap dump cho thấy heap nhỏ nhưng RSS lớn, điều tra direct buffer, thread count/stack, code cache, JNI và memory limit của container. Nếu heap tăng đều, tìm object còn được giữ qua GC roots bằng heap dump.",
+            "Dùng thread dump khi CPU cao, request treo hoặc pool cạn; dùng heap dump khi cần biết object nào đang giữ phần lớn heap. Hai loại dump trả lời câu hỏi khác nhau."
+          ],
+          "en": [
+            "Use the distinction when heap usage looks healthy but process RSS grows, when diagnosing thread exhaustion, stack overflow or container memory limits.",
+            "Thread dumps explain what threads are doing; heap dumps help identify objects retained from GC roots."
+          ]
+        },
+        "pitfalls": {
+          "vi": [
+            "Nói đơn giản rằng toàn bộ object luôn nằm trên heap và không có tối ưu hóa: JIT có thể loại bỏ allocation hoặc scalar-replace object trong một số trường hợp. Hãy hiểu mô hình runtime trước, nhưng đo bộ nhớ thực tế thay vì suy ra layout từ mã nguồn.",
+            "Cho rằng biến local hết scope đồng nghĩa object lập tức được giải phóng. GC thu hồi theo khả năng truy cập và thời điểm GC quyết định, không theo dấu ngoặc đóng của method.",
+            "Tăng `-Xmx` để chữa mọi OOM. Heap lớn hơn có thể khiến container vượt memory limit; lỗi native thread hoặc direct buffer không được chữa bằng cách tăng heap.",
+            "Gọi `System.gc()` như lệnh giải phóng đồng bộ. Đây chỉ là gợi ý cho JVM, có thể bị bỏ qua và gây pause; cần tìm nguyên nhân giữ object hoặc cấu hình vùng bộ nhớ phù hợp."
+          ],
+          "en": [
+            "Scope exit does not immediately free an object; collection depends on reachability and collector decisions.",
+            "Increasing `-Xmx` does not fix native-thread or direct-buffer exhaustion and can push a container over its memory limit."
+          ]
+        }
+      }
+    },
+    {
+      "id": "java-jvm-metaspaces-and-class-metadata",
+      "title": { "vi": "Metaspace, class metadata và class unloading", "en": "Metaspace, class metadata and class unloading" },
+      "resources": [
+        { "type": "docs", "title": "JVM Specification · Runtime Data Areas", "url": "https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-2.html#jvms-2.5" },
+        { "type": "docs", "title": "HotSpot VM Options · Metaspace", "url": "https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html" }
+      ],
+      "notes": {
+        "what": {
+          "vi": [
+            "**Metaspace** là cách HotSpot lưu phần lớn class metadata native ngoài Java heap (từ Java 8 thay PermGen). Metadata gồm thông tin runtime về class như cấu trúc, method và constant pool; object `Class<?>` tương ứng vẫn là object Java có thể được tham chiếu trong heap.",
+            "Metaspace không phải một 'kho class bất tử'. Khi class không còn dùng và class loader định nghĩa nó có thể được thu hồi, JVM có thể unload class và giải phóng metadata liên quan. Class loader chỉ unload được khi chính loader trở nên unreachable; giữ loader thường đồng nghĩa giữ các class của nó.",
+            "**Tình huống thực tế:** ứng dụng triển khai lại nhiều lần trong app server. Mỗi bản có web-app class loader riêng. Nếu thread do web app tạo vẫn chạy, `ThreadLocal` giữ object của web app, hoặc static cache bên ngoài giữ class, loader cũ không thu hồi được; số class loader và metaspace có thể tăng theo từng lần deploy.",
+            "`-XX:MaxMetaspaceSize` đặt ngưỡng metaspace cho HotSpot. Chạm ngưỡng có thể dẫn đến `OutOfMemoryError: Metaspace`, nhưng chỉ tăng ngưỡng có thể che memory leak do class loader thay vì sửa nguyên nhân."
+          ],
+          "en": [
+            "HotSpot stores most class metadata in native Metaspace rather than the Java heap (PermGen was removed in Java 8). `Class<?>` objects themselves are Java objects.",
+            "Classes can unload when their defining class loader is unreachable. Retained loaders, threads, ThreadLocals or caches can prevent unloading and cause Metaspace growth."
+          ]
+        },
+        "how": {
+          "vi": [
+            "**Theo dõi class load/unload:** chạy `java -Xlog:class+load=info,class+unload=info -jar app.jar`. So sánh số lượng class được nạp/thu hồi qua các chu kỳ deploy hoặc request; log class là bằng chứng để khoanh vùng, chưa tự nó chứng minh leak.",
+            "**Đo native memory:** khởi chạy với `-XX:NativeMemoryTracking=summary` (có overhead), sau đó chạy `jcmd <pid> VM.native_memory summary`. NMT không thay thế profiler và không theo dõi mọi allocation native do thư viện bên thứ ba thực hiện.",
+            "**Điều tra nghi ngờ loader leak:** lấy heap dump bằng `jcmd <pid> GC.heap_dump /path/heap.hprof`, mở bằng Eclipse MAT hoặc công cụ phân tích heap, tìm nhiều instance `ClassLoader`/web-app loader, xem dominator tree và đường *Path to GC Roots*. Xác định object nào giữ loader trước khi sửa.",
+            "Trong code plugin, dừng executor do plugin tạo, xóa listener khỏi registry toàn cục, gỡ `ThreadLocal` trong `finally`, xóa cache/static reference và đóng resource khi unload. Không gọi `URLClassLoader.close()` rồi kỳ vọng nó tự làm class đã nạp biến mất; close chủ yếu ngăn mở thêm resource từ loader đó."
+          ],
+          "en": [
+            "Log load/unload events with `-Xlog:class+load=info,class+unload=info`. Enable Native Memory Tracking at startup and query it with `jcmd <pid> VM.native_memory summary`.",
+            "A heap dump and GC-root paths can reveal what retains old class loaders. Stop plugin threads, clear registrations and ThreadLocals, and release caches during unload."
+          ]
+        },
+        "when": {
+          "vi": [
+            "Tập trung vào metaspace/class loader khi gặp `OutOfMemoryError: Metaspace`, số class loaded tăng mãi, redeploy làm RSS tăng dần, hoặc ứng dụng có plugin, script engine, proxy sinh động và hot-reload.",
+            "Nếu metaspace tăng lúc khởi động rồi ổn định, đó có thể là warm-up bình thường. Nếu sau mỗi chu kỳ deploy số loader cũ vẫn còn và không giảm, kiểm tra đường tham chiếu giữ loader trước khi kết luận.",
+            "Dùng heap dump để tìm ai giữ class loader (root nằm trong heap) và NMT/log class để bổ sung góc nhìn native/runtime. Chỉ nhìn biểu đồ heap used không đủ để loại trừ metaspace leak."
+          ],
+          "en": [
+            "Investigate Metaspace when its OOM occurs, loaded-class counts keep rising, or repeated redeploys increase memory in plugin, scripting or hot-reload systems.",
+            "A stable post-startup increase can be normal; look for retained old loaders across repeated lifecycle cycles before calling it a leak."
+          ]
+        },
+        "pitfalls": {
+          "vi": [
+            "Gọi metaspace là Java heap hoặc nói mọi dữ liệu class đều nằm trong heap. Phân biệt metadata native với `Class` object và instance của class.",
+            "Tăng `MaxMetaspaceSize` mà không kiểm tra class-loader lifecycle. Ngưỡng cao hơn có thể chuyển lỗi thành process bị container kill vì dùng thêm native memory.",
+            "Ép GC trong vòng lặp rồi kỳ vọng class unload tức thì. Class unloading phụ thuộc collector, khả năng loader trở nên unreachable và thời điểm GC; hãy xác nhận qua log và heap dump.",
+            "Kết luận mọi class được load là leak. Framework có thể tạo proxy/class hợp lệ; vấn đề là tốc độ tăng có giới hạn không và loader cũ có được thu hồi theo vòng đời mong đợi không."
+          ],
+          "en": [
+            "Metaspace is native class metadata, not the Java heap. Distinguish it from `Class` objects and ordinary instances.",
+            "Raising `MaxMetaspaceSize` can hide a loader leak or cause a container kill; verify loader retention and unloading behavior."
+          ]
+        }
+      }
+    },
+    {
+      "id": "java-heap-objects-and-gc",
+      "title": { "vi": "Object trên heap, reachability và Garbage Collection", "en": "Heap objects, reachability and garbage collection" },
+      "resources": [
+        { "type": "docs", "title": "Garbage-First Garbage Collector Tuning · Java SE 21", "url": "https://docs.oracle.com/en/java/javase/21/gctuning/garbage-first-garbage-collector.html" },
+        { "type": "docs", "title": "Java HotSpot VM Garbage Collection Tuning Guide", "url": "https://docs.oracle.com/en/java/javase/21/gctuning/" }
+      ],
+      "notes": {
+        "what": {
+          "vi": [
+            "**Reachability, không phải số biến:** GC xem object còn đường đi từ GC roots hay không. Roots thường gồm tham chiếu trong stack của thread đang chạy, static reference, JNI handle và một số tham chiếu runtime. Object không còn reachable có thể thu hồi; 'đã bỏ khỏi scope' hay 'không dùng nữa theo ý định lập trình viên' không đủ nếu cache vẫn giữ nó.",
+            "**Ví dụ cache leak:** `static final Map<String, byte[]> CACHE = new HashMap<>();` rồi thêm dữ liệu mà không giới hạn kích thước. Dữ liệu vẫn reachable qua static field nên GC không thể dọn. Cách sửa có thể là eviction có giới hạn, TTL, cache chuyên dụng hoặc bỏ dữ liệu khi hết vòng đời — không phải gọi GC.",
+            "**Generational hypothesis:** nhiều object chết sớm, nên collector thường xử lý vùng object mới (young generation) thường xuyên hơn vùng object sống lâu (old generation). G1 chia heap thành regions; Eden/Survivor/Old là cách mô tả vai trò tuổi đời, không bắt buộc là ba vùng liên tục cố định như sơ đồ cổ điển.",
+            "GC pause là thời gian ứng dụng bị dừng hoặc giảm hoạt động theo collector và loại pha. Allocation rate cao, object sống lâu, heap quá chật hoặc workload không đều đều ảnh hưởng pause/throughput; không có một con số GC đơn lẻ đủ kết luận cần tăng heap."
+          ],
+          "en": [
+            "GC follows reachability from roots such as thread stacks, static references and JNI handles. Objects retained by a static cache remain live even if the application no longer needs them.",
+            "Collectors often exploit the fact that many objects die young. G1 uses regions; Eden, Survivor and Old describe roles rather than requiring three contiguous fixed areas.",
+            "Pause time, throughput, allocation rate and live-set size must be considered together."
+          ]
+        },
+        "how": {
+          "vi": [
+            "**Bật GC log:** với Java 21 chạy `java -Xlog:gc*,safepoint:file=gc.log:time,uptime,level,tags -jar app.jar`. Xem loại GC, thời gian pause, heap trước/sau collection và nhịp GC; đối chiếu với latency ứng dụng cùng thời điểm.",
+            "**Thực hành giữ object:** thêm nhiều `byte[1_000_000]` vào static list, quan sát heap tăng; sau đó xóa list và chờ GC để thấy heap used có thể giảm. JVM không bắt buộc trả toàn bộ memory đã commit về OS ngay cả khi object được thu hồi.",
+            "**Tạo heap dump khi OOM:** `-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./dumps` hoặc `jcmd <pid> GC.heap_dump /path/heap.hprof`. Phân tích *Histogram*, *Dominator Tree*, *Retained Heap* và *Path to GC Roots* để tìm nhóm object giữ bộ nhớ.",
+            "**Chẩn đoán theo thứ tự:** xác nhận heap used sau GC có xu hướng tăng; xem allocation rate và GC log; lấy heap dump ở thời điểm đại diện; tìm dominator/root giữ object; rồi sửa lifetime/cache hoặc cấu hình heap dựa trên mức tải và memory limit."
+          ],
+          "en": [
+            "Enable unified GC logging with `-Xlog:gc*,safepoint:file=gc.log:time,uptime,level,tags` and correlate pauses with application latency.",
+            "Use heap dumps, dominator trees, retained size and GC-root paths to find retained objects. Heap being collected does not mean committed memory is immediately returned to the OS."
+          ]
+        },
+        "when": {
+          "vi": [
+            "Dùng GC log và heap dump khi gặp heap OOM, pause tăng, latency p99 xấu, GC chạy liên tục hoặc memory tăng theo thời gian. Trước khi chỉnh collector, xác định live set, allocation rate và mục tiêu SLA.",
+            "Nếu heap used sau GC ổn định nhưng RSS tăng, tìm native memory thay vì tiếp tục chỉnh GC. Nếu heap sau GC tăng đều, ưu tiên kiểm tra object retention và cache.",
+            "Trong production, bật log có kiểm soát và giới hạn nơi lưu dump: heap dump có thể rất lớn, gây I/O mạnh và chứa dữ liệu nhạy cảm của ứng dụng. Dùng quy trình vận hành phù hợp với môi trường."
+          ],
+          "en": [
+            "Use GC logs and heap dumps for heap OOMs, rising pauses, poor p99 latency, repeated collections or sustained memory growth.",
+            "A stable post-GC live set with rising RSS points toward native memory; a growing live set calls for retention analysis."
+          ]
+        },
+        "pitfalls": {
+          "vi": [
+            "Nghĩ GC dọn mọi object mà ứng dụng không còn muốn dùng. GC chỉ biết reachable hay không, không biết ý định nghiệp vụ.",
+            "Chỉ nhìn `-Xmx` hoặc một lần pause rồi chỉnh heap/collector. Đo trong workload đại diện, xem nhiều chu kỳ và đối chiếu SLA, allocation rate, live set.",
+            "Cho rằng heap used thấp nghĩa là JVM trả memory về OS hoặc process RSS phải thấp. Heap có committed capacity; native memory và page residency làm hai biểu đồ khác nhau.",
+            "Gọi `System.gc()` như cách sửa leak hoặc cam kết Full GC. Đây là hint, có thể bị tắt, và không làm unreachable references biến mất nếu còn root giữ chúng."
+          ],
+          "en": [
+            "GC cannot infer business intent; it only sees reachability. A low used heap does not imply low RSS or that committed heap was returned to the OS.",
+            "Do not tune from one pause or rely on `System.gc()` to fix retained objects."
+          ]
+        }
+      }
+    },
+    {
+      "id": "java-jvm-memory-diagnostics",
+      "title": { "vi": "Đọc lỗi bộ nhớ và chẩn đoán bằng jcmd", "en": "Memory errors and practical diagnostics with jcmd" },
+      "resources": [
+        { "type": "docs", "title": "jcmd Command Reference · Java SE 21", "url": "https://docs.oracle.com/en/java/javase/21/docs/specs/man/jcmd.html" },
+        { "type": "docs", "title": "java Command Reference · Java SE 21", "url": "https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html" }
+      ],
+      "notes": {
+        "what": {
+          "vi": [
+            "**Đọc đúng thông điệp:** `Java heap space` thường là không cấp phát được object trên heap; `GC overhead limit exceeded` nghĩa là JVM dành quá nhiều thời gian GC nhưng thu hồi quá ít (nếu cơ chế này bật); `Metaspace` liên quan class metadata; `unable to create native thread` thường liên quan tài nguyên thread/OS/native; `Direct buffer memory` liên quan direct buffer ngoài heap.",
+            "Một OOM có thể là **leak** (live set tăng do còn reference), **cần thêm capacity** (live set hợp lệ lớn hơn heap), **allocation burst** (tạo object quá nhanh), hoặc lỗi native/OS. Chỉ tên exception chưa chỉ ra nguyên nhân cuối cùng.",
+            "`jcmd` gửi chẩn đoán tới JVM đang chạy. Một số lệnh cần cùng user/host/container với process. Lấy PID bằng `jcmd -l`; xem lệnh và tùy chọn hỗ trợ bằng `jcmd <pid> help`."
+          ],
+          "en": [
+            "Heap-space, Metaspace, direct-buffer and native-thread OOMs point to different resource areas. An OOM can be a leak, insufficient capacity, an allocation burst or an OS/native limit.",
+            "Use `jcmd -l` to list local JVMs and `jcmd <pid> help` to inspect commands supported by that JVM."
+          ]
+        },
+        "how": {
+          "vi": [
+            "**Bộ lệnh khởi đầu:** `jcmd -l`; `jcmd <pid> VM.version`; `jcmd <pid> VM.flags`; `jcmd <pid> GC.heap_info`; `jcmd <pid> Thread.print`; và khi cần, `jcmd <pid> GC.class_histogram`. Thay `<pid>` bằng PID thật; chạy trong đúng container nếu app ở container.",
+            "**Bật NMT khi khởi động:** thêm `-XX:NativeMemoryTracking=summary` hoặc `detail`, rồi truy vấn `jcmd <pid> VM.native_memory summary` (hoặc `detail`). NMT cần bật từ lúc JVM khởi động; không thể bật hồi tố sau khi process đã chạy.",
+            "**Thiết lập heap dump:** `-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/tmp/java-dumps`. Kiểm tra dung lượng ổ đĩa và quyền truy cập trước; dump thường gần bằng heap và cần được bảo vệ như dữ liệu ứng dụng.",
+            "**Quy trình sự cố:** (1) ghi lại exception đầy đủ, PID, thời gian và memory limit; (2) xác định loại memory qua thông điệp; (3) chụp heap/thread/native data phù hợp; (4) so sánh theo thời gian; (5) truy đường giữ object hoặc giới hạn OS; (6) thay đổi một yếu tố và đo lại dưới tải tương đương.",
+            "**Ví dụ chọn công cụ:** request treo → thread dump; heap used tăng sau mỗi GC → heap dump và GC roots; RSS tăng nhưng heap ổn định → NMT, direct buffers, thread count và native library; class loader tăng sau deploy → class load/unload log và heap dump."
+          ],
+          "en": [
+            "Start with `jcmd -l`, `VM.flags`, `GC.heap_info`, `Thread.print` and, when useful, `GC.class_histogram`. Run commands in the right host/container context.",
+            "Enable NMT at startup before querying it. Heap dumps can be large and sensitive; ensure storage and access controls are ready."
+          ]
+        },
+        "when": {
+          "vi": [
+            "Dùng `jcmd` để thu thập bằng chứng từ process trước khi restart, khi điều tra sự cố production hoặc cần so sánh snapshot qua thời gian. Thực hành trước trong staging để biết lệnh nào tạo tải đáng kể.",
+            "`GC.class_histogram` và heap dump có thể làm ứng dụng chậm; heap dump cần I/O lớn. Chọn thời điểm, timeout và cách lưu theo chính sách vận hành của hệ thống.",
+            "Trong container, kiểm tra cả giới hạn cgroup/container và JVM ergonomics. Một heap hợp lệ theo máy host có thể quá lớn so với memory limit container nếu JVM không nhận diện giới hạn đúng."
+          ],
+          "en": [
+            "Collect evidence before restarting a process when investigating production incidents, but understand the cost of histograms and heap dumps.",
+            "Check container/cgroup limits as well as JVM flags; host memory and container memory limits may differ."
+          ]
+        },
+        "pitfalls": {
+          "vi": [
+            "Chạy một lệnh nặng tùy tiện trên production mà chưa tính ảnh hưởng latency, disk hoặc dữ liệu nhạy cảm trong dump.",
+            "Nghĩ `jcmd` luôn nhìn thấy mọi JVM. Quyền user, namespace/container, attach mechanism hoặc cấu hình runtime có thể ngăn kết nối.",
+            "Bật NMT sau khi sự cố xảy ra rồi mong truy lại allocation native trước đó. NMT phải được bật từ lúc khởi động và có chi phí tài nguyên.",
+            "Sửa bằng cách tăng heap chỉ vì thấy chữ OutOfMemory. Phân biệt loại memory và xác nhận cgroup/OS limit trước khi thay đổi cấu hình."
+          ],
+          "en": [
+            "Diagnostic commands can affect latency and dumps can expose sensitive data; plan their impact and storage.",
+            "NMT must be enabled at startup, and increasing heap is not a general fix for every OutOfMemoryError."
+          ]
+        }
+      }
     }
   ]
 }

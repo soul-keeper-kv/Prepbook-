@@ -105,6 +105,30 @@ URL phải là http(s). Tên là văn bản thuần; chỉ `lesson` và `notes` 
 
 Cùng 1 link bài ở nhiều mục (kể cả khác module) vẫn là 1 bài trong notebook (khớp theo link, bỏ qua `www.`, dấu `/` cuối và phần sau tên bài của LeetCode).
 
+## Viết tiếng Việt: thuật ngữ giữ tiếng Anh
+
+Câu viết bằng tiếng Việt, còn **thuật ngữ kỹ thuật giữ nguyên tiếng Anh**, đúng như trong đề LeetCode, tag, lời giải và lúc phỏng vấn. Đề bài viết "sorted array", "subarray", "in-place"; ghi chú dịch thành "mảng đã sắp xếp", "đoạn con", "tại chỗ" thì người đọc phải dịch ngược lại mới nhận ra trong đề, và nhiều từ dịch còn khó hiểu hơn từ gốc.
+
+- Không kèm bản dịch trong ngoặc ("Two Pointers (hai con trỏ)"). Lần đầu gặp một thuật ngữ người mới có thể chưa biết, giải thích nghĩa của nó bằng lời thường: "subarray: một đoạn **liên tiếp** của array".
+- Giữ tiếng Việt cho lời giải thích và các từ thường: phần tử, số, bước, biến, hàm, vòng `for`, tổng, dấu hiệu.
+- Tên dạng của một pattern cũng giữ tiếng Anh: Opposite Direction, Same Direction, Fast & Slow.
+- Áp dụng cho mọi chữ tiếng Việt trong `data/`: `title`, `lesson`, `guide`, `quiz`, `notes`, cả comment và bảng chạy tay trong khối code.
+
+| Viết                                                                                       | Không viết                                                       |
+| ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| array, string, sorted / unsorted, index, in-place, duplicate                               | mảng, chuỗi, đã sắp xếp, vị trí, tại chỗ, trùng                  |
+| subarray, substring, subsequence, subset, permutation, combination, prefix, suffix         | đoạn con, chuỗi con, dãy con, tập con, hoán vị, tổ hợp, tiền tố  |
+| Two Pointers, pointer, Sliding Window, window, expand / shrink                             | hai con trỏ, con trỏ, cửa sổ trượt, nới rộng / co cửa sổ         |
+| brute force, time / space complexity, extra space, constraints, edge case, dry run         | vét cạn, độ phức tạp, bộ nhớ thêm, giới hạn, trường hợp biên     |
+| stack, queue, deque, heap, min-heap, priority queue, hash map, hash set, linked list, node | ngăn xếp, hàng đợi, đống, bảng băm, danh sách liên kết, nút      |
+| tree, binary tree, BST, root, leaf, parent, child, subtree, level, depth, height           | cây, cây nhị phân, gốc, lá, cha, con, cây con, tầng, độ sâu      |
+| graph, vertex, edge, neighbor, adjacency list, directed / undirected, weight, cycle        | đồ thị, đỉnh, cạnh, láng giềng, danh sách kề, trọng số, chu trình |
+| connected component, shortest path, in-degree, spanning tree, grid, cell, matrix, interval | thành phần liên thông, đường đi ngắn nhất, bậc vào, lưới, khoảng |
+| recursion, base case, backtracking, greedy, divide and conquer, Binary Search              | đệ quy, điều kiện dừng, quay lui, tham lam, chia để trị          |
+| DP, state, transition, memoization, invariant, monotonic, median, overflow                 | quy hoạch động, trạng thái, chuyển trạng thái, bất biến, đơn điệu |
+| prime, GCD, modulo, fast power, modular inverse                                            | số nguyên tố, ước chung lớn nhất, đồng dư, lũy thừa nhanh        |
+| Template                                                                                   | khung code, khuôn                                                |
+
 ## Bài giảng (`lesson`)
 
 Bài giảng là bước đầu của Lộ trình học ("Hiểu pattern"): đọc để hiểu, trước khi viết lại Nhận diện, Ý tưởng, Template bằng lời của mình. App chỉ hiện nó, không chép vào notebook, nên sửa ở đây là thấy ngay.
@@ -112,10 +136,10 @@ Bài giảng là bước đầu của Lộ trình học ("Hiểu pattern"): đ�
 Viết cho người biết lập trình (Java) nhưng chưa biết pattern, đọc một lượt là hiểu. Theo khuôn của `p1-twoptr`:
 
 1. `## <Pattern> là gì?`: 2–4 câu bằng lời thường.
-2. `## Vì sao cần: một bài cụ thể`: một bài nhỏ, cách vét cạn tốn bao nhiêu, rồi cách dùng pattern **chạy tay từng bước** trong khối code `text` (cột thẳng hàng; mỗi bước ghi giá trị các biến và quyết định).
+2. `## Vì sao cần: một bài cụ thể`: một bài nhỏ, brute force tốn bao nhiêu, rồi cách dùng pattern **dry run từng bước** trong khối code `text` (cột thẳng hàng; mỗi bước ghi giá trị các biến và quyết định).
 3. `## Vì sao cách này đúng`: ý then chốt, giải thích bằng chính ví dụ ở trên.
 4. `## Các dạng thường gặp`: mỗi dạng một câu và một ví dụ nhỏ.
-5. `## Khung code`: Java ngắn, comment tiếng Việt.
+5. `## Template`: Java ngắn, comment tiếng Việt.
 6. `## Khi nào nghĩ tới <pattern>?`: 3–5 dấu hiệu trong đề.
 7. `## Tự kiểm tra`: 2–3 câu hỏi, không kèm đáp án.
 
@@ -123,13 +147,15 @@ Viết `{ "vi": [...] }`, mảng các dòng. Thiếu `en` thì bản tiếng Anh
 
 ## Giải thích từng bước (`guide`) và trắc nghiệm (`quiz`)
 
-`guide` có cùng tên mục như `notes` (`recognition`, `idea`, `template`, `pitfalls`). Mỗi bước của Lộ trình học hiện phần giải thích của nó trước, rồi mới tới ghi chú của người dùng. Viết như khi trả lời đúng một câu hỏi hẹp: bảng (dấu hiệu → dạng), các câu hỏi để tự quyết định, vét cạn và cách tối ưu đặt cạnh nhau, đọc từng dòng code, lỗi hay gặp. Mẫu: `p1-twoptr`.
+`guide` có cùng tên mục như `notes` (`recognition`, `idea`, `template`, `pitfalls`). Mỗi bước của Lộ trình học hiện phần giải thích của nó trước, rồi mới tới ghi chú của người dùng. Viết như khi trả lời đúng một câu hỏi hẹp: bảng (dấu hiệu → dạng), các câu hỏi để tự quyết định, brute force và cách tối ưu đặt cạnh nhau, đọc từng dòng code, lỗi hay gặp. Mẫu: `p1-twoptr`.
 
 `quiz` hiện ở bước Nhận diện: mỗi câu `{ "question", "options", "answer", "why" }`, `answer` là vị trí đáp án đúng trong `options` (đếm từ 0), `why` hiện ra sau khi người dùng chọn. App không lưu kết quả: đây là luyện tập, không tính mức.
 
 ## Lý thuyết mẫu (`notes`)
 
 Mỗi mục có thể kèm lý thuyết cho từng mục ghi chú của pattern. Thêm mục thành pattern là lý thuyết này được chép vào mục ghi chú cùng tên; người dùng viết lại bằng lời của mình (để nguyên bản mẫu thì app không tính là đã học). Mục ghi chú nào bị xoá trắng thì khung Gợi ý ở trang pattern cho chép lại. Sửa `notes` ở đây không đổi gì trong notebook đã có.
+
+Sửa chữ của `notes` đã có thì chạy `npm run samples:legacy` trước khi commit. Lệnh lưu hash của bản cũ vào `src/notebook/legacy-samples.json`, để bản cũ đã chép vào notebook vẫn được nhận là bản mẫu. Thiếu bước này thì bản cũ bị tính là lời của người dùng, và các bước của Lộ trình học hiện là đã xong dù họ chưa viết gì.
 
 Tên các mục theo loại chủ đề của module (`src/notebook/templates.ts`); dùng sai tên thì app báo lỗi:
 
@@ -140,7 +166,7 @@ Tên các mục theo loại chủ đề của module (`src/notebook/templates.ts
 | `design` (System Design)     | `requirements`, `estimates`, `design`, `deepDive`, `tradeoffs` |
 | `story` (Hành vi)            | `situation`, `task`, `action`, `result`, `questions`           |
 
-- Giá trị là Markdown, viết thành mảng các dòng (app nối bằng xuống dòng). App hiện được: đoạn văn, tiêu đề `## `, danh sách `- ` và `1. ` (không lồng nhau), `code`, **đậm**, link, bảng `| a | b |` (dòng thứ hai là `| --- | --- |`), khối code (`text` thì không có số dòng, hợp để vẽ bảng chạy tay).
+- Giá trị là Markdown, viết thành mảng các dòng (app nối bằng xuống dòng). App hiện được: đoạn văn, tiêu đề `## `, danh sách `- ` và `1. ` (không lồng nhau), `code`, **đậm**, link, bảng `| a | b |` (dòng thứ hai là `| --- | --- |`), khối code (`text` thì không có số dòng, hợp để vẽ bảng dry run).
 - Chữ thì viết `{ "vi": [...], "en": [...] }`. Code (`template`) viết một lần, không chia ngôn ngữ, comment tiếng Anh.
 - Template của DSA viết bằng Java. Bẫy (`pitfalls`) ở đây là bẫy hay gặp, ghi kèm tên bài trong ngoặc; bẫy của riêng bạn thì bạn tự ghi thêm.
 - Mục chỉ là bộ bài luyện (CSES, AtCoder, Codeforces, contest) thì không cần `notes`.

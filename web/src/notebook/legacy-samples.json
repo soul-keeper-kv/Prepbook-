@@ -1,0 +1,274 @@
+{
+  "p0-basics": {
+    "idea": ["804:f6ea8903"],
+    "pitfalls": ["586:13e95563"]
+  },
+  "p0-lang": {
+    "idea": ["805:8f9c1166"],
+    "pitfalls": ["869:a2caedad"]
+  },
+  "p0-stdlib": {
+    "idea": ["837:6faecce3"],
+    "pitfalls": ["760:4ec5d514"]
+  },
+  "p1-bigo": {
+    "idea": ["842:32bddea5"],
+    "pitfalls": ["697:77a7a1f1"],
+    "recognition": ["445:942eb038"]
+  },
+  "p1-hashing": {
+    "idea": ["784:b05eaa74"],
+    "pitfalls": ["666:4e7bf2ca"],
+    "recognition": ["723:107e9ade"]
+  },
+  "p1-kadane": {
+    "idea": ["720:5e72b6de"],
+    "pitfalls": ["619:6ae6919c"],
+    "recognition": ["657:84a6d809"]
+  },
+  "p1-math": {
+    "idea": ["767:05aad611"],
+    "pitfalls": ["605:65b3dff6"],
+    "recognition": ["721:fc337878"]
+  },
+  "p1-matrix": {
+    "idea": ["845:bfc55315"],
+    "pitfalls": ["662:793de983"],
+    "recognition": ["604:6af7a82d"]
+  },
+  "p1-prefix": {
+    "idea": ["899:bb0b0af8"],
+    "pitfalls": ["594:feefe3e8"],
+    "recognition": ["803:a4de6634"]
+  },
+  "p1-sort": {
+    "idea": ["983:5154797a"],
+    "pitfalls": ["603:b40400bd"],
+    "recognition": ["759:55bf3bcb"]
+  },
+  "p1-twoptr": {
+    "idea": ["862:75bbdd86"],
+    "pitfalls": ["560:ce7665bc"],
+    "recognition": ["661:38f6d566"]
+  },
+  "p1-window": {
+    "idea": ["538:3315deef"],
+    "pitfalls": ["542:1bc2249c"],
+    "recognition": ["549:fbe66970"]
+  },
+  "p2-bsearch": {
+    "idea": ["765:0237b563"],
+    "pitfalls": ["789:b1a29aa1"],
+    "recognition": ["710:990b900e"]
+  },
+  "p2-bsearch-answer": {
+    "idea": ["728:081fed35"],
+    "pitfalls": ["914:cb0a1ef7"],
+    "recognition": ["641:b4f71e8b"]
+  },
+  "p2-ds": {
+    "idea": ["1032:5d3ca3fd"],
+    "pitfalls": ["612:d54389c6"],
+    "recognition": ["625:c3750ed8"]
+  },
+  "p2-fast-slow": {
+    "idea": ["884:5b10b398"],
+    "pitfalls": ["778:506934b5"],
+    "recognition": ["669:d526bc68"]
+  },
+  "p2-heap": {
+    "idea": ["869:2a831ee5"],
+    "pitfalls": ["681:c9a9bf90"],
+    "recognition": ["676:9d202446"]
+  },
+  "p2-kway": {
+    "idea": ["827:39703646"],
+    "pitfalls": ["742:a86d770a"],
+    "recognition": ["662:bf114af0"]
+  },
+  "p2-list": {
+    "idea": ["919:5bd97834"],
+    "pitfalls": ["587:eb6129f6"],
+    "recognition": ["640:60651fca"]
+  },
+  "p2-stack": {
+    "idea": ["751:3bf2f73a"],
+    "pitfalls": ["630:e4de1743"],
+    "recognition": ["658:4454fb6f"]
+  },
+  "p2-stackq": {
+    "idea": ["966:b7d56458"],
+    "pitfalls": ["652:fcd6f109"],
+    "recognition": ["651:02ef827d"]
+  },
+  "p2-two-heaps": {
+    "idea": ["926:570cf189"],
+    "pitfalls": ["738:4010972e"],
+    "recognition": ["592:30561bf3"]
+  },
+  "p3-backtrack": {
+    "idea": ["891:ba3b1e16"],
+    "pitfalls": ["678:a2311cf7"],
+    "recognition": ["586:c868c092"]
+  },
+  "p3-bfs-path": {
+    "idea": ["947:ce5bfe72"],
+    "pitfalls": ["719:805f778b"],
+    "recognition": ["546:bb8d61b3"]
+  },
+  "p3-bit": {
+    "idea": ["1069:a45a7853"],
+    "pitfalls": ["754:484a1969"],
+    "recognition": ["584:e222c1c0"]
+  },
+  "p3-bst": {
+    "idea": ["750:3d712d46"],
+    "pitfalls": ["860:6e6accf5"],
+    "recognition": ["531:c7d6eeb2"]
+  },
+  "p3-graph": {
+    "idea": ["916:6447372d"],
+    "pitfalls": ["712:ac2f32d6"],
+    "recognition": ["666:af8a29f8"]
+  },
+  "p3-graphs": {
+    "idea": ["905:f8c1a631"],
+    "pitfalls": ["779:0ee0cdd5"],
+    "recognition": ["612:33ee5f01"]
+  },
+  "p3-greedy": {
+    "idea": ["1229:0efb2e50"],
+    "pitfalls": ["627:da09defe"],
+    "recognition": ["683:473ee8e5"]
+  },
+  "p3-intervals": {
+    "idea": ["1235:e34443e1"],
+    "pitfalls": ["792:eaaf76ef"],
+    "recognition": ["722:c64f7e4f"]
+  },
+  "p3-recur": {
+    "idea": ["692:2d30adb9"],
+    "pitfalls": ["825:21fa4201"],
+    "recognition": ["618:aa94d148"]
+  },
+  "p3-topo": {
+    "idea": ["1007:cc1c3338"],
+    "pitfalls": ["784:bf5d6050"],
+    "recognition": ["665:832a8bef"]
+  },
+  "p3-tree": {
+    "idea": ["786:5794c26a"],
+    "pitfalls": ["841:49b1fa78"],
+    "recognition": ["621:900c213a"]
+  },
+  "p3-tree-bfs": {
+    "idea": ["689:55dd2576"],
+    "pitfalls": ["719:5346baa8"],
+    "recognition": ["559:e3763bd6"]
+  },
+  "p3-trees": {
+    "idea": ["762:f62b9029"],
+    "pitfalls": ["774:d671b7a1"],
+    "recognition": ["692:3705d721"]
+  },
+  "p4-adv-graph": {
+    "idea": ["1055:92973092"],
+    "pitfalls": ["743:5ce51c86"],
+    "recognition": ["728:2dee6bad"]
+  },
+  "p4-dp": {
+    "idea": ["1003:39b74316"],
+    "pitfalls": ["625:21b93edf"],
+    "recognition": ["801:f1abdf9f"]
+  },
+  "p4-dp-adv": {
+    "idea": ["929:18d30254"],
+    "pitfalls": ["756:144d5396"],
+    "recognition": ["637:06f57eba"]
+  },
+  "p4-dp-interval": {
+    "idea": ["832:769b61a9"],
+    "pitfalls": ["797:6add7e17"],
+    "recognition": ["587:7498d9ae"]
+  },
+  "p4-dp-state": {
+    "idea": ["847:d60f9ab0"],
+    "pitfalls": ["860:2ec47294"],
+    "recognition": ["688:6980fada"]
+  },
+  "p4-dp-strings": {
+    "idea": ["892:e035fe14"],
+    "pitfalls": ["710:1c0fdf45"],
+    "recognition": ["672:d357ce86"]
+  },
+  "p4-dp-tree": {
+    "idea": ["927:ad9debdb"],
+    "pitfalls": ["741:502ede20"],
+    "recognition": ["640:3d374588"]
+  },
+  "p4-dsu": {
+    "idea": ["697:6fc71cb7"],
+    "pitfalls": ["692:3e4e8be3"],
+    "recognition": ["770:e01e0914"]
+  },
+  "p4-lis": {
+    "idea": ["873:d96006c3"],
+    "pitfalls": ["728:3ac80d5c"],
+    "recognition": ["592:dc8ac05d"]
+  },
+  "p4-mst": {
+    "idea": ["1082:0a0e7941"],
+    "pitfalls": ["782:519475b1"],
+    "recognition": ["698:0d723ccf"]
+  },
+  "p4-neet-dp": {
+    "idea": ["871:dc9ec973"],
+    "pitfalls": ["630:21ef02b2"],
+    "recognition": ["668:807976e0"]
+  },
+  "p4-palindrome": {
+    "idea": ["888:fc4a8222"],
+    "pitfalls": ["653:14b6da9d"],
+    "recognition": ["560:35919482"]
+  },
+  "p4-sp": {
+    "idea": ["1033:75f83ee5"],
+    "pitfalls": ["818:e930ce71"],
+    "recognition": ["878:b32b457d"]
+  },
+  "p5-bitmask": {
+    "idea": ["738:6a50fc2c"],
+    "pitfalls": ["637:19d15d8f"],
+    "recognition": ["601:0b856aae"]
+  },
+  "p5-lca": {
+    "idea": ["837:661975a8"],
+    "pitfalls": ["499:10471459"],
+    "recognition": ["487:03285d9e"]
+  },
+  "p5-math": {
+    "idea": ["790:317f2621"],
+    "pitfalls": ["688:5ff2f07a"],
+    "recognition": ["543:35882d9d"]
+  },
+  "p5-misc": {
+    "idea": ["934:9779e852"],
+    "pitfalls": ["700:3d263117"],
+    "recognition": ["736:58ecebd0"]
+  },
+  "p5-rangeq": {
+    "idea": ["907:77175dd4"],
+    "pitfalls": ["545:ba5fc44e"],
+    "recognition": ["589:64c857d4"]
+  },
+  "p5-string": {
+    "idea": ["852:8d961ede"],
+    "pitfalls": ["671:ea236697"],
+    "recognition": ["658:60eb005c"]
+  },
+  "p5-trie": {
+    "idea": ["845:2f512258"],
+    "pitfalls": ["705:f92304d2"],
+    "recognition": ["531:fea0bbdc"]
+  }
+}

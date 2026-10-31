@@ -4,7 +4,9 @@ import { platformKey } from "@/content/problems"
 import type { Item, NoteText, ResourceType } from "@/content/schema"
 import { LANG_CODES, type Lang } from "@/i18n/languages"
 import { normalizeUrl, problemIdFor } from "@/notebook/ids"
+import legacySamples from "@/notebook/legacy-samples.json"
 import { getLive, problemsOf, resourcesOf, type SampleTexts } from "@/notebook/logic"
+import { sampleHash } from "@/notebook/sample-hash"
 import type { Notebook, Pattern, ResourceKind, TopicKind } from "@/notebook/schema"
 import { SECTION_TEMPLATES } from "@/notebook/templates"
 
@@ -94,9 +96,32 @@ function suggestedNoteTexts(item: Item, key: string): string[] {
   return value ? [...new Set(LANG_CODES.map((lang) => noteText(value, lang)))] : []
 }
 
+/** item id -> note key -> sampleHash of each older wording (`npm run samples:legacy`) */
+const LEGACY_SAMPLES: Partial<Record<string, Partial<Record<string, string[]>>>> = legacySamples
+
+/** The old sample notes found in a section, as they appear there */
+export function oldSamplesIn(section: string, hashes: readonly string[]): string[] {
+  // A copied note starts the section or follows a blank line (see withNote)
+  const starts = [0]
+  for (let i = section.indexOf("\n\n"); i >= 0; i = section.indexOf("\n\n", i + 1))
+    starts.push(i + 2)
+  const found: string[] = []
+  for (const hash of hashes) {
+    const length = Number(hash.slice(0, hash.indexOf(":")))
+    const text = starts
+      .map((start) => section.slice(start, start + length))
+      .find((text) => text.length === length && sampleHash(text) === hash)
+    if (text) found.push(text)
+  }
+  return found
+}
+
 const samplesCache = new WeakMap<Content, SampleTexts>()
 
-/** The sample notes a pattern's sections may hold, from the item it was made from */
+/**
+ * The sample notes a pattern's sections may hold, from the item it was made from: the
+ * current ones, and older wordings still found in the section (copied before data/ changed)
+ */
 export function samplesFrom(content: Content): SampleTexts {
   const cached = samplesCache.get(content)
   if (cached) return cached
@@ -107,7 +132,9 @@ export function samplesFrom(content: Content): SampleTexts {
     const id = `${entry.item.id}\n${key}`
     let texts = byKey.get(id)
     if (!texts) byKey.set(id, (texts = suggestedNoteTexts(entry.item, key)))
-    return texts
+    const old = LEGACY_SAMPLES[entry.item.id]?.[key]
+    const section = pattern.sections[key]
+    return old && section ? [...texts, ...oldSamplesIn(section, old)] : texts
   }
   samplesCache.set(content, samples)
   return samples

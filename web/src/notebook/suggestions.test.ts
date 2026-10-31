@@ -1,8 +1,23 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 import { buildContent } from "@/content/load"
+import { ownText } from "@/notebook/logic"
 import { EPOCH, patternFromItem, withDefaultTopics } from "@/notebook/migrate"
+import { sampleHash } from "@/notebook/sample-hash"
 import { emptyNotebook, type Notebook } from "@/notebook/schema"
-import { patternSuggestions, pickSuggestedProblems, withNote } from "@/notebook/suggestions"
+import {
+  oldSamplesIn,
+  patternSuggestions,
+  pickSuggestedProblems,
+  samplesFrom,
+  withNote,
+} from "@/notebook/suggestions"
+
+// An older wording of the "win" recognition note, as legacy-samples.json records it
+const OLD = vi.hoisted(() => "- đoạn con liên tiếp\n- dài nhất")
+vi.mock("@/notebook/legacy-samples.json", async () => {
+  const { sampleHash } = await import("@/notebook/sample-hash")
+  return { default: { win: { recognition: [sampleHash(OLD)] } } }
+})
 
 const content = buildContent(
   new Map<string, unknown>([
@@ -54,6 +69,30 @@ describe("patternSuggestions notes", () => {
     const [recognition, template] = patternSuggestions(content, nb, pattern, "vi").notes
     expect(recognition?.copied).toBe(true)
     expect(template?.copied).toBe(false)
+  })
+})
+
+describe("old sample notes", () => {
+  it("finds an old wording at the start of a section or after a blank line", () => {
+    const hashes = [sampleHash(OLD)]
+    expect(oldSamplesIn(OLD, hashes)).toEqual([OLD])
+    expect(oldSamplesIn(withNote("- my own", OLD), hashes)).toEqual([OLD])
+    expect(oldSamplesIn(`${OLD}\n\n- added after`, hashes)).toEqual([OLD])
+    expect(oldSamplesIn(`x${OLD}`, hashes)).toEqual([])
+    expect(oldSamplesIn(OLD.replace("dài", "ngắn"), hashes)).toEqual([])
+  })
+
+  it("does not count a note copied before data/ reworded it as the user's own words", () => {
+    const samples = samplesFrom(content)
+    const own = (section: string) => {
+      const pattern = Object.values(notebookWith({ recognition: section }).patterns)[0]!
+      return ownText(pattern, "recognition", samples)
+    }
+    expect(own(OLD)).toBe("")
+    expect(own(withNote(OLD, "- liên tiếp\n- dài nhất"))).toBe("")
+    expect(own(withNote("- my own", OLD))).toBe("- my own")
+    const edited = OLD.replace("dài", "ngắn")
+    expect(own(edited)).toBe(edited)
   })
 })
 

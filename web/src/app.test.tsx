@@ -374,7 +374,7 @@ describe("App", () => {
       "aria-expanded",
       "true"
     )
-    expect(within(lesson).getByRole("heading", { name: "Hai con trỏ là gì?" })).toBeInTheDocument()
+    expect(within(lesson).getByRole("heading", { name: "Two Pointers là gì?" })).toBeInTheDocument()
     const recognition = within(lesson).getByRole("button", { name: /^Nhận diện/ })
     expect(recognition).toHaveAttribute("aria-expanded", "false")
 
@@ -384,11 +384,11 @@ describe("App", () => {
       within(lesson).getByRole("columnheader", { name: "Dấu hiệu trong đề" })
     ).toBeInTheDocument()
     const quiz = within(lesson).getByRole("region", { name: "Luyện nhận diện" })
-    await user.click(within(quiz).getByRole("radio", { name: "Cùng chiều (read / write)" }))
+    await user.click(within(quiz).getByRole("radio", { name: "Same Direction (read / write)" }))
     expect(quiz).toHaveTextContent("Chưa đúng.")
     expect(quiz).toHaveTextContent("Câu 1/5 · đúng 0/1")
     await user.click(within(quiz).getByRole("button", { name: "Câu sau" }))
-    await user.click(within(quiz).getByRole("radio", { name: "Cùng chiều (read / write)" }))
+    await user.click(within(quiz).getByRole("radio", { name: "Same Direction (read / write)" }))
     expect(quiz).toHaveTextContent("Câu 2/5 · đúng 1/2")
 
     // The notes, still the copied sample, are folded under the explanation; edited in place
@@ -405,7 +405,7 @@ describe("App", () => {
         "idea",
         `${copied}
 
-Hai đầu đi vào giữa`
+Opposite Direction: hai đầu đi vào giữa`
       )
     )
     expect(lesson).toHaveTextContent("Lý thuyết 1/3")
