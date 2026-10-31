@@ -54,20 +54,28 @@ Pattern → Resources, note sections, Q&A cards
 
   | Level | When |
   | --- | --- |
-  | Not started | Nothing yet |
-  | Learning | Has notes or problems |
+  | Not started | Nothing the user did yet |
+  | Learning | Notes in the user's own words, a problem tried, a card, a takeaway on material |
   | Got it | 3 problems solved alone |
   | Mastered | 3 problems solved alone again in a review (≥ 7 days after the first try) and nothing overdue |
+
+  Problems, links and sample theory that came in with a suggestion do not start a pattern:
+  the sample texts are told apart with `ownText` (logic.ts), fed by `samplesFrom(content)`
+  (`useSamples()` in components). This is the only definition of "the user's own words";
+  the Learning path uses it too.
 
   A review more than 7 days overdue drops the pattern one level.
 - **Attempt outcome** has 3 values: solved alone / needed a hint / read the solution.
   Redo after 1 day (solution), 3 days (hint), growing gaps (alone).
 - The modules in `web/data/` (one folder per module, each bound to a topic) are a
-  **suggestion source only**: shown in a "Suggestions: <module title>" box on that topic's
-  page, added to a pattern only when the user clicks. On the pattern page the same box also
-  offers the item's suggested theory per note section: the name opens it in a dialog, and
-  "Copy in" appends it below what the section already holds (with Undo). Notes are never
-  filled in automatically.
+  **suggestion source**, shown in a "Suggestions: <module title>" box on that topic's page.
+  Adding an item (one, a phase, or all) makes it a pattern **with everything it offers**: the
+  sample theory copied into the note sections, its problems and its links (asked for on
+  2026-10-31; before that, patterns were added empty). Undo removes the pattern and what
+  came in with it, except problems and links also in other patterns. On the pattern page
+  the same box offers back what the pattern does not hold (never added, or removed): the
+  name of a note opens it in a dialog, "Copy in" appends it below what the section holds,
+  and "Add all" adds the notes, problems and links it lists, all with Undo.
 
 ## Screens
 
@@ -134,11 +142,53 @@ and Related patterns. The DSA section template, in order:
 Above the sections sits a mastery strip: a segmented bar of the outcomes plus a plain
 sentence ("Got it: solved 3 of the last 5 alone").
 
+A DSA pattern that is not pure theory is shown as a **Learning path** for beginners
+(`components/pattern/pattern-lesson.tsx`, logic in `notebook/lesson.ts`), asked for on
+2026-10-31 because the numbered sections read as clutter. It replaces note sections 1–4 on
+that page: they are read and edited inside the path, not below it. Below it come only
+Problems done, Material read and My interview questions, numbered from 1. Other topic
+kinds, and theory patterns, keep the numbered note sections.
+- Understand first: "Understand the pattern" opens to the item's beginner lesson (`lesson`
+  in data/, Markdown: plain words, a worked example traced in a `text` block, why it works),
+  added on 2026-10-31 after the user found the sample notes too abstract to learn from.
+  Under it, or instead of it when data/ has none, buttons send a ready-made beginner prompt
+  to an AI (`prompt.pattern`, `components/common/ask-ai.tsx`). It is Next until any
+  checkpoint holds the user's own words; reading is not ticked. Pure-theory patterns
+  show the same lesson as a card above their sections (`ExplainCard`).
+- Theory: Recognition, Idea and Template, each a row that opens to its section's
+  text and editor. When data/ has a `guide` for the step it comes first: a focused
+  explanation (tables, decision questions, brute force beside the pattern, code read line
+  by line). Recognition then shows the `quiz` (`components/pattern/quiz.tsx`): one question
+  at a time, right or wrong shown at once with the reason, nothing saved. "Your notes" sits
+  below, folded while it holds only the copied sample. Markdown renders `| tables |`. The step to do next starts open, the others closed; only the open step
+  shows its instruction. A step counts once its section holds words of the user's own
+  (`ownText`): the sample theory left as it is does not. When the section does not hold
+  the sample, the open step offers to read it.
+- Problems: the three easiest suggested problems (by level, keeping the data/ order within
+  a level), one line each: the example ("optional", counts once tried), then two solved
+  alone (count once solved alone). The pattern's own problems fill in only when data/ has
+  fewer than three, so adding a problem never swaps the picks. Its button adds the
+  problem to the pattern if needed and opens it. Nothing is locked; a faint note advises
+  the theory first. Only the next problem shows its instruction.
+- Pitfalls: a last row holding the Pitfalls section (the common ones came in with the
+  pattern; the user adds their own mistakes).
+- Every tick is derived, like the level. The first step not done is marked Next; once a
+  solo problem has been tried, Next skips the optional example. The section numbers come
+  from one list in `pattern-page.tsx`.
+
 Other topics get their own template. Proposed, not settled:
 - System Design: Requirements → Estimates → Design → Deep dive → Trade-offs
 - Behavioral: a STAR story bank mapped to common questions
 
-**Problem detail.** It has three parts:
+**Problem detail.** It has these parts:
+- "How to solve a problem" (`components/problem/solve-steps.tsx`), above the attempt
+  form: 7 steps that fit any problem (understand, read the limits on n with a small
+  n → complexity table, brute force, find what it wastes, trace by hand, edge cases,
+  stuck after `THINK_MINUTES`). Only for reading, nothing is saved; whether it starts
+  open is remembered on this device (`solveStepsOpen`)
+- when the problem is part of its pattern's Learning path, a tag under the title names its
+  part ("Example · optional", "Solve alone 1"). The example opens "Stuck?" already
+  open on "Explain step by step", without changing the saved AI mode
 - an attempt form: outcome, minutes, mistakes, note, code
 - the attempt history, newest first, each with its outcome tag, minutes, mistake tags,
   code and note

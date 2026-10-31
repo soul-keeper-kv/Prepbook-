@@ -20,6 +20,8 @@ interface UiState {
   suggestSort: SuggestSort
   /** Platforms and levels of suggested problems to show; kept until the app is closed */
   suggestFilters: SuggestFilters
+  /** The problem page's solving steps start open */
+  solveStepsOpen: boolean
 }
 
 export const SUGGEST_SORTS = ["order", "level", "platform"] as const
@@ -54,6 +56,8 @@ export const useUiStore = create<UiState>()(() => ({
   problemFilters: [],
   suggestSort: readChoice(KEYS.suggestSort, SUGGEST_SORTS, "order"),
   suggestFilters: { platform: [], level: [] },
+  // Open for a beginner; closed once, it stays closed on this device
+  solveStepsOpen: storage.get(KEYS.solveStepsOpen) !== false,
 }))
 
 const set = useUiStore.setState
@@ -79,4 +83,8 @@ export const uiActions = {
   },
   setSuggestFilter: (kind: keyof SuggestFilters, keys: string[]) =>
     set((s) => ({ suggestFilters: { ...s.suggestFilters, [kind]: keys } })),
+  setSolveStepsOpen: (solveStepsOpen: boolean) => {
+    storage.set(KEYS.solveStepsOpen, solveStepsOpen)
+    set({ solveStepsOpen })
+  },
 }

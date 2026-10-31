@@ -185,9 +185,30 @@ export interface PatternStatus {
   overdue: number
 }
 
-const hasNotes = (pattern: Pattern) => Object.values(pattern.sections).some((s) => s.trim())
+/**
+ * The sample texts from data/ a section may hold without the user having written a word:
+ * adding a suggested pattern copies them in. Built from the content by `samplesFrom`
+ * (suggestions.ts); NO_SAMPLES where there is no content.
+ */
+export type SampleTexts = (pattern: Pattern, key: string) => readonly string[]
+export const NO_SAMPLES: SampleTexts = () => []
 
-export function patternStatus(nb: Notebook, pattern: Pattern, now: number): PatternStatus {
+/** What the user wrote in a section: its text without the samples copied in */
+export const ownText = (pattern: Pattern, key: string, samples: SampleTexts) =>
+  samples(pattern, key)
+    .filter(Boolean)
+    .reduce((rest, sample) => rest.replaceAll(sample, ""), pattern.sections[key] ?? "")
+    .trim()
+
+const hasOwnNotes = (pattern: Pattern, samples: SampleTexts) =>
+  Object.keys(pattern.sections).some((key) => ownText(pattern, key, samples))
+
+export function patternStatus(
+  nb: Notebook,
+  pattern: Pattern,
+  now: number,
+  samples: SampleTexts
+): PatternStatus {
   const problems = problemsOf(nb, pattern.id)
   const cards = cardsOf(nb, pattern.id)
   const outcomes: PatternStatus["outcomes"] = { alone: 0, hint: 0, solution: 0, todo: 0 }
@@ -217,11 +238,13 @@ export function patternStatus(nb: Notebook, pattern: Pattern, now: number): Patt
     overdue = Math.max(overdue, overdueDays(dueAt, now))
   }
 
+  // Started by something the user did: suggestions come in with the pattern, so problems
+  // and links being there, or sample theory, say nothing
   const started =
-    hasNotes(pattern) ||
-    problems.length > 0 ||
+    hasOwnNotes(pattern, samples) ||
+    outcomes.todo < problems.length ||
     cards.length > 0 ||
-    resourcesOf(nb, pattern.id).length > 0 ||
+    resourcesOf(nb, pattern.id).some((r) => r.takeaway.trim()) ||
     Boolean(pattern.done)
 
   let level: Level
@@ -263,9 +286,9 @@ export function levelCounts(statuses: PatternStatus[]): LevelCounts {
   return { total, byLevel, pct }
 }
 
-export function topicStatus(nb: Notebook, topicId: string, now: number) {
+export function topicStatus(nb: Notebook, topicId: string, now: number, samples: SampleTexts) {
   const patterns = patternsOfTopic(nb, topicId)
-  const statuses = patterns.map((p) => patternStatus(nb, p, now))
+  const statuses = patterns.map((p) => patternStatus(nb, p, now, samples))
   const counts = levelCounts(statuses)
   const next = patterns.find((_, i) => statuses[i]!.level < 2)
   const problemIds = new Set(patterns.flatMap((p) => problemsOf(nb, p.id).map((x) => x.id)))
@@ -312,7 +335,7 @@ export function dueCards(nb: Notebook, now: number): DueCard[] {
     .sort((a, b) => b.overdue - a.overdue || a.dueAt.localeCompare(b.dueAt))
 }
 
-export function todayTasks(nb: Notebook, now: number): Task[] {
+export function todayTasks(nb: Notebook, now: number, samples: SampleTexts): Task[] {
   const tasks: Task[] = dueProblems(nb, now).map(({ problem, dueAt, last, overdue }) => ({
     kind: "problem",
     problem,
@@ -337,7 +360,7 @@ export function todayTasks(nb: Notebook, now: number): Task[] {
 
   // Keep going on the pattern touched last, while it is still being learned
   const learning = liveValues(nb.patterns)
-    .filter((p) => !cardsByPattern.has(p.id) && patternStatus(nb, p, now).level === 1)
+    .filter((p) => !cardsByPattern.has(p.id) && patternStatus(nb, p, now, samples).level === 1)
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0]
   if (learning) tasks.push({ kind: "continue", pattern: learning, minutes: 30 })
   return tasks

@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { useThemeStore } from "@/lib/theme"
 import { cn } from "@/lib/utils"
 import { buildGraph, type GraphLink, type GraphNode } from "@/notebook/graph"
-import { useNotebook } from "@/notebook/hooks"
+import { useNotebook, useSamples } from "@/notebook/hooks"
 import { topicsOf } from "@/notebook/logic"
 import { TOPIC_COLORS, type TopicColor } from "@/notebook/schema"
 import { href, navigate } from "@/state/router"
@@ -68,9 +68,10 @@ export default function GraphPage() {
     void theme
     return readPalette()
   }, [theme])
+  const samples = useSamples()
   const data = useMemo(
-    () => buildGraph(nb, { hiddenTopics, showProblems }, now),
-    [nb, hiddenTopics, showProblems, now]
+    () => buildGraph(nb, { hiddenTopics, showProblems }, now, samples),
+    [nb, hiddenTopics, showProblems, now, samples]
   )
 
   useEffect(() => {

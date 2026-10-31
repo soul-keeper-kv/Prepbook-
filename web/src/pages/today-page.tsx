@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { dayKey } from "@/lib/dates"
 import { dueText, durationText } from "@/lib/time"
 import { cn } from "@/lib/utils"
-import { useLang, useNotebook } from "@/notebook/hooks"
+import { useLang, useNotebook, useSamples } from "@/notebook/hooks"
 import {
   activityByDay,
   attemptsOf,
@@ -165,7 +165,8 @@ export function TodayPage() {
   const lang = useLang()
   const nb = useNotebook()
   const now = useNow()
-  const tasks = todayTasks(nb, now)
+  const samples = useSamples()
+  const tasks = todayTasks(nb, now, samples)
   const minutes = tasks.reduce((sum, task) => sum + task.minutes, 0)
   const activity = useMemo(() => activityByDay(nb), [nb])
   const reviewTasks = tasks.filter((x) => x.kind !== "continue")
@@ -275,7 +276,7 @@ export function TodayPage() {
       <h2 className="mb-2.5 text-15 font-semibold">{t("today.topics")}</h2>
       <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-3">
         {topicsOf(nb).map((topic) => {
-          const status = topicStatus(nb, topic.id, now)
+          const status = topicStatus(nb, topic.id, now, samples)
           return (
             <a
               key={topic.id}

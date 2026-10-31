@@ -6,6 +6,7 @@ import {
   patternsOfTopic,
   topicsOf,
   type Level,
+  type SampleTexts,
 } from "@/notebook/logic"
 import type { Notebook, TopicColor } from "@/notebook/schema"
 
@@ -37,7 +38,7 @@ export interface GraphOptions {
   showProblems: boolean
 }
 
-export function buildGraph(nb: Notebook, options: GraphOptions, now: number) {
+export function buildGraph(nb: Notebook, options: GraphOptions, now: number, samples: SampleTexts) {
   const nodes: GraphNode[] = []
   const links: GraphLink[] = []
   const shown = new Set<string>()
@@ -53,7 +54,7 @@ export function buildGraph(nb: Notebook, options: GraphOptions, now: number) {
       size: 8,
     })
     for (const pattern of patternsOfTopic(nb, topic.id)) {
-      const status = patternStatus(nb, pattern, now)
+      const status = patternStatus(nb, pattern, now, samples)
       nodes.push({
         id: pattern.id,
         kind: "pattern",

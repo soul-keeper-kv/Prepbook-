@@ -110,7 +110,7 @@ export function ResourceList({ pattern }: { pattern: Pattern }) {
                 value={r.takeaway}
                 label={t("resource.takeaway", { name: r.title })}
                 placeholder={t("resource.takeawayPlaceholder")}
-                emptyText={t("resource.takeawayEmpty")}
+                writeLabel={t("resource.writeTakeaway")}
                 onChange={(takeaway) => notebookActions.updateResource(r.id, { takeaway })}
               />
             </li>

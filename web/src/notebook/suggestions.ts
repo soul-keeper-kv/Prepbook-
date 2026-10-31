@@ -2,10 +2,10 @@ import type { Content, Module } from "@/content/load"
 import { localize } from "@/content/localize"
 import { platformKey } from "@/content/problems"
 import type { Item, NoteText, ResourceType } from "@/content/schema"
-import type { Lang } from "@/i18n/languages"
+import { LANG_CODES, type Lang } from "@/i18n/languages"
 import { normalizeUrl, problemIdFor } from "@/notebook/ids"
-import { getLive, problemsOf, resourcesOf } from "@/notebook/logic"
-import type { Notebook, Pattern, ResourceKind } from "@/notebook/schema"
+import { getLive, problemsOf, resourcesOf, type SampleTexts } from "@/notebook/logic"
+import type { Notebook, Pattern, ResourceKind, TopicKind } from "@/notebook/schema"
 import { SECTION_TEMPLATES } from "@/notebook/templates"
 
 // The modules in data/ are not the user's content: they only suggest. Phases and items become
@@ -88,6 +88,31 @@ const noteText = (value: NoteText, lang: Lang) => {
   return (Array.isArray(text) ? text.join("\n") : text).trim()
 }
 
+/** A suggested note in every language: a note copied in while in Vietnamese is still a copy in English */
+function suggestedNoteTexts(item: Item, key: string): string[] {
+  const value = (item.notes as Partial<Record<string, NoteText>> | undefined)?.[key]
+  return value ? [...new Set(LANG_CODES.map((lang) => noteText(value, lang)))] : []
+}
+
+const samplesCache = new WeakMap<Content, SampleTexts>()
+
+/** The sample notes a pattern's sections may hold, from the item it was made from */
+export function samplesFrom(content: Content): SampleTexts {
+  const cached = samplesCache.get(content)
+  if (cached) return cached
+  const byKey = new Map<string, string[]>()
+  const samples: SampleTexts = (pattern, key) => {
+    const entry = pattern.sourceId ? content.items.get(pattern.sourceId) : undefined
+    if (!entry) return []
+    const id = `${entry.item.id}\n${key}`
+    let texts = byKey.get(id)
+    if (!texts) byKey.set(id, (texts = suggestedNoteTexts(entry.item, key)))
+    return texts
+  }
+  samplesCache.set(content, samples)
+  return samples
+}
+
 /** The section text after copying a suggested note in: below what the user already wrote */
 export const withNote = (section: string | undefined, text: string) =>
   section?.trim() ? `${section.trimEnd()}\n\n${text}` : text
@@ -107,6 +132,28 @@ export function moduleSuggestions(module: Module, nb: Notebook, lang: Lang): Sug
   }))
 }
 
+/** What an item puts into its pattern: notes copied into sections, problems, links */
+export interface SuggestionInput {
+  notes: { key: string; text: string }[]
+  problems: { url: string; title: string; level: string }[]
+  resources: SuggestedResource[]
+}
+
+/** An item's notes for the sections of a topic kind, in section order */
+function itemNotes(item: Item, kind: TopicKind, lang: Lang) {
+  return SECTION_TEMPLATES[kind].flatMap((key) => {
+    const value = (item.notes as Partial<Record<string, NoteText>> | undefined)?.[key]
+    return value ? [{ key, text: noteText(value, lang) }] : []
+  })
+}
+
+/** Everything an item offers: what adding it as a pattern puts in */
+export const itemSuggestion = (item: Item, kind: TopicKind, lang: Lang): SuggestionInput => ({
+  notes: itemNotes(item, kind, lang),
+  problems: suggestedProblems(item, lang),
+  resources: suggestedResources(item, lang),
+})
+
 /**
  * What a module offers for a pattern made from one of its items: problems and links not in
  * yet, and notes for the sections of the pattern's topic (kept even once copied, to reread)
@@ -115,12 +162,9 @@ export function patternSuggestions(content: Content, nb: Notebook, pattern: Patt
   const entry = pattern.sourceId ? content.items.get(pattern.sourceId) : undefined
   if (!entry) return { module: null, notes: [], problems: [], resources: [] }
   const topic = getLive(nb.topics, pattern.topicId)
-  const notes: SuggestedNote[] = (topic ? SECTION_TEMPLATES[topic.kind] : []).flatMap((key) => {
-    const value = (entry.item.notes as Partial<Record<string, NoteText>> | undefined)?.[key]
-    if (!value) return []
-    const text = noteText(value, lang)
-    return [{ key, text, copied: (pattern.sections[key] ?? "").includes(text) }]
-  })
+  const notes: SuggestedNote[] = (topic ? itemNotes(entry.item, topic.kind, lang) : []).map(
+    (note) => ({ ...note, copied: (pattern.sections[note.key] ?? "").includes(note.text) })
+  )
   const linked = new Set(problemsOf(nb, pattern.id).map((p) => p.id))
   const read = new Set(resourcesOf(nb, pattern.id).map((r) => normalizeUrl(r.url)))
   return {
@@ -138,6 +182,8 @@ export interface ProblemFilters {
 
 const levelOf = (p: SuggestedProblem) => p.level || "none"
 const LEVEL_RANK: Record<string, number> = { easy: 0, medium: 1, hard: 2, advanced: 3, expert: 4 }
+/** Easy first; no level or an unknown one last */
+export const levelRank = (level: string) => LEVEL_RANK[level.toLowerCase()] ?? 5
 const collator = new Intl.Collator(undefined, { sensitivity: "base" })
 
 /**
@@ -162,9 +208,7 @@ export function pickSuggestedProblems(
   const shown = problems.filter((p) => fits(p))
   if (sort === "level")
     shown.sort(
-      (a, b) =>
-        last(levelOf(a)) - last(levelOf(b)) ||
-        (LEVEL_RANK[a.level] ?? 5) - (LEVEL_RANK[b.level] ?? 5)
+      (a, b) => last(levelOf(a)) - last(levelOf(b)) || levelRank(a.level) - levelRank(b.level)
     )
   if (sort === "platform")
     shown.sort(

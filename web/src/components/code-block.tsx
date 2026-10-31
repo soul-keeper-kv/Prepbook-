@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react"
+import { cn } from "@/lib/utils"
 
 function useHighlighted(code: string, lang: string): ReactNode | null {
   const key = `${lang}\u0000${code}`
@@ -28,6 +29,8 @@ function useHighlighted(code: string, lang: string): ReactNode | null {
  */
 export function CodeBlock({ code, lang }: { code: string; lang: string }) {
   const highlighted = useHighlighted(code, lang)
+  // A plain-text block is a drawing (a trace, a table, a tree): line numbers only add noise
+  const plain = lang === "text"
   const lineNumbers = useMemo(
     () =>
       code
@@ -39,12 +42,17 @@ export function CodeBlock({ code, lang }: { code: string; lang: string }) {
 
   return (
     <div className="flex bg-code font-mono text-13 leading-[1.6]">
-      <pre aria-hidden className="shrink-0 py-3 pr-4 pl-4 text-right text-gutter select-none">
-        {lineNumbers}
-      </pre>
+      {!plain && (
+        <pre aria-hidden className="shrink-0 py-3 pr-4 pl-4 text-right text-gutter select-none">
+          {lineNumbers}
+        </pre>
+      )}
       <pre
         tabIndex={0}
-        className="min-w-0 flex-1 overflow-x-auto py-3 pr-4 text-code-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+        className={cn(
+          "min-w-0 flex-1 overflow-x-auto py-3 pr-4 text-code-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
+          plain && "pl-4"
+        )}
       >
         <code className="shiki-code">{highlighted ?? code}</code>
       </pre>

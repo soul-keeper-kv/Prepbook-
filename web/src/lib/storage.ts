@@ -13,6 +13,8 @@ export const KEYS = {
   problemSort: "prep_problem_sort",
   /** Order of the suggested problems on pattern pages (this device only) */
   suggestSort: "prep_suggest_sort",
+  /** Whether the problem page's solving steps start open (this device only) */
+  solveStepsOpen: "prep_solve_steps_open",
   // Progress of the old roadmap: read once to carry it into the notebook, then left alone
   progress: "dsa_progress_v3",
   driveSync: "dsa_drive_sync",

@@ -41,7 +41,7 @@
   },
   "mastery": {
     "practice": {
-      "0": "Not started: write a few lines of notes or add a first problem.",
+      "0": "Not started: write a few lines of your own notes or try a first problem.",
       "1": "Learning: solve {{alone}}/{{need}} problems on your own to reach “Got it”.",
       "2": "Got it: {{alone}} problems solved on your own. Redo {{need}} of them alone in a review (at least {{gap}} days after the first try) to master it: {{reviewed}}/{{need}}.",
       "3": "Mastered: {{reviewed}} problems redone alone in reviews, nothing overdue."
@@ -118,8 +118,8 @@
     },
     "idea": {
       "title": "Idea",
-      "hint": "The core idea, in your own words",
-      "placeholder": "Two pointers both move right: right grows the window, left shrinks it when it breaks…"
+      "hint": "From the brute force to the core idea, in your own words",
+      "placeholder": "- Brute force: try every substring, O(n²)\n- Observation: a broken window stays broken when it grows, so shrink it from the left\n- Trace: \"abcabcbb\" → window \"abc\", the second \"a\" shrinks it from the left…\n- Complexity: O(n), each element enters and leaves the window once"
     },
     "template": {
       "title": "Template code",
@@ -300,6 +300,79 @@
     "related": "Related patterns",
     "relatedEmpty": "Not linked to any pattern yet."
   },
+  "lesson": {
+    "title": "Learning path",
+    "progress": "Theory {{theory}}/{{theoryTotal}} · Problems {{solved}}/{{total}}",
+    "next": "Next",
+    "done": "Got it",
+    "theoryTitle": "Theory first",
+    "theoryIntro": "Open each part and rewrite it in your own words: edit the sample or add to it. The sample left as it is does not count.",
+    "checkpoint": {
+      "recognition": "Write 2–3 signals in a problem statement that call for this pattern.",
+      "idea": "Explain it back: where the brute force is slow, and what waste the pattern removes. Trace it by hand on a small example.",
+      "template": "Read the sample template, then cover it and type it again without looking. Compare with the sample only once done."
+    },
+    "readTheory": "Read the sample theory",
+    "practiceTitle": "Problems",
+    "theoryFirst": "best after the theory",
+    "noProblems": "No problems yet: add 3 under {{section}}; the easiest becomes the example.",
+    "role": {
+      "guided": "Example · optional",
+      "solo": "Solve alone {{n}}"
+    },
+    "guidedDetail_one": "Let an AI explain it step by step, then code it yourself. Log the attempt as “{{outcome}}”: the app has you redo it alone after {{count}} day.",
+    "guidedDetail_other": "Let an AI explain it step by step, then code it yourself. Log the attempt as “{{outcome}}”: the app has you redo it alone after {{count}} days.",
+    "soloDetail": "Think on your own for at least {{minutes}} minutes before any hint, following “{{steps}}” on the problem's page.",
+    "soloRetry": "Not solved alone last time. It counts once a redo is solved alone.",
+    "learnFrom": "Learn from the example",
+    "solve": "Solve it",
+    "open": "Open",
+    "finished": "Path done. Solve more from the Suggestions box: {{n}} solved alone takes the pattern to “{{level}}”.",
+    "guidedHere": "The example of “{{pattern}}”: “{{help}}” is open, with the AI set to explain step by step.",
+    "soloHere": "One to solve alone for “{{pattern}}”: think for at least {{minutes}} minutes before any hint.",
+    "pitfallsHint": "Common pitfalls are in already. Add each mistake you make here, with the problem's name.",
+    "explainTitle": "Understand the pattern",
+    "explainHint": "Read slowly and trace the example again on paper. Once it makes sense, rewrite the parts below in your own words.",
+    "askAgain": "Still unclear after reading? Ask an AI to explain it another way:",
+    "noExplain": "This pattern has no written lesson yet. Ask an AI to teach it for a beginner (the prompt is ready):",
+    "yourNotes": "Your notes",
+    "sampleOnly": "still the copied sample: open it and rewrite it in your words"
+  },
+  "solve": {
+    "title": "How to solve a problem",
+    "larger": "larger",
+    "logHint": "Note the step you got stuck on under “{{note}}”: next time you know what to practise.",
+    "step": {
+      "understand": {
+        "title": "Understand the problem",
+        "detail": "Say it again in your own words. Make up a small example and work out its answer by hand."
+      },
+      "limits": {
+        "title": "Read the limits on n",
+        "detail": "A machine runs about 10⁸ simple operations a second, so the limits say which complexity you need:"
+      },
+      "brute": {
+        "title": "Start from the brute force",
+        "detail": "A slow way that is surely right, with its complexity. No code yet."
+      },
+      "waste": {
+        "title": "Find what the brute force wastes",
+        "detail": "Does it recompute something already known, or try cases that cannot work? That is where the pattern goes."
+      },
+      "trace": {
+        "title": "Trace it by hand before coding",
+        "detail": "Run the idea on the example from step 1. Code only once it gives the right answer."
+      },
+      "edges": {
+        "title": "Code it, then try the edge cases",
+        "detail": "Empty input, one element, duplicates, negative numbers, very large numbers."
+      },
+      "stuck": {
+        "title": "Stuck for more than {{minutes}} minutes",
+        "detail": "Open “{{help}}” and ask an AI in “{{mode}}” mode. Read the solution only if still stuck."
+      }
+    }
+  },
   "problem": {
     "url": "Problem link",
     "urlPlaceholder": "https://leetcode.com/problems/…",
@@ -401,7 +474,7 @@
     "unlink": "Remove {{name}} from the pattern",
     "takeaway": "What I took away from {{name}}",
     "takeawayPlaceholder": "1-2 lines you took away from it",
-    "takeawayEmpty": "No takeaway written yet."
+    "writeTakeaway": "Write what you took away"
   },
   "card": {
     "question": "Question",
@@ -476,8 +549,8 @@
   },
   "suggest": {
     "title": "Suggestions: {{name}}",
-    "roadmapIntro": "Only a suggestion: Add turns an item into an (empty) pattern of yours, and its problems and material show on the pattern page for you to pick.",
-    "patternIntro": "Added to the pattern only when you click.",
+    "roadmapIntro": "Only a suggestion: Add turns an item into a pattern of yours, with its sample theory, problems and material already in.",
+    "patternIntro": "Whatever the pattern does not hold (never added, or removed) can be added again here.",
     "left_one": "{{count}} not added",
     "left_other": "{{count}} not added",
     "add": "Add",
@@ -485,8 +558,8 @@
     "addAll_other": "Add all ({{count}})",
     "addPhase_one": "Add the whole phase ({{count}})",
     "addPhase_other": "Add the whole phase ({{count}})",
-    "addedPatterns_one": "Added {{count}} pattern.",
-    "addedPatterns_other": "Added {{count}} patterns.",
+    "addedPatterns_one": "Added {{count}} pattern, with its theory, problems and material.",
+    "addedPatterns_other": "Added {{count}} patterns, with their theory, problems and material.",
     "addedItems_one": "Added {{count}} item to the pattern.",
     "addedItems_other": "Added {{count}} items to the pattern.",
     "undo": "Undo",
@@ -497,7 +570,6 @@
     "pitfallsLabel": "Common pitfalls",
     "copy": "Copy in",
     "copyNamed": "Copy {{name}} into your notes",
-    "noteCopied": "Copied",
     "noteCopiedTo": "Copied into {{section}}.",
     "noteTitle": "{{name}} · suggestion",
     "noteHint": "Copy in puts this into your {{section}} section, below what you already wrote. Then rewrite it in your own words.",
@@ -578,7 +650,7 @@
   },
   "help": {
     "toggle": "Stuck? Get a hint",
-    "tip": "Think on your own for about 20 minutes first. Stuck: ask an AI in “Hints only” mode; still stuck: read the solution. Using this panel makes the attempt “Needed a hint” or “Read the solution”.",
+    "tip": "Think on your own for about {{minutes}} minutes first. Stuck: ask an AI in “Hints only” mode; still stuck: read the solution. Using this panel makes the attempt “Needed a hint” or “Read the solution”.",
     "read": "Read a solution",
     "editorial": "Official editorial",
     "solutions": "Community solutions",
@@ -600,7 +672,8 @@
   },
   "prompt": {
     "hint": "I'm practising for interviews by pattern; this problem belongs to the pattern \"{{lesson}}\".\nI'm working on \"{{title}}\" on {{site}}: {{url}}\n\nGuide me like a teacher, without giving the solution away:\n1. Restate the problem in simple words, with one small example. If you are not sure which problem this is, ask me to paste the statement rather than guessing.\n2. Give one small hint at a time, then stop and wait for my answer. Go from brute force to the optimal approach.\n3. Only write complete code ({{lang}}) when I ask for it.",
-    "explain": "I'm practising for interviews by pattern; this problem belongs to the pattern \"{{lesson}}\".\nPlease explain \"{{title}}\" on {{site}}: {{url}}\n\nExplain it step by step:\n1. What the problem asks, in simple words, with one small example. If you are not sure which problem this is, ask me to paste the statement rather than guessing.\n2. The brute-force approach and why it is too slow.\n3. The key observation that leads to the optimal approach, and why it is this pattern.\n4. The algorithm's steps, traced by hand on the example from step 1.\n5. {{lang}} code with short comments.\n6. Time/space complexity and the edge cases that are easy to get wrong."
+    "explain": "I'm practising for interviews by pattern; this problem belongs to the pattern \"{{lesson}}\".\nPlease explain \"{{title}}\" on {{site}}: {{url}}\n\nExplain it step by step:\n1. What the problem asks, in simple words, with one small example. If you are not sure which problem this is, ask me to paste the statement rather than guessing.\n2. The brute-force approach and why it is too slow.\n3. The key observation that leads to the optimal approach, and why it is this pattern.\n4. The algorithm's steps, traced by hand on the example from step 1.\n5. {{lang}} code with short comments.\n6. Time/space complexity and the edge cases that are easy to get wrong.",
+    "pattern": "I'm new to DSA and learning the \"{{pattern}}\" pattern. I don't understand it yet.\n\nTeach it like a patient tutor, in plain words, so I get it in one read:\n1. What the pattern is, in 2–3 sentences, no jargon.\n2. Why it is needed: take one concrete problem and compare brute force with the pattern (how many operations each).\n3. Trace the pattern on that problem step by step: each step, the values of the variables and why.\n4. Why it is correct and misses no answer.\n5. The common variants, each with a small example.\n6. A short {{lang}} template with comments.\n7. The signals in a problem statement that call for this pattern.\n8. 2–3 questions to check I understood (no answers)."
   },
   "copy": {
     "label": "Copy",
@@ -636,5 +709,14 @@
     "invalidJson": "{{file}} is not valid JSON: {{message}}",
     "contentTitle": "The files in the data folder have errors",
     "contentHint": "Fix the JSON file as the message below says. Under npm run dev the page reloads when you save; with start.sh, run start.sh again."
+  },
+  "quiz": {
+    "title": "Recognition practice",
+    "progress": "Question {{n}}/{{total}} · {{right}}/{{answered}} right",
+    "right": "Right.",
+    "wrong": "Not quite.",
+    "prev": "Previous",
+    "next": "Next",
+    "again": "Start over"
   }
 }

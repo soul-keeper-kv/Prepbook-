@@ -4,8 +4,8 @@ import { INLINE_CODE } from "@/components/inline-text"
 import { cn } from "@/lib/utils"
 
 // The little Markdown the notes need, rendered without a library (the app must stay small and
-// work offline): paragraphs, "-" and "1." lists, "#" headings, fenced code (highlighted like
-// VS Code), `code`, **bold**, [links](https://...) and bare https:// links.
+// work offline): paragraphs, "-" and "1." lists, "#" headings, | tables |, fenced code
+// (highlighted like VS Code), `code`, **bold**, [links](https://...) and bare https:// links.
 // Anything else shows as typed.
 
 const LANG_ALIAS: Record<string, string> = {
@@ -43,7 +43,12 @@ export function MarkdownInline({ text }: { text: string }) {
         </code>
       )
     } else if (m[2] !== undefined) {
-      parts.push(<strong key={key}>{m[2]}</strong>)
+      // Bold may hold `code` or a link: render its inside as inline Markdown too
+      parts.push(
+        <strong key={key}>
+          <MarkdownInline text={m[2]} />
+        </strong>
+      )
     } else {
       const url = m[4] ?? m[5] ?? ""
       parts.push(
@@ -63,10 +68,20 @@ type Block =
   | { kind: "h"; text: string }
   | { kind: "ul" | "ol"; items: string[] }
   | { kind: "code"; lang: string; code: string }
+  | { kind: "table"; head: string[]; rows: string[][] }
 
 const BULLET = /^\s*[-*]\s+(.*)$/
 const NUMBERED = /^\s*\d+[.)]\s+(.*)$/
 const HEADING = /^#{1,6}\s+(.*)$/
+const TABLE_ROW = /^\s*\|.*\|\s*$/
+const TABLE_RULE = /^\s*\|(\s*:?-+:?\s*\|)+\s*$/
+const cellsOf = (row: string) =>
+  row
+    .trim()
+    .replace(/^\|/, "")
+    .replace(/\|$/, "")
+    .split("|")
+    .map((cell) => cell.trim())
 
 export function parseBlocks(text: string): Block[] {
   const blocks: Block[] = []
@@ -93,6 +108,16 @@ export function parseBlocks(text: string): Block[] {
       i++
       continue
     }
+    // | head | head |, then | --- | --- |, then rows: a table
+    if (TABLE_ROW.test(line) && TABLE_RULE.test(lines[i + 1] ?? "")) {
+      const head = cellsOf(line)
+      const rows: string[][] = []
+      i += 2
+      while (i < lines.length && TABLE_ROW.test(lines[i] ?? ""))
+        rows.push(cellsOf(lines[i++] ?? ""))
+      blocks.push({ kind: "table", head, rows })
+      continue
+    }
     const listKind = BULLET.test(line) ? "ul" : NUMBERED.test(line) ? "ol" : null
     if (listKind) {
       const re = listKind === "ul" ? BULLET : NUMBERED
@@ -110,6 +135,7 @@ export function parseBlocks(text: string): Block[] {
       (lines[i] ?? "").trim() &&
       !/^\s*```/.test(lines[i] ?? "") &&
       !HEADING.test(lines[i] ?? "") &&
+      !TABLE_ROW.test(lines[i] ?? "") &&
       !BULLET.test(lines[i] ?? "") &&
       !NUMBERED.test(lines[i] ?? "")
     ) {
@@ -133,10 +159,38 @@ export function Markdown({ text, className }: { text: string; className?: string
               </div>
             )
           case "h":
+            // A heading opens a part of a longer text (a lesson): space above sets it apart
             return (
-              <p key={i} className="font-semibold">
+              <h3 key={i} className="pt-2 text-15 font-semibold first:pt-0">
                 <MarkdownInline text={block.text} />
-              </p>
+              </h3>
+            )
+          case "table":
+            return (
+              <div key={i} className="overflow-x-auto rounded-md border">
+                <table className="w-full border-collapse text-13">
+                  <thead className="bg-muted text-left">
+                    <tr>
+                      {block.head.map((cell, j) => (
+                        <th key={j} className="px-3 py-1.5 font-semibold">
+                          <MarkdownInline text={cell} />
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {block.rows.map((row, r) => (
+                      <tr key={r} className="border-t align-top">
+                        {block.head.map((_, j) => (
+                          <td key={j} className="px-3 py-1.5">
+                            <MarkdownInline text={row[j] ?? ""} />
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )
           case "ul":
           case "ol": {

@@ -16,14 +16,19 @@ import { BackButton, PageHeader, Panel } from "@/components/common/page"
 import { PatternPicker } from "@/components/common/pattern-picker"
 import { AttemptForm } from "@/components/problem/attempt-form"
 import { ProblemHelp } from "@/components/problem/problem-help"
+import { practiceLabel } from "@/components/pattern/pattern-lesson"
 import { ProblemPager } from "@/components/problem/problem-pager"
+import { SolveSteps } from "@/components/problem/solve-steps"
 import { Tag } from "@/components/tag"
 import { Button } from "@/components/ui/button"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { Textarea } from "@/components/ui/textarea"
 import { formatDate, formatTime, dueText } from "@/lib/time"
 import { cn } from "@/lib/utils"
+import { useContent } from "@/content/context"
+import { THINK_MINUTES } from "@/content/problems"
 import { useLang, useNotebook } from "@/notebook/hooks"
+import { patternLesson } from "@/notebook/lesson"
 import { attemptsOf, getLive, isDue, problemSchedule } from "@/notebook/logic"
 import type { Attempt, Conflict, Problem } from "@/notebook/schema"
 import { notebookActions } from "@/notebook/store"
@@ -187,6 +192,8 @@ export function ProblemPage({ id }: { id: string }) {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const now = useNow()
   const levelId = useId()
+  const content = useContent()
+  const lang = useLang()
   const lastPatternId = useUiStore((s) => s.lastPatternId)
   const problem = getLive(nb.problems, id)
   if (!problem) {
@@ -207,6 +214,13 @@ export function ProblemPage({ id }: { id: string }) {
   const pattern = patterns.find((p) => p.id === lastPatternId) ?? patterns[0]
   const topic = getLive(nb.topics, pattern?.topicId)
   const patternNames = patterns.map((p) => p.name).join(", ")
+  // Its part in that pattern's lesson: the guided example, or one to solve alone
+  const practice =
+    pattern && topic?.kind === "dsa" && !pattern.theory
+      ? patternLesson(content, nb, pattern, lang).practice
+      : []
+  const practiceIndex = practice.findIndex((p) => p.id === problem.id)
+  const guided = practice[practiceIndex]?.role === "guided"
   const conflictLabel = (c: Conflict) =>
     c.entityId === problem.id
       ? t("problem.notes")
@@ -286,6 +300,14 @@ export function ProblemPage({ id }: { id: string }) {
         <div className="mt-3">
           <ProblemPatterns problem={problem} />
         </div>
+        {pattern && practiceIndex >= 0 && (
+          <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-13 text-muted-foreground">
+            <Tag tone="link">{practiceLabel(t, practice, practiceIndex)}</Tag>
+            {guided
+              ? t("lesson.guidedHere", { pattern: pattern.name, help: t("help.toggle") })
+              : t("lesson.soloHere", { pattern: pattern.name, minutes: THINK_MINUTES })}
+          </p>
+        )}
       </PageHeader>
 
       <ConfirmDialog
@@ -308,6 +330,7 @@ export function ProblemPage({ id }: { id: string }) {
 
       <div className="flex flex-wrap items-start gap-6">
         <div className="flex min-w-0 flex-[999_1_520px] flex-col gap-5">
+          <SolveSteps />
           <Panel title={t("attempt.title")}>
             <AttemptForm key={problem.id} problemId={problem.id} />
           </Panel>
@@ -333,13 +356,22 @@ export function ProblemPage({ id }: { id: string }) {
               onChange={(notes) => notebookActions.updateProblem(problem.id, { notes })}
             />
           </Panel>
-          <Collapsible className="rounded-md border bg-card">
+          {/* A guided example opens on the step-by-step explanation */}
+          <Collapsible
+            key={`${problem.id}-${guided}`}
+            defaultOpen={guided}
+            className="rounded-md border bg-card"
+          >
             <CollapsibleTrigger className="group/h flex w-full cursor-pointer items-center gap-2 px-4 py-2.5 text-left text-14 font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <ChevronRightIcon className="size-4 text-muted-foreground transition-transform group-data-[state=open]/h:rotate-90" />
               {t("help.toggle")}
             </CollapsibleTrigger>
             <CollapsibleContent className="border-t px-4 py-3">
-              <ProblemHelp problem={problem} patternNames={patternNames} />
+              <ProblemHelp
+                problem={problem}
+                patternNames={patternNames}
+                initialMode={guided ? "explain" : undefined}
+              />
             </CollapsibleContent>
           </Collapsible>
         </div>

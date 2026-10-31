@@ -136,10 +136,36 @@ describe("notebookActions", () => {
     expect(changes).toBe(1)
     expect(added).toHaveLength(ids.length)
     expect(phasesOf(notebookActions.get(), "t_dsa")).toHaveLength(1)
+
+    // Each pattern comes with everything its item offers: sample theory, problems, links
+    const doc = notebookActions.get()
+    const slidingWindow = phase.items.find((i) => i.id === "p1-window")!
+    const pattern = liveValues(doc.patterns).find((p) => p.sourceId === "p1-window")!
+    expect(Object.keys(pattern.sections).sort()).toEqual(Object.keys(slidingWindow.notes!).sort())
+    expect(problemsOf(doc, pattern.id).map((p) => p.url)).toEqual(
+      slidingWindow.problems!.map((p) => p.url)
+    )
+    expect(liveValues(doc.resources).length).toBeGreaterThan(0)
+
     // Adding again adds nothing new
     expect(notebookActions.addSuggestedPatterns(content, ids, "vi")).toEqual([])
     notebookActions.deletePatterns(added)
-    expect(liveValues(notebookActions.get().patterns)).toHaveLength(0)
+    const undone = notebookActions.get()
+    expect(liveValues(undone.patterns)).toHaveLength(0)
+    expect(liveValues(undone.problems)).toHaveLength(0)
+    expect(liveValues(undone.resources)).toHaveLength(0)
+  })
+
+  it("keeps a problem of another pattern when undoing an added suggestion", () => {
+    const content = buildContent(dataFiles)
+    const mine = notebookActions.addPattern("t_dsa", null, "Mine")
+    const url = content.items.get("p1-window")!.item.problems![0]!.url
+    const shared = notebookActions.addProblem({ url, title: "Shared", patternIds: [mine] })
+    const added = notebookActions.addSuggestedPatterns(content, ["p1-window"], "vi")
+    expect(notebookActions.get().problems[shared]?.patternIds).toEqual([mine, added[0]])
+    notebookActions.deletePatterns(added)
+    expect(notebookActions.get().problems[shared]).toMatchObject({ patternIds: [mine] })
+    expect(notebookActions.get().problems[shared]?.deleted).toBeFalsy()
   })
 
   it("start over keeps the default topics, empty", () => {

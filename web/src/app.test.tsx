@@ -41,6 +41,8 @@ beforeEach(async () => {
   uiActions.setSuggestSort("order")
   uiActions.setSuggestFilter("platform", [])
   uiActions.setSuggestFilter("level", [])
+  uiActions.setAiMode("hint")
+  uiActions.setSolveStepsOpen(true)
   window.location.hash = ""
 })
 
@@ -69,6 +71,8 @@ describe("App", () => {
     await waitFor(() => expect(window.location.hash).toMatch(/^#\/pattern\//))
     await act(async () => window.dispatchEvent(new HashChangeEvent("hashchange")))
     await screen.findByRole("heading", { level: 1, name: /Sliding Window/ })
+    // A DSA pattern is a learning path: its notes open from their step
+    await user.click(screen.getByRole("button", { name: /^Nhận diện/ }))
     await user.click(screen.getByRole("button", { name: "Sửa: Nhận diện" }))
     await user.type(screen.getByRole("textbox", { name: "Nhận diện" }), "đoạn con liên tiếp")
     const pattern = liveValues(saved().patterns).find((p) => p.name === "Sliding Window")!
@@ -97,7 +101,8 @@ describe("App", () => {
     expect(screen.getByText("Đã giải · cần gợi ý")).toBeInTheDocument()
     expect(screen.getByText("1 lần làm")).toBeInTheDocument()
     expect(screen.getByText("Làm lại: sau 3 ngày")).toBeInTheDocument()
-  })
+    // Three pages and ~100 typed keys, each a save and a render: near 5 s on a busy machine
+  }, 15_000)
 
   it("sorts a pattern's problem table, and the problem page steps in that order", async () => {
     const user = userEvent.setup()
@@ -272,11 +277,23 @@ describe("App", () => {
       return sites.has("leetcode.com") && sites.has("www.hackerrank.com")
     })!
     const id = notebookActions.addSuggestedPattern(content, entry.item.id, "vi")!
+    // Everything comes in with the pattern: taken out again, the box offers it back
+    notebookActions.unlinkProblems(
+      liveValues(saved().problems).map((p) => p.id),
+      id
+    )
+    notebookActions.unlinkResources(
+      liveValues(saved().resources).map((r) => r.id),
+      id
+    )
+    const noteKeys = Object.keys(saved().patterns[id]!.sections)
+    for (const key of noteKeys) notebookActions.setSection(id, key, "")
     const fromLeetCode = entry.item.problems!.filter((p) => p.url.includes("leetcode.com"))
     renderApp()
     await go(`#/pattern/${id}`)
     await screen.findByRole("heading", { level: 1 })
-    const total = entry.item.problems!.length + (entry.item.resources?.length ?? 0)
+    const total =
+      entry.item.problems!.length + (entry.item.resources?.length ?? 0) + noteKeys.length
     expect(screen.getByRole("button", { name: `Thêm tất cả (${total})` })).toBeInTheDocument()
 
     await user.click(screen.getByRole("button", { name: "Nền tảng" }))
@@ -295,12 +312,13 @@ describe("App", () => {
     expect(levels[0]).toBe("LeetCode · easy")
     expect(storage.get(KEYS.suggestSort)).toBe("level")
 
-    // "Add all" adds what is shown: the LeetCode problems, plus the links
-    const added = fromLeetCode.length + (entry.item.resources?.length ?? 0)
+    // "Add all" adds what is shown: the LeetCode problems, plus the links and the theory
+    const added = fromLeetCode.length + (entry.item.resources?.length ?? 0) + noteKeys.length
     await user.click(screen.getByRole("button", { name: `Thêm tất cả (${added})` }))
     const problems = liveValues(saved().problems)
     expect(problems).toHaveLength(fromLeetCode.length)
     expect(problems.every((p) => p.url.includes("leetcode.com"))).toBe(true)
+    expect(Object.values(saved().patterns[id]!.sections).every(Boolean)).toBe(true)
   })
 
   it("steps through a pattern's problems, then goes back to the pattern", async () => {
@@ -337,6 +355,108 @@ describe("App", () => {
     // Stepping added no history entries: Back skips the problems stepped through
     await user.click(screen.getByRole("button", { name: "Quay lại" }))
     await screen.findByRole("heading", { level: 1, name: /Two Pointers/ })
+  })
+
+  it("shows a DSA pattern as a learning path: notes inside, then an example and two to solve", async () => {
+    const user = userEvent.setup()
+    const pattern = notebookActions.addSuggestedPattern(content, "p1-twoptr", "vi")!
+    renderApp()
+    await go(`#/pattern/${pattern}`)
+    await screen.findByRole("heading", { level: 1, name: /Two Pointers/ })
+    const lesson = screen.getByRole("region", { name: "Lộ trình học" })
+    expect(lesson).toHaveTextContent("Lý thuyết 0/3 · Bài 0/3")
+    // The note sections live inside the path, not below it
+    expect(screen.queryByRole("heading", { level: 2, name: /^1. Nhận diện/ })).toBeNull()
+    expect(screen.getByRole("heading", { level: 2, name: "1. Bài đã làm" })).toBeInTheDocument()
+
+    // Understanding comes first: the lesson is open, the notes to rewrite are closed
+    expect(within(lesson).getByRole("button", { name: /^Hiểu pattern/ })).toHaveAttribute(
+      "aria-expanded",
+      "true"
+    )
+    expect(within(lesson).getByRole("heading", { name: "Hai con trỏ là gì?" })).toBeInTheDocument()
+    const recognition = within(lesson).getByRole("button", { name: /^Nhận diện/ })
+    expect(recognition).toHaveAttribute("aria-expanded", "false")
+
+    // A step opens to its explanation (a table here) and a quiz answered on the spot
+    await user.click(recognition)
+    expect(
+      within(lesson).getByRole("columnheader", { name: "Dấu hiệu trong đề" })
+    ).toBeInTheDocument()
+    const quiz = within(lesson).getByRole("region", { name: "Luyện nhận diện" })
+    await user.click(within(quiz).getByRole("radio", { name: "Cùng chiều (read / write)" }))
+    expect(quiz).toHaveTextContent("Chưa đúng.")
+    expect(quiz).toHaveTextContent("Câu 1/5 · đúng 0/1")
+    await user.click(within(quiz).getByRole("button", { name: "Câu sau" }))
+    await user.click(within(quiz).getByRole("radio", { name: "Cùng chiều (read / write)" }))
+    expect(quiz).toHaveTextContent("Câu 2/5 · đúng 1/2")
+
+    // The notes, still the copied sample, are folded under the explanation; edited in place
+    const notes = within(lesson).getByRole("button", { name: /^Ghi chú của bạn/ })
+    expect(notes).toHaveAttribute("aria-expanded", "false")
+    await user.click(notes)
+    expect(within(lesson).getByRole("button", { name: "Sửa: Nhận diện" })).toBeInTheDocument()
+
+    // Words of your own tick a step; the sample alone does not
+    const copied = saved().patterns[pattern]!.sections.idea!
+    act(() =>
+      notebookActions.setSection(
+        pattern,
+        "idea",
+        `${copied}
+
+Hai đầu đi vào giữa`
+      )
+    )
+    expect(lesson).toHaveTextContent("Lý thuyết 1/3")
+
+    // The three easiest suggested problems: an example to learn from, then two to solve alone
+    expect(within(lesson).getByText("Bài mẫu · tuỳ chọn")).toBeInTheDocument()
+    expect(within(lesson).getByText("Tự làm 1")).toBeInTheDocument()
+    expect(within(lesson).getByText("Tự làm 2")).toBeInTheDocument()
+    await user.click(screen.getByRole("button", { name: "Học qua bài mẫu" }))
+    await act(async () => window.dispatchEvent(new HashChangeEvent("hashchange")))
+    await screen.findByRole("heading", { level: 1, name: /Valid Palindrome/ })
+
+    // The example opens its help on the step-by-step explanation, leaving the saved choice alone
+    expect(screen.getByText("Bài mẫu · tuỳ chọn")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Bí? Xem gợi ý" })).toHaveAttribute(
+      "aria-expanded",
+      "true"
+    )
+    expect(screen.getByRole("radio", { name: "Giải thích từng bước" })).toHaveAttribute(
+      "aria-checked",
+      "true"
+    )
+    expect(storage.get(KEYS.aiMode)).toBe("hint")
+
+    // A Java pattern keeps its own sections, with no path
+    const java = notebookActions.addPattern("t_java", null, "HashMap")
+    await go(`#/pattern/${java}`)
+    await screen.findByRole("heading", { level: 1, name: /HashMap/ })
+    expect(screen.queryByRole("region", { name: "Lộ trình học" })).toBeNull()
+    expect(screen.getByRole("heading", { level: 2, name: "1. Là gì" })).toBeInTheDocument()
+  })
+
+  it("lists the solving steps above the attempt form, and remembers closing them", async () => {
+    const user = userEvent.setup()
+    const pattern = notebookActions.addPattern("t_dsa", null, "Two Pointers")
+    const problem = notebookActions.addProblem({
+      url: "https://leetcode.com/problems/3sum/",
+      title: "3Sum",
+      patternIds: [pattern],
+    })
+    renderApp()
+    await go(`#/problem/${problem}`)
+    await screen.findByRole("heading", { level: 1, name: /3Sum/ })
+    const steps = screen.getByRole("button", { name: "Các bước giải một bài" })
+    expect(steps).toHaveAttribute("aria-expanded", "true")
+    expect(screen.getByText("n ≤ 20 → O(2ⁿ)")).toBeInTheDocument()
+    expect(screen.getByText("Bí quá 20 phút")).toBeInTheDocument()
+
+    await user.click(steps)
+    expect(steps).toHaveAttribute("aria-expanded", "false")
+    expect(storage.get(KEYS.solveStepsOpen)).toBe(false)
   })
 
   it("collects a link in the inbox and files it as a problem", async () => {
@@ -385,28 +505,32 @@ describe("App", () => {
     )
   })
 
-  it("copies suggested theory into a pattern's notes only when asked", async () => {
+  it("adds a suggested pattern with its theory, and offers a cleared note again", async () => {
     const user = userEvent.setup()
     const entry = [...content.items.values()].find(
       (e) => e.item.notes?.recognition && e.item.notes.template
     )!
     const id = notebookActions.addSuggestedPattern(content, entry.item.id, "vi")!
+    const sample = [localize(entry.item.notes!.recognition!, "vi")].flat()[0]!
+    expect(saved().patterns[id]?.sections.recognition).toContain(sample)
+    expect(saved().patterns[id]?.sections.template).toMatch(/^```java\n/)
+
+    notebookActions.setSection(id, "recognition", "")
+    notebookActions.setSection(id, "template", "- mine")
     renderApp()
     await go(`#/pattern/${id}`)
     await screen.findByRole("heading", { level: 1 })
-    expect(saved().patterns[id]?.sections).toEqual({})
 
     // Copy straight from the list
     await user.click(screen.getByRole("button", { name: "Chép Nhận diện vào ghi chú" }))
     const recognition = saved().patterns[id]?.sections.recognition ?? ""
-    expect(recognition).toContain([localize(entry.item.notes!.recognition!, "vi")].flat()[0]!)
-    expect(screen.getByText("Đã chép")).toBeInTheDocument()
+    expect(recognition).toContain(sample)
 
     // Read first, then copy from the dialog: it goes below what is already there
     await user.click(screen.getByRole("button", { name: "Template code" }))
     const dialog = await screen.findByRole("dialog", { name: "Template code · gợi ý" })
     await user.click(within(dialog).getByRole("button", { name: "Chép vào" }))
-    expect(saved().patterns[id]?.sections.template).toMatch(/^```java\n/)
+    expect(saved().patterns[id]?.sections.template).toMatch(/^- mine\n\n```java\n/)
     expect(saved().patterns[id]?.sections.recognition).toBe(recognition)
   })
 

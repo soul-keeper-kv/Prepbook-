@@ -64,7 +64,32 @@ export const ItemSchema = z.strictObject({
   title: Text,
   problems: z.array(Problem).optional(),
   resources: z.array(Resource).optional(),
-  /** Suggested text for the pattern's note sections, copied in only when the user asks */
+  /**
+   * A beginner's explanation, read before the notes: plain words, a worked example traced
+   * step by step, why it works. Shown on the pattern page, never copied into the notebook.
+   */
+  lesson: NoteText.optional(),
+  /**
+   * A clear explanation for each step of the learning path (Recognition, Idea, Template...):
+   * tables, side-by-side comparisons, line-by-line code. Shown in that step, never copied.
+   */
+  guide: z.partialRecord(z.enum(NOTE_KEYS), NoteText).optional(),
+  /** Multiple-choice questions to practise recognising the pattern, answered in the app */
+  quiz: z
+    .array(
+      z
+        .strictObject({
+          question: Text,
+          options: z.array(Text).min(2),
+          /** Index of the right option */
+          answer: z.number().int().min(0),
+          /** Why that option is right, shown once the user has picked */
+          why: Text,
+        })
+        .refine((q) => q.answer < q.options.length, "answer must be the index of an option")
+    )
+    .optional(),
+  /** Sample text for the pattern's note sections, copied in when the pattern is added */
   notes: z.partialRecord(z.enum(NOTE_KEYS), NoteText).optional(),
 })
 

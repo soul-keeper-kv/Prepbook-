@@ -97,3 +97,6 @@ export const AI_TOOLS = [
 
 export const AI_MODES = ["hint", "explain"] as const
 export type AiMode = (typeof AI_MODES)[number]
+
+/** Think on your own this long before asking for help */
+export const THINK_MINUTES = 20

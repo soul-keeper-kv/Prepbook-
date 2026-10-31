@@ -484,6 +484,325 @@
         { "type": "article", "title": "USACO Guide: Two Pointers", "url": "https://usaco.guide/silver/two-pointers" },
         { "type": "practice", "title": "LeetCode tag: Two Pointers", "url": "https://leetcode.com/problem-list/two-pointers/" }
       ],
+      "guide": {
+        "recognition": {
+          "vi": [
+            "Mấu chốt: nhìn **dữ liệu được tổ chức thế nào** và **đề muốn làm gì**, không nhìn tên bài.",
+            "",
+            "## Dấu hiệu → dạng nên thử",
+            "",
+            "| Dấu hiệu trong đề | Dạng nên thử |",
+            "| --- | --- |",
+            "| Mảng **đã sắp xếp**, tìm cặp hoặc bộ ba có tổng bằng target | Hai đầu đi vào giữa |",
+            "| Kiểm tra palindrome, so sánh đối xứng | Hai đầu đi vào giữa |",
+            "| Chọn hai vị trí `i < j` để tối ưu một đại lượng (diện tích, khoảng cách) | Hai đầu đi vào giữa |",
+            "| Xoá phần tử trùng, dồn số 0, gom phần tử thoả điều kiện, **sửa tại chỗ** | Cùng chiều (read / write) |",
+            "| Đoạn con, chuỗi con **liên tiếp** dài nhất hay ngắn nhất | Sliding Window (pattern riêng) |",
+            "| Linked list: tìm phần tử giữa, phát hiện vòng lặp | Nhanh – chậm (pattern riêng) |",
+            "| Mảng **chưa** sắp xếp và cần **index gốc** | Không phải hai con trỏ: dùng Hash map |",
+            "",
+            "## Hỏi lần lượt 4 câu",
+            "",
+            "1. Đề có cần xét **cặp** phần tử, hay so sánh nhiều vị trí với nhau không? Không thì nhiều khả năng không phải hai con trỏ.",
+            "2. Dữ liệu **đã sắp xếp** hoặc có tính **đối xứng**? Có thì thử **hai đầu đi vào giữa**.",
+            "3. Phải **lọc, ghi đè, dồn** phần tử ngay trong mảng, không tạo mảng mới? Có thì thử **cùng chiều**.",
+            "4. Là **linked list**, cần tìm phần tử giữa hay phát hiện vòng? Có thì thử **nhanh – chậm**.",
+            "",
+            "Không câu nào khớp thì nghĩ tới Sliding Window, Hash map hoặc Binary Search.",
+            "",
+            "## Giới hạn của n cũng là một dấu hiệu",
+            "",
+            "n tới 10⁴–10⁵ thì thử mọi cặp (O(n²), tới khoảng 5·10⁹ phép tính) sẽ quá chậm: đề đang ngầm đòi O(n) hoặc O(n log n). Hai con trỏ chạy O(n); nếu phải sort trước thì O(n log n)."
+          ]
+        },
+        "idea": {
+          "vi": [
+            "## Từ vét cạn tới hai con trỏ",
+            "",
+            "**Bài:** mảng đã sắp xếp, có hai số nào tổng bằng `target` không?",
+            "",
+            "**Vét cạn:** thử mọi cặp.",
+            "",
+            "```java",
+            "for (int i = 0; i < n; i++)",
+            "    for (int j = i + 1; j < n; j++)",
+            "        if (nums[i] + nums[j] == target) return true;",
+            "return false;",
+            "```",
+            "",
+            "**Hai con trỏ:** mỗi bước bỏ hẳn một số.",
+            "",
+            "```java",
+            "int left = 0, right = n - 1;",
+            "while (left < right) {",
+            "    int sum = nums[left] + nums[right];",
+            "    if (sum == target) return true;",
+            "    if (sum < target) left++;",
+            "    else right--;",
+            "}",
+            "return false;",
+            "```",
+            "",
+            "| | Vét cạn | Hai con trỏ |",
+            "| --- | --- | --- |",
+            "| Thời gian | O(n²) | O(n) |",
+            "| Bộ nhớ thêm | O(1) | O(1) |",
+            "| Với n = 10⁵ | khoảng 5·10⁹ phép tính: quá chậm | khoảng 10⁵ phép tính |",
+            "| Cần mảng đã sắp xếp? | Không | **Có** |",
+            "",
+            "## Ý chính trong một câu",
+            "",
+            "Mảng đã sắp xếp nên mỗi lần so `sum` với `target`, bạn **biết chắc** một số không thể nằm trong đáp án và bỏ nó đi: tổng lớn quá thì số bên phải lớn quá, tổng nhỏ quá thì số bên trái nhỏ quá.",
+            "",
+            "## Ý chính của từng dạng",
+            "",
+            "| Dạng | Hai con trỏ bắt đầu ở đâu | Mỗi bước làm gì |",
+            "| --- | --- | --- |",
+            "| Hai đầu đi vào giữa | `left = 0`, `right = n - 1` | So hai đầu, dời **một** con trỏ vào giữa |",
+            "| Cùng chiều | `read` và `write` cùng ở đầu | `read` đi qua mọi phần tử; phần tử được giữ thì chép vào `write` rồi tăng `write` |",
+            "| Nhanh – chậm | cùng ở đầu linked list | `slow` đi 1 bước, `fast` đi 2 bước |"
+          ]
+        },
+        "template": {
+          "vi": [
+            "## Khung 1: hai đầu đi vào giữa",
+            "",
+            "```java",
+            "int left = 0, right = nums.length - 1;",
+            "while (left < right) {          // gặp nhau là đã xét hết",
+            "    if (/* tìm thấy */) return /* đáp án */;",
+            "    if (/* cần số lớn hơn */) left++;",
+            "    else right--;                // cần số nhỏ hơn",
+            "}",
+            "```",
+            "",
+            "| Dòng | Vì sao viết vậy |",
+            "| --- | --- |",
+            "| `left = 0, right = n - 1` | Bắt đầu ở hai đầu: mọi cặp đều nằm giữa hai con trỏ |",
+            "| `while (left < right)` | Dùng `<` chứ không `<=`: một số không được ghép với chính nó |",
+            "| `left++` | Tổng nhỏ quá: số ở `left` ghép với số nào còn lại cũng nhỏ, bỏ nó |",
+            "| `right--` | Tổng lớn quá: số ở `right` ghép với số nào còn lại cũng lớn, bỏ nó |",
+            "",
+            "## Khung 2: cùng chiều (read / write)",
+            "",
+            "```java",
+            "int write = 0;",
+            "for (int read = 0; read < nums.length; read++) {",
+            "    if (/* nums[read] được giữ lại */) {",
+            "        nums[write] = nums[read];",
+            "        write++;",
+            "    }",
+            "}",
+            "return write;                    // số phần tử được giữ",
+            "```",
+            "",
+            "`read` đọc mọi phần tử; `write` luôn chỉ ô trống tiếp theo cho phần tử được giữ. Phần đầu mảng, từ 0 tới `write - 1`, là kết quả.",
+            "",
+            "## Lỗi hay gặp khi tự gõ lại",
+            "",
+            "- Viết `left <= right`: một số bị ghép với chính nó.",
+            "- Dời cả hai con trỏ cùng lúc khi chưa tìm thấy: có thể bỏ sót đáp án.",
+            "- Đề không nói mảng đã sắp xếp mà quên sort; còn nếu đề cần index gốc thì sort làm mất index.",
+            "- Khung 2: trả về `write - 1` thay vì `write`."
+          ]
+        }
+      },
+      "quiz": [
+        {
+          "question": {
+            "vi": "Cho mảng **đã sắp xếp** và `target`. Có hai số nào tổng bằng `target` không?"
+          },
+          "options": [
+            {
+              "vi": "Hai đầu đi vào giữa"
+            },
+            {
+              "vi": "Cùng chiều (read / write)"
+            },
+            {
+              "vi": "Nhanh – chậm"
+            },
+            {
+              "vi": "Không phải hai con trỏ"
+            }
+          ],
+          "answer": 0,
+          "why": {
+            "vi": "Mảng đã sắp xếp cho phép dời con trỏ mà không bỏ sót: tổng lớn quá thì dời `right`, nhỏ quá thì dời `left`."
+          }
+        },
+        {
+          "question": {
+            "vi": "Dồn mọi số 0 về cuối mảng, giữ nguyên thứ tự các số khác, không tạo mảng mới (Move Zeroes)."
+          },
+          "options": [
+            {
+              "vi": "Hai đầu đi vào giữa"
+            },
+            {
+              "vi": "Cùng chiều (read / write)"
+            },
+            {
+              "vi": "Nhanh – chậm"
+            },
+            {
+              "vi": "Không phải hai con trỏ"
+            }
+          ],
+          "answer": 1,
+          "why": {
+            "vi": "`read` đi qua mọi số; số khác 0 thì chép vào ô `write` rồi tăng `write`. Xong thì điền 0 từ `write` tới cuối."
+          }
+        },
+        {
+          "question": {
+            "vi": "Cho đầu một linked list. Danh sách có vòng lặp không (Linked List Cycle)?"
+          },
+          "options": [
+            {
+              "vi": "Hai đầu đi vào giữa"
+            },
+            {
+              "vi": "Cùng chiều (read / write)"
+            },
+            {
+              "vi": "Nhanh – chậm"
+            },
+            {
+              "vi": "Không phải hai con trỏ"
+            }
+          ],
+          "answer": 2,
+          "why": {
+            "vi": "`fast` đi 2 bước, `slow` đi 1 bước. Có vòng thì `fast` đuổi kịp `slow`; không có vòng thì `fast` chạm `null`."
+          }
+        },
+        {
+          "question": {
+            "vi": "Mảng **chưa sắp xếp**. Trả về **index** của hai số có tổng bằng `target` (Two Sum)."
+          },
+          "options": [
+            {
+              "vi": "Hai đầu đi vào giữa"
+            },
+            {
+              "vi": "Cùng chiều (read / write)"
+            },
+            {
+              "vi": "Nhanh – chậm"
+            },
+            {
+              "vi": "Không phải hai con trỏ"
+            }
+          ],
+          "answer": 3,
+          "why": {
+            "vi": "Sort sẽ làm mất index gốc. Dùng Hash map: với mỗi số, tra xem `target - số` đã gặp chưa, O(n)."
+          }
+        },
+        {
+          "question": {
+            "vi": "Chuỗi `s` có đọc xuôi và đọc ngược như nhau không, chỉ xét chữ và số (Valid Palindrome)?"
+          },
+          "options": [
+            {
+              "vi": "Hai đầu đi vào giữa"
+            },
+            {
+              "vi": "Cùng chiều (read / write)"
+            },
+            {
+              "vi": "Nhanh – chậm"
+            },
+            {
+              "vi": "Không phải hai con trỏ"
+            }
+          ],
+          "answer": 0,
+          "why": {
+            "vi": "So ký tự ở hai đầu rồi cùng đi vào giữa; gặp ký tự không phải chữ hay số thì bỏ qua nó."
+          }
+        }
+      ],
+      "lesson": {
+        "vi": [
+          "## Hai con trỏ là gì?",
+          "",
+          "Bạn dùng **hai biến chỉ vị trí** trong mảng hoặc chuỗi, thường tên là `left` và `right`. Mỗi bước, bạn nhìn hai phần tử chúng đang trỏ tới rồi **dời một trong hai con trỏ** theo một quy tắc, cho tới khi hai con trỏ gặp nhau.",
+          "",
+          "Nhờ vậy bạn chỉ đi qua mảng **một lượt**, thay vì thử mọi cặp bằng hai vòng `for` lồng nhau.",
+          "",
+          "## Vì sao cần: một bài cụ thể",
+          "",
+          "**Bài:** cho mảng **đã sắp xếp** `[1, 2, 4, 7, 11, 15]` và `target = 15`. Tìm hai số có tổng bằng 15.",
+          "",
+          "**Cách vét cạn:** thử mọi cặp (1, 2), (1, 4), (1, 7)… Mảng 6 số có 15 cặp; n số có khoảng n²/2 cặp. Với n = 100 000 là khoảng 5 tỷ cặp, trong khi máy chạy khoảng 10⁸ phép tính mỗi giây: quá chậm.",
+          "",
+          "**Cách hai con trỏ:** đặt `L` ở đầu mảng, `R` ở cuối mảng. Cộng hai số ở `L` và `R`, rồi:",
+          "",
+          "- tổng **lớn quá** thì dời `R` sang trái (lấy số nhỏ hơn);",
+          "- tổng **nhỏ quá** thì dời `L` sang phải (lấy số lớn hơn);",
+          "- tổng **bằng** target thì xong.",
+          "",
+          "```text",
+          "vị trí:  0   1   2   3   4   5",
+          "mảng:    1   2   4   7   11  15    target = 15",
+          "",
+          "bước 1:  L                   R   1 + 15 = 16 > 15  → R sang trái",
+          "bước 2:  L               R       1 + 11 = 12 < 15  → L sang phải",
+          "bước 3:      L           R       2 + 11 = 13 < 15  → L sang phải",
+          "bước 4:          L       R       4 + 11 = 15       → tìm thấy (4, 11)",
+          "```",
+          "",
+          "Chỉ 4 bước thay vì thử 15 cặp. Mỗi bước loại được ít nhất một số, nên nhiều nhất n bước: **O(n)**.",
+          "",
+          "## Vì sao dời như vậy mà không bỏ sót đáp án?",
+          "",
+          "Đây là chỗ quan trọng nhất: hiểu được nó là hiểu pattern.",
+          "",
+          "- Bước 1: tổng 1 + 15 = 16 **lớn quá**. `1` là số nhỏ nhất còn lại, ghép với `15` mà vẫn lớn quá, thì ghép `15` với số nào khác cũng lớn quá. Vậy `15` chắc chắn không nằm trong đáp án: bỏ nó, dời `R` sang trái.",
+          "- Bước 2: tổng 1 + 11 = 12 **nhỏ quá**. `11` là số lớn nhất còn lại, ghép với `1` mà vẫn nhỏ quá, thì `1` ghép với số nào cũng nhỏ quá. Vậy `1` chắc chắn không nằm trong đáp án: dời `L` sang phải.",
+          "",
+          "Quy tắc chung: **mỗi lần dời một con trỏ, bạn phải giải thích được vì sao phần tử bị bỏ không thể là đáp án.** Ở bài này, mảng đã sắp xếp là thứ cho phép giải thích điều đó. Mảng chưa sắp xếp thì không làm thế được.",
+          "",
+          "## Các dạng thường gặp",
+          "",
+          "**1. Hai đầu đi vào giữa.** `left` ở đầu, `right` ở cuối, đi dần vào giữa. Dùng khi cần so sánh hai đầu, như bài ở trên. Ví dụ khác: kiểm tra `\"racecar\"` đọc xuôi và đọc ngược có như nhau không (palindrome):",
+          "",
+          "```text",
+          "r a c e c a r",
+          "L           R   r = r  → giống nhau, cả hai đi vào giữa",
+          "  L       R     a = a  → giống nhau, cả hai đi vào giữa",
+          "    L   R       c = c  → giống nhau, cả hai đi vào giữa",
+          "      ↑         hai con trỏ gặp nhau  → là palindrome",
+          "```",
+          "",
+          "**2. Cùng chiều.** Cả hai con trỏ đi từ trái sang phải. Thường một con trỏ **đọc** (`read`) từng phần tử, con kia **ghi** (`write`): chỉ chỗ đặt phần tử tiếp theo được giữ lại. Ví dụ: xoá số trùng trong mảng đã sắp xếp, sửa ngay trên mảng, không tạo mảng mới:",
+          "",
+          "```text",
+          "mảng: [1, 1, 2, 3, 3]   write = 1 (số đầu luôn giữ)",
+          "",
+          "read=1:  1 trùng 1  → bỏ qua",
+          "read=2:  2 khác 1   → ghi vào ô 1, write=2  [1, 2, 2, 3, 3]",
+          "read=3:  3 khác 2   → ghi vào ô 2, write=3  [1, 2, 3, 3, 3]",
+          "read=4:  3 trùng 3  → bỏ qua",
+          "",
+          "kết quả: 3 số đầu là [1, 2, 3]",
+          "```",
+          "",
+          "Sliding Window (cửa sổ trượt) cũng là hai con trỏ cùng chiều, nhưng quan tâm cả đoạn nằm giữa hai con trỏ; app có pattern riêng cho nó.",
+          "",
+          "**3. Nhanh và chậm.** Một con trỏ đi 1 bước, con kia đi 2 bước. Hay dùng với linked list: tìm phần tử ở giữa, phát hiện vòng lặp. App có pattern riêng \"Con trỏ nhanh – chậm\" ở giai đoạn 2.",
+          "",
+          "## Tự kiểm tra",
+          "",
+          "Trả lời thành tiếng, không nhìn lại; chưa trả lời được thì đọc lại phần tương ứng ở trên.",
+          "",
+          "1. Ở bước 1 của bài tổng bằng 15, vì sao bỏ số 15 là an toàn?",
+          "2. Nếu mảng **chưa** sắp xếp, cách dời con trỏ ở trên còn đúng không? Vì sao?",
+          "3. Dạng \"cùng chiều\" khác dạng \"hai đầu\" ở điểm nào? Kể một bài cho mỗi dạng."
+        ]
+      },
       "notes": {
         "recognition": {
           "vi": [

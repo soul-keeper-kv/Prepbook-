@@ -16,26 +16,17 @@ import { LevelTag, OutcomeBar } from "@/components/common/badges"
 import { ConflictList } from "@/components/common/conflicts"
 import { EditableText, NoteEditor } from "@/components/common/editing"
 import { FilterMenu, levelLabel, platformLabel } from "@/components/common/filter-menu"
-import { Markdown } from "@/components/common/markdown"
 import { DocSection, PageHeader, Panel } from "@/components/common/page"
 import { CardList } from "@/components/pattern/card-list"
+import { NoteDialog, useCopyNote, useNoteLabels } from "@/components/pattern/note-dialog"
+import { ExplainCard, PatternLesson, type SectionTarget } from "@/components/pattern/pattern-lesson"
 import { PatternLinks } from "@/components/pattern/pattern-links"
 import { ProblemList, ProblemTableActions } from "@/components/pattern/problem-list"
 import { orderLevelKeys, orderPlatformKeys } from "@/components/pattern/problem-table"
 import { ResourceList } from "@/components/pattern/resource-list"
 import { LABEL } from "@/components/section"
-import { Tag } from "@/components/tag"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,7 +36,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useContent } from "@/content/context"
 import { localize } from "@/content/localize"
-import { useLang, useNotebook } from "@/notebook/hooks"
+import { useLang, useNotebook, useSamples } from "@/notebook/hooks"
 import {
   DROP_AFTER_DAYS,
   GOT_IT_PROBLEMS,
@@ -60,7 +51,6 @@ import { notebookActions } from "@/notebook/store"
 import {
   patternSuggestions,
   pickSuggestedProblems,
-  withNote,
   type SuggestedNote,
 } from "@/notebook/suggestions"
 import { CODE_SECTIONS, SECTION_TEMPLATES } from "@/notebook/templates"
@@ -114,25 +104,12 @@ function MasteryStrip({ pattern, status }: { pattern: Pattern; status: PatternSt
   )
 }
 
-/** One suggested note: read it in a dialog, then copy it below what the section already has */
+/** One suggested note not in the pattern: read it in a dialog, or copy it in */
 function NoteSuggestion({ pattern, note }: { pattern: Pattern; note: SuggestedNote }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
-  const section = t(`section.${note.key}.title` as "section.idea.title")
-  // Suggested pitfalls are common ones; the section is for the user's own
-  const label = note.key === "pitfalls" ? t("suggest.pitfallsLabel") : section
-
-  function copy() {
-    const before = pattern.sections[note.key] ?? ""
-    notebookActions.setSection(pattern.id, note.key, withNote(before, note.text))
-    setOpen(false)
-    toast.success(t("suggest.noteCopiedTo", { section }), {
-      action: {
-        label: t("suggest.undo"),
-        onClick: () => notebookActions.setSection(pattern.id, note.key, before),
-      },
-    })
-  }
+  const { label } = useNoteLabels(note)
+  const copy = useCopyNote(pattern, note)
 
   return (
     <li className="flex items-center gap-2 border-t py-1.5 text-13">
@@ -143,46 +120,16 @@ function NoteSuggestion({ pattern, note }: { pattern: Pattern; note: SuggestedNo
       >
         {label}
       </button>
-      {note.copied ? (
-        <Tag tone="ok">{t("suggest.noteCopied")}</Tag>
-      ) : (
-        <Button
-          size="xs"
-          variant="outline"
-          aria-label={t("suggest.copyNamed", { name: label })}
-          onClick={copy}
-        >
-          <ClipboardPasteIcon />
-          {t("suggest.copy")}
-        </Button>
-      )}
-      <Dialog open={open} onOpenChange={setOpen}>
-        {/* Only the note scrolls: the title and the Copy button stay in view on a phone */}
-        <DialogContent className="flex max-h-[85vh] flex-col gap-4 rounded-lg border border-border-strong bg-card ring-0 sm:max-w-180">
-          <DialogHeader>
-            <DialogTitle className="text-15 font-semibold">
-              {t("suggest.noteTitle", { name: label })}
-            </DialogTitle>
-            <DialogDescription className="text-13">
-              {t("suggest.noteHint", { section })}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="min-h-0 min-w-0 flex-1 overflow-y-auto text-14">
-            <Markdown text={note.text} />
-          </div>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">{t("suggest.close")}</Button>
-            </DialogClose>
-            {!note.copied && (
-              <Button onClick={copy}>
-                <ClipboardPasteIcon />
-                {t("suggest.copy")}
-              </Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <Button
+        size="xs"
+        variant="outline"
+        aria-label={t("suggest.copyNamed", { name: label })}
+        onClick={copy}
+      >
+        <ClipboardPasteIcon />
+        {t("suggest.copy")}
+      </Button>
+      <NoteDialog pattern={pattern} note={note} open={open} onOpenChange={setOpen} />
     </li>
   )
 }
@@ -292,32 +239,33 @@ function PatternSuggestions({ pattern }: { pattern: Pattern }) {
   const lang = useLang()
   const filters = useUiStore((s) => s.suggestFilters)
   const sort = useUiStore((s) => s.suggestSort)
-  const { module, notes, problems, resources } = patternSuggestions(content, nb, pattern, lang)
-  if (!module || (!notes.length && !problems.length && !resources.length)) return null
+  const suggestions = patternSuggestions(content, nb, pattern, lang)
+  const { module, problems, resources } = suggestions
+  // Only what the pattern does not hold yet: theory already in its sections is not offered
+  const notesLeft = suggestions.notes.filter((n) => !n.copied)
+  if (!module || (!notesLeft.length && !problems.length && !resources.length)) return null
   const { shown, platforms, levels } = pickSuggestedProblems(problems, filters, sort)
   const filtered = filters.platform.length + filters.level.length > 0
-  // "Add all" adds what the filters show
+  // "Add all" adds what the filters show, and the theory not copied in yet
   const items = shown.length + resources.length
+  const total = items + notesLeft.length
 
-  // Every suggested problem and link in one change, with Undo
+  // Every suggested note, problem and link in one change, with Undo
   function addAll() {
-    const problemIds = notebookActions.addProblems(
-      shown.map((p) => ({
-        url: p.url,
-        title: p.title,
-        level: p.level,
-        patternIds: [pattern.id],
-      }))
-    )
-    const resourceIds = notebookActions.addResources(
-      resources.map((r) => ({ url: r.url, title: r.title, kind: r.kind, patternIds: [pattern.id] }))
-    )
-    toast.success(t("suggest.addedItems", { count: problemIds.length + resourceIds.length }), {
+    const before = pattern.sections
+    const { problemIds, resourceIds } = notebookActions.addSuggestions(pattern.id, {
+      notes: notesLeft,
+      problems: shown,
+      resources,
+    })
+    toast.success(t("suggest.addedItems", { count: total }), {
       action: {
         label: t("suggest.undo"),
         onClick: () => {
           notebookActions.unlinkProblems(problemIds, pattern.id)
           notebookActions.unlinkResources(resourceIds, pattern.id)
+          for (const note of notesLeft)
+            notebookActions.setSection(pattern.id, note.key, before[note.key] ?? "")
         },
       },
     })
@@ -327,26 +275,26 @@ function PatternSuggestions({ pattern }: { pattern: Pattern }) {
     <Panel
       title={t("suggest.title", { name: localize(module.title, lang) })}
       actions={
-        items > 0 && (
+        total > 0 && (
           <Button size="xs" onClick={addAll}>
             <ListPlusIcon />
-            {t("suggest.addAll", { count: items })}
+            {t("suggest.addAll", { count: total })}
           </Button>
         )
       }
     >
       <p className="mb-2 text-12 text-faint">{t("suggest.patternIntro")}</p>
-      {notes.length > 0 && (
+      {notesLeft.length > 0 && (
         <>
           <h3 className={cn(LABEL, "mt-3 mb-1")}>{t("suggest.notesTitle")}</h3>
           <ul className={cn(items > 0 && "mb-3")}>
-            {notes.map((note) => (
+            {notesLeft.map((note) => (
               <NoteSuggestion key={note.key} pattern={pattern} note={note} />
             ))}
           </ul>
         </>
       )}
-      {items > 0 && notes.length > 0 && (
+      {items > 0 && notesLeft.length > 0 && (
         <h3 className={cn(LABEL, "mb-1")}>{t("suggest.itemsTitle")}</h3>
       )}
       {problems.length > 1 && (
@@ -434,6 +382,7 @@ function PatternSuggestions({ pattern }: { pattern: Pattern }) {
 export function PatternPage({ id }: { id: string }) {
   const { t } = useTranslation()
   const nb = useNotebook()
+  const samples = useSamples()
   const [confirmDelete, setConfirmDelete] = useState(false)
   const now = useNow()
   useEffect(() => uiActions.setLastPattern(id), [id])
@@ -448,13 +397,31 @@ export function PatternPage({ id }: { id: string }) {
       </PageHeader>
     )
   }
-  const status = patternStatus(nb, pattern, now)
+  const status = patternStatus(nb, pattern, now, samples)
   const phase = getLive(nb.phases, phaseOfPattern(nb, pattern))
   const sections = SECTION_TEMPLATES[topic.kind]
   const sectionTitle = (key: string) => t(`section.${key}.title` as "section.idea.title")
   const fieldLabel = (c: Conflict) =>
     c.field.startsWith("sections.") ? sectionTitle(c.field.slice("sections.".length)) : c.field
-  const after = sections.length + (pattern.theory ? 0 : 1)
+  // A DSA pattern with problems is shown as a learning path, which holds its note sections
+  const lesson = topic.kind === "dsa" && !pattern.theory
+  const noteSections = lesson ? [] : sections
+  // Every block of the page, numbered here only: the learning path names the same titles
+  const listTitles: Record<string, string> = {
+    problems: t("pattern.problems"),
+    resources: t("pattern.resources"),
+    cards: t("pattern.cards"),
+  }
+  const blocks: string[] = [
+    ...noteSections,
+    ...(pattern.theory ? [] : ["problems"]),
+    "resources",
+    "cards",
+  ]
+  const block = (key: string): SectionTarget => ({
+    id: `section-${key}`,
+    title: `${blocks.indexOf(key) + 1}. ${listTitles[key] ?? sectionTitle(key)}`,
+  })
 
   return (
     <>
@@ -509,10 +476,15 @@ export function PatternPage({ id }: { id: string }) {
 
       <div className="flex flex-wrap items-start gap-8">
         <article className="min-w-0 flex-[999_1_520px] space-y-6">
-          {sections.map((key, i) => (
+          {lesson ? (
+            <PatternLesson key={pattern.id} pattern={pattern} sectionOf={block} />
+          ) : (
+            <ExplainCard key={pattern.id} pattern={pattern} />
+          )}
+          {noteSections.map((key) => (
             <DocSection
               key={key}
-              title={`${i + 1}. ${sectionTitle(key)}`}
+              {...block(key)}
               hint={t(`section.${key}.hint` as "section.idea.hint")}
             >
               <NoteEditor
@@ -527,21 +499,17 @@ export function PatternPage({ id }: { id: string }) {
           ))}
           {!pattern.theory && (
             <DocSection
-              id="problems"
-              title={`${sections.length + 1}. ${t("pattern.problems")}`}
+              {...block("problems")}
               hint={t("pattern.problemsHint")}
               actions={<ProblemTableActions pattern={pattern} />}
             >
               <ProblemList pattern={pattern} now={now} />
             </DocSection>
           )}
-          <DocSection
-            title={`${after + 1}. ${t("pattern.resources")}`}
-            hint={t("pattern.resourcesHint")}
-          >
+          <DocSection {...block("resources")} hint={t("pattern.resourcesHint")}>
             <ResourceList pattern={pattern} />
           </DocSection>
-          <DocSection title={`${after + 2}. ${t("pattern.cards")}`} hint={t("pattern.cardsHint")}>
+          <DocSection {...block("cards")} hint={t("pattern.cardsHint")}>
             <CardList pattern={pattern} now={now} />
           </DocSection>
         </article>

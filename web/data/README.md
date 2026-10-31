@@ -95,16 +95,41 @@ Nhiều module cùng gắn 1 chủ đề thì trang chủ đề hiện nhiều k
 | `items`     | Các mục. Mỗi mục có `id`, `title` (thành tên pattern khi được thêm), và `problems`, `resources` nếu có                                                                                  |
 | `problems`  | Bài gợi ý: `{ "title", "url", "level", "guides" }`. `level`: `Easy` / `Medium` / `Hard` (HackerRank có thêm `Advanced`, `Expert`). Mục không có bài nào thành pattern "lý thuyết thuần" |
 | `resources` | Tài liệu gợi ý: `{ "type", "title", "url" }`. `type`: `article`, `video`, `course`, `docs`, `book`, `visual`, `practice`                                                                |
-| `notes`     | Lý thuyết gợi ý cho các mục ghi chú của pattern, xem phần dưới                                                                                                                          |
+| `lesson`    | Bài giảng cho người mới, đọc trước khi viết ghi chú, xem phần dưới                                                                                                                      |
+| `guide`     | Giải thích riêng cho từng bước của Lộ trình học (Nhận diện, Ý tưởng, Template, Bẫy), xem phần dưới                                                                                      |
+| `quiz`      | Câu hỏi trắc nghiệm luyện nhận diện, xem phần dưới                                                                                                                                      |
+| `notes`     | Lý thuyết mẫu cho các mục ghi chú của pattern, xem phần dưới                                                                                                                            |
 
 Chỉ có các trường này, và trường nào cũng được app đọc. Gõ sai tên trường hay thêm trường lạ thì app báo lỗi, không bỏ qua.
-URL phải là http(s). Tên là văn bản thuần; chỉ `notes` dùng Markdown.
+URL phải là http(s). Tên là văn bản thuần; chỉ `lesson` và `notes` dùng Markdown.
 
 Cùng 1 link bài ở nhiều mục (kể cả khác module) vẫn là 1 bài trong notebook (khớp theo link, bỏ qua `www.`, dấu `/` cuối và phần sau tên bài của LeetCode).
 
-## Lý thuyết gợi ý (`notes`)
+## Bài giảng (`lesson`)
 
-Mỗi mục có thể kèm lý thuyết cho từng mục ghi chú của pattern. Trang pattern hiện chúng trong khung Gợi ý, phần **Lý thuyết**: bấm tên để đọc, bấm **Chép vào** thì nội dung được chép vào mục ghi chú cùng tên, bên dưới phần bạn đã viết. Ghi chú vẫn là của bạn: app không tự điền, và sửa `notes` ở đây không đổi gì trong notebook.
+Bài giảng là bước đầu của Lộ trình học ("Hiểu pattern"): đọc để hiểu, trước khi viết lại Nhận diện, Ý tưởng, Template bằng lời của mình. App chỉ hiện nó, không chép vào notebook, nên sửa ở đây là thấy ngay.
+
+Viết cho người biết lập trình (Java) nhưng chưa biết pattern, đọc một lượt là hiểu. Theo khuôn của `p1-twoptr`:
+
+1. `## <Pattern> là gì?`: 2–4 câu bằng lời thường.
+2. `## Vì sao cần: một bài cụ thể`: một bài nhỏ, cách vét cạn tốn bao nhiêu, rồi cách dùng pattern **chạy tay từng bước** trong khối code `text` (cột thẳng hàng; mỗi bước ghi giá trị các biến và quyết định).
+3. `## Vì sao cách này đúng`: ý then chốt, giải thích bằng chính ví dụ ở trên.
+4. `## Các dạng thường gặp`: mỗi dạng một câu và một ví dụ nhỏ.
+5. `## Khung code`: Java ngắn, comment tiếng Việt.
+6. `## Khi nào nghĩ tới <pattern>?`: 3–5 dấu hiệu trong đề.
+7. `## Tự kiểm tra`: 2–3 câu hỏi, không kèm đáp án.
+
+Viết `{ "vi": [...] }`, mảng các dòng. Thiếu `en` thì bản tiếng Anh hiện bản tiếng Việt.
+
+## Giải thích từng bước (`guide`) và trắc nghiệm (`quiz`)
+
+`guide` có cùng tên mục như `notes` (`recognition`, `idea`, `template`, `pitfalls`). Mỗi bước của Lộ trình học hiện phần giải thích của nó trước, rồi mới tới ghi chú của người dùng. Viết như khi trả lời đúng một câu hỏi hẹp: bảng (dấu hiệu → dạng), các câu hỏi để tự quyết định, vét cạn và cách tối ưu đặt cạnh nhau, đọc từng dòng code, lỗi hay gặp. Mẫu: `p1-twoptr`.
+
+`quiz` hiện ở bước Nhận diện: mỗi câu `{ "question", "options", "answer", "why" }`, `answer` là vị trí đáp án đúng trong `options` (đếm từ 0), `why` hiện ra sau khi người dùng chọn. App không lưu kết quả: đây là luyện tập, không tính mức.
+
+## Lý thuyết mẫu (`notes`)
+
+Mỗi mục có thể kèm lý thuyết cho từng mục ghi chú của pattern. Thêm mục thành pattern là lý thuyết này được chép vào mục ghi chú cùng tên; người dùng viết lại bằng lời của mình (để nguyên bản mẫu thì app không tính là đã học). Mục ghi chú nào bị xoá trắng thì khung Gợi ý ở trang pattern cho chép lại. Sửa `notes` ở đây không đổi gì trong notebook đã có.
 
 Tên các mục theo loại chủ đề của module (`src/notebook/templates.ts`); dùng sai tên thì app báo lỗi:
 
@@ -115,7 +140,7 @@ Tên các mục theo loại chủ đề của module (`src/notebook/templates.ts
 | `design` (System Design)     | `requirements`, `estimates`, `design`, `deepDive`, `tradeoffs` |
 | `story` (Hành vi)            | `situation`, `task`, `action`, `result`, `questions`           |
 
-- Giá trị là Markdown, viết thành mảng các dòng (app nối bằng xuống dòng). App hiện được: đoạn văn, danh sách `- ` và `1. ` (không lồng nhau), `code`, **đậm**, link, khối code. Không có bảng.
+- Giá trị là Markdown, viết thành mảng các dòng (app nối bằng xuống dòng). App hiện được: đoạn văn, tiêu đề `## `, danh sách `- ` và `1. ` (không lồng nhau), `code`, **đậm**, link, bảng `| a | b |` (dòng thứ hai là `| --- | --- |`), khối code (`text` thì không có số dòng, hợp để vẽ bảng chạy tay).
 - Chữ thì viết `{ "vi": [...], "en": [...] }`. Code (`template`) viết một lần, không chia ngôn ngữ, comment tiếng Anh.
 - Template của DSA viết bằng Java. Bẫy (`pitfalls`) ở đây là bẫy hay gặp, ghi kèm tên bài trong ngoặc; bẫy của riêng bạn thì bạn tự ghi thêm.
 - Mục chỉ là bộ bài luyện (CSES, AtCoder, Codeforces, contest) thì không cần `notes`.

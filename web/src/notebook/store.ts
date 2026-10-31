@@ -6,6 +6,7 @@ import { KEYS, storage } from "@/lib/storage"
 import { newId, normalizeUrl, problemIdFor } from "@/notebook/ids"
 import { getLive, liveValues, patternsOf, phasesOf, topicsOf } from "@/notebook/logic"
 import { patternFromItem } from "@/notebook/migrate"
+import { itemSuggestion, withNote, type SuggestionInput } from "@/notebook/suggestions"
 import { DEFAULT_TOPICS } from "@/notebook/templates"
 import {
   COLLECTIONS,
@@ -186,6 +187,29 @@ function addResourceIn(
     createdAt: tx.now,
   })
   return id
+}
+
+/**
+ * Puts suggestions into a pattern: each note below what its section holds (unless already
+ * there), each problem and link added or linked. Works on the transaction's entities only:
+ * the cached lookups of logic.ts must not see a draft notebook.
+ */
+function addSuggestionsIn(tx: Tx, patternId: string, input: SuggestionInput) {
+  const pattern = tx.get("patterns", patternId)
+  if (!pattern) return { problemIds: [], resourceIds: [] }
+  const sections = { ...pattern.sections }
+  const notes = input.notes.filter((note) => !(sections[note.key] ?? "").includes(note.text))
+  for (const note of notes) sections[note.key] = withNote(sections[note.key], note.text)
+  if (notes.length) tx.patch("patterns", patternId, { sections })
+  const patternIds = [patternId]
+  return {
+    problemIds: input.problems.map((p) =>
+      addProblemIn(tx, { url: p.url, title: p.title, level: p.level, patternIds })
+    ),
+    resourceIds: input.resources.map((r) =>
+      addResourceIn(tx, { url: r.url, title: r.title, kind: r.kind, patternIds })
+    ),
+  }
 }
 
 /** Reads a field by path ("notes", "sections.idea") */
@@ -370,7 +394,8 @@ export const notebookActions = {
   },
 
   /**
-   * "Add all": several suggested items in one change (one save, one upload).
+   * "Add all": several suggested items in one change (one save, one upload), each with
+   * everything it offers: sample theory in the sections, problems and links.
    * Returns the patterns that were not in the notebook before, for Undo.
    */
   addSuggestedPatterns(content: Content, itemIds: string[], lang: Lang): string[] {
@@ -378,7 +403,8 @@ export const notebookActions = {
       const added: string[] = []
       for (const itemId of itemIds) {
         const made = patternFromItem(content, itemId, lang, tx.now)
-        if (!made) continue
+        const entry = content.items.get(itemId)
+        if (!made || !entry) continue
         const phase = tx.get("phases", made.phase.id)
         if (!phase) tx.put("phases", made.phase)
         else if (phase.deleted) tx.patch("phases", phase.id, { deleted: false })
@@ -387,12 +413,23 @@ export const notebookActions = {
         else if (pattern.deleted) tx.patch("patterns", pattern.id, { deleted: false })
         else continue
         added.push(made.pattern.id)
+        const topic = tx.get("topics", made.pattern.topicId)
+        if (topic)
+          addSuggestionsIn(tx, made.pattern.id, itemSuggestion(entry.item, topic.kind, lang))
       }
       return added
     })
   },
 
-  /** Undo of "Add all": the patterns it added are still empty, so nothing is lost */
+  /** "Add all" on a pattern page: the suggestions it lists, in one change */
+  addSuggestions(patternId: string, input: SuggestionInput) {
+    return transact((tx) => addSuggestionsIn(tx, patternId, input))
+  },
+
+  /**
+   * Undo of "Add all": the patterns it added hold only what the suggestions put in, so
+   * nothing of the user's is lost; problems and links also in other patterns stay there
+   */
   deletePatterns(ids: string[]) {
     transact((tx) => {
       for (const id of ids) deletePatternIn(tx, id)

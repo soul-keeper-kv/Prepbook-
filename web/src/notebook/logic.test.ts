@@ -2,12 +2,14 @@ import { describe, expect, it } from "vitest"
 import { addDays } from "@/lib/dates"
 import {
   cardDueAt,
+  NO_SAMPLES,
   fold,
   patternStatus,
   problemSchedule,
   search,
   streakDays,
   todayTasks,
+  type SampleTexts,
 } from "@/notebook/logic"
 import {
   emptyNotebook,
@@ -109,9 +111,37 @@ describe("problemSchedule", () => {
 
 describe("patternStatus", () => {
   it("is not started with nothing, learning with any note", () => {
-    expect(patternStatus(notebook({}), notebook({}).patterns.p!, NOW).level).toBe(0)
+    expect(patternStatus(notebook({}), notebook({}).patterns.p!, NOW, NO_SAMPLES).level).toBe(0)
     const nb = notebook({}, { sections: { idea: "two pointers" } })
-    expect(patternStatus(nb, nb.patterns.p!, NOW).level).toBe(1)
+    expect(patternStatus(nb, nb.patterns.p!, NOW, NO_SAMPLES).level).toBe(1)
+  })
+
+  it("is not started by what came in with a suggestion: sample theory, untried problems", () => {
+    const sample = "Grow right, shrink left"
+    const samples: SampleTexts = (_, key) => (key === "idea" ? [sample] : [])
+    const nb = notebook({ a: [], b: [] }, { sections: { idea: sample } })
+    nb.resources.r = {
+      id: "r",
+      updatedAt: daysAgo(1),
+      url: "https://usaco.guide/silver/two-pointers",
+      title: "Two Pointers",
+      kind: "article",
+      patternIds: ["p"],
+      takeaway: "",
+      createdAt: daysAgo(1),
+    }
+    expect(patternStatus(nb, nb.patterns.p!, NOW, samples).level).toBe(0)
+
+    // Each thing the user does starts it: own words, a try, a takeaway
+    const own = {
+      ...nb,
+      patterns: { p: { ...nb.patterns.p!, sections: { idea: `${sample}\n\nmine` } } },
+    }
+    expect(patternStatus(own, own.patterns.p!, NOW, samples).level).toBe(1)
+    const tried = { ...nb, attempts: { x: attempt("a", daysAgo(1), "hint", { id: "x" }) } }
+    expect(patternStatus(tried, tried.patterns.p!, NOW, samples).level).toBe(1)
+    const read = { ...nb, resources: { r: { ...nb.resources.r!, takeaway: "both ends" } } }
+    expect(patternStatus(read, read.patterns.p!, NOW, samples).level).toBe(1)
   })
 
   it("is 'got it' after 3 problems solved alone", () => {
@@ -120,13 +150,13 @@ describe("patternStatus", () => {
       b: [attempt("b", daysAgo(2), "alone")],
       c: [attempt("c", daysAgo(2), "hint")],
     })
-    expect(patternStatus(nb, nb.patterns.p!, NOW).level).toBe(1)
+    expect(patternStatus(nb, nb.patterns.p!, NOW, NO_SAMPLES).level).toBe(1)
     // The store never edits a notebook in place: a change is a new object
     const next = {
       ...nb,
       attempts: { ...nb.attempts, extra: attempt("c", daysAgo(1), "alone", { id: "extra" }) },
     }
-    const status = patternStatus(next, next.patterns.p!, NOW)
+    const status = patternStatus(next, next.patterns.p!, NOW, NO_SAMPLES)
     expect(status.level).toBe(2)
     expect(status.outcomes).toEqual({ alone: 3, hint: 0, solution: 0, todo: 0 })
   })
@@ -137,7 +167,7 @@ describe("patternStatus", () => {
       attempt(id, daysAgo(4), "alone"),
     ]
     const nb = notebook({ a: redone("a"), b: redone("b"), c: redone("c") })
-    const status = patternStatus(nb, nb.patterns.p!, NOW)
+    const status = patternStatus(nb, nb.patterns.p!, NOW, NO_SAMPLES)
     expect(status.reviewedAlone).toBe(3)
     expect(status.level).toBe(3)
   })
@@ -148,14 +178,14 @@ describe("patternStatus", () => {
       b: [attempt("b", daysAgo(2), "alone")],
       c: [attempt("c", daysAgo(2), "alone")],
     })
-    const status = patternStatus(nb, nb.patterns.p!, NOW)
+    const status = patternStatus(nb, nb.patterns.p!, NOW, NO_SAMPLES)
     expect(status.overdue).toBeGreaterThan(7)
     expect(status.level).toBe(1)
   })
 
   it("theory: ticked done is 'got it', every card solid is mastered", () => {
     const nb = notebook({}, { theory: true, done: true })
-    expect(patternStatus(nb, nb.patterns.p!, NOW).level).toBe(2)
+    expect(patternStatus(nb, nb.patterns.p!, NOW, NO_SAMPLES).level).toBe(2)
     const next = { ...nb, cards: { ...nb.cards } }
     next.cards.c = {
       id: "c",
@@ -166,7 +196,7 @@ describe("patternStatus", () => {
       reviews: [{ at: daysAgo(1), grade: "solid" }],
       createdAt: daysAgo(3),
     }
-    expect(patternStatus(next, next.patterns.p!, NOW).level).toBe(3)
+    expect(patternStatus(next, next.patterns.p!, NOW, NO_SAMPLES).level).toBe(3)
   })
 })
 
@@ -195,7 +225,7 @@ describe("todayTasks and streak", () => {
       due: [attempt("due", daysAgo(3), "hint")],
       fresh: [attempt("fresh", daysAgo(0), "alone")],
     })
-    const tasks = todayTasks(nb, NOW)
+    const tasks = todayTasks(nb, NOW, NO_SAMPLES)
     expect(tasks.map((t) => (t.kind === "problem" ? t.problem.id : t.kind))).toEqual([
       "late",
       "due",

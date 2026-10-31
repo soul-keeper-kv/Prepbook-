@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next"
 import { LevelMeter } from "@/components/common/badges"
 import { PatternPicker } from "@/components/common/pattern-picker"
 import { Button } from "@/components/ui/button"
-import { useNotebook } from "@/notebook/hooks"
+import { useNotebook, useSamples } from "@/notebook/hooks"
 import { getLive, patternStatus } from "@/notebook/logic"
 import type { Pattern } from "@/notebook/schema"
 import { notebookActions } from "@/notebook/store"
@@ -25,6 +25,7 @@ export function PatternLinks({
 }) {
   const { t } = useTranslation()
   const nb = useNotebook()
+  const samples = useSamples()
   const [editing, setEditing] = useState(false)
   const now = useNow()
   const linked = pattern[field].map((id) => getLive(nb.patterns, id)).filter((p) => p !== undefined)
@@ -55,7 +56,7 @@ export function PatternLinks({
         <ul className="space-y-1">
           {linked.map((p) => (
             <li key={p.id} className="flex items-center gap-2 text-14">
-              <LevelMeter level={patternStatus(nb, p, now).level} />
+              <LevelMeter level={patternStatus(nb, p, now, samples).level} />
               <a href={href.pattern(p.id)} className="min-w-0 truncate">
                 {p.name}
               </a>

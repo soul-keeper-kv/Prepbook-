@@ -39,7 +39,7 @@
   },
   "mastery": {
     "practice": {
-      "0": "Chưa bắt đầu: viết vài dòng ghi chú hoặc thêm bài đầu tiên.",
+      "0": "Chưa bắt đầu: viết vài dòng ghi chú của bạn hoặc làm bài đầu tiên.",
       "1": "Đang học: tự làm được {{alone}}/{{need}} bài để lên “Nắm được”.",
       "2": "Nắm được: tự làm được {{alone}} bài. Tự làm lại được {{need}} bài khi ôn (cách lần đầu từ {{gap}} ngày) để thành thạo: {{reviewed}}/{{need}}.",
       "3": "Thành thạo: {{reviewed}} bài tự làm lại được khi ôn, không có gì trễ hạn."
@@ -115,8 +115,8 @@
     },
     "idea": {
       "title": "Ý tưởng",
-      "hint": "Ý chính, viết bằng lời của bạn",
-      "placeholder": "Hai con trỏ cùng chạy sang phải: phải mở rộng, trái co lại khi cửa sổ sai…"
+      "hint": "Từ cách vét cạn tới ý chính, viết bằng lời của bạn",
+      "placeholder": "- Vét cạn: thử mọi đoạn con, O(n²)\n- Nhận xét: cửa sổ đã sai thì nới rộng vẫn sai, nên co từ bên trái\n- Chạy tay: \"abcabcbb\" → cửa sổ \"abc\", gặp \"a\" thứ hai thì co trái…\n- Độ phức tạp: O(n), mỗi phần tử vào và ra cửa sổ 1 lần"
     },
     "template": {
       "title": "Template code",
@@ -289,6 +289,78 @@
     "related": "Pattern liên quan",
     "relatedEmpty": "Chưa nối với pattern nào."
   },
+  "lesson": {
+    "title": "Lộ trình học",
+    "progress": "Lý thuyết {{theory}}/{{theoryTotal}} · Bài {{solved}}/{{total}}",
+    "next": "Tiếp theo",
+    "done": "Đã nắm",
+    "theoryTitle": "Lý thuyết trước",
+    "theoryIntro": "Mở từng mục, viết lại bằng lời của bạn: sửa bản mẫu hoặc viết thêm. Để nguyên bản mẫu thì chưa tính.",
+    "checkpoint": {
+      "recognition": "Viết 2–3 dấu hiệu trong đề cho biết nên dùng pattern này.",
+      "idea": "Giải thích lại: cách vét cạn chậm ở đâu, pattern bỏ được phần thừa nào. Chạy tay trên 1 ví dụ nhỏ.",
+      "template": "Đọc template mẫu, rồi che nó đi và tự gõ lại không nhìn. Gõ xong mới so với bản mẫu."
+    },
+    "readTheory": "Đọc lý thuyết mẫu",
+    "practiceTitle": "Làm bài",
+    "theoryFirst": "nên làm sau phần lý thuyết",
+    "noProblems": "Chưa có bài nào: thêm 3 bài ở mục {{section}}, bài dễ nhất sẽ là bài mẫu.",
+    "role": {
+      "guided": "Bài mẫu · tuỳ chọn",
+      "solo": "Tự làm {{n}}"
+    },
+    "guidedDetail_other": "Xem AI giải thích từng bước, hiểu rồi tự code lại. Ghi lần làm là “{{outcome}}”: app hẹn làm lại sau {{count}} ngày để bạn tự làm.",
+    "soloDetail": "Tự nghĩ ít nhất {{minutes}} phút trước khi xem gợi ý, theo “{{steps}}” ở trang bài.",
+    "soloRetry": "Lần trước chưa tự làm được. Tự làm được ở lần làm lại mới tính là xong.",
+    "learnFrom": "Học qua bài mẫu",
+    "solve": "Làm bài",
+    "open": "Mở bài",
+    "finished": "Xong lộ trình. Làm thêm bài trong khung Gợi ý: tự làm được {{n}} bài là lên mức “{{level}}”.",
+    "guidedHere": "Bài mẫu của “{{pattern}}”: khung “{{help}}” đã mở sẵn, AI để chế độ giải thích từng bước.",
+    "soloHere": "Bài tự làm của “{{pattern}}”: tự nghĩ ít nhất {{minutes}} phút trước khi xem gợi ý.",
+    "pitfallsHint": "Bẫy hay gặp đã có sẵn. Làm bài sai ở đâu thì ghi thêm vào đây, kèm tên bài.",
+    "explainTitle": "Hiểu pattern",
+    "explainHint": "Đọc chậm, tự chạy tay lại ví dụ ra giấy. Hiểu rồi mới viết lại các mục bên dưới bằng lời của bạn.",
+    "askAgain": "Đọc xong vẫn chưa rõ chỗ nào? Nhờ AI giảng lại theo cách khác:",
+    "noExplain": "Pattern này chưa có bài giảng viết sẵn. Nhờ AI giảng theo cách dành cho người mới (câu hỏi đã soạn sẵn):",
+    "yourNotes": "Ghi chú của bạn",
+    "sampleOnly": "đang là bản mẫu chép sẵn: mở ra, sửa thành lời của bạn"
+  },
+  "solve": {
+    "title": "Các bước giải một bài",
+    "larger": "lớn hơn",
+    "logHint": "Kẹt ở bước nào thì ghi vào “{{note}}”: lần sau biết cần luyện chỗ đó.",
+    "step": {
+      "understand": {
+        "title": "Hiểu đề",
+        "detail": "Nói lại đề bằng lời của bạn. Tự lấy 1 ví dụ nhỏ và tính đáp án bằng tay."
+      },
+      "limits": {
+        "title": "Đọc giới hạn của n",
+        "detail": "Máy chạy khoảng 10⁸ phép tính mỗi giây, nên giới hạn cho biết cần độ phức tạp nào:"
+      },
+      "brute": {
+        "title": "Nghĩ cách vét cạn trước",
+        "detail": "Cách chậm nhưng chắc chắn đúng, kèm độ phức tạp của nó. Chưa cần code."
+      },
+      "waste": {
+        "title": "Tìm chỗ vét cạn làm thừa",
+        "detail": "Nó tính lại thứ đã biết, hay thử cả trường hợp chắc chắn sai? Pattern dùng ở đúng chỗ đó."
+      },
+      "trace": {
+        "title": "Chạy tay trước khi code",
+        "detail": "Chạy ý tưởng trên ví dụ ở bước 1. Ra đúng đáp án rồi mới code."
+      },
+      "edges": {
+        "title": "Code, rồi thử trường hợp biên",
+        "detail": "Mảng rỗng, 1 phần tử, giá trị trùng nhau, số âm, số rất lớn."
+      },
+      "stuck": {
+        "title": "Bí quá {{minutes}} phút",
+        "detail": "Mở “{{help}}” và hỏi AI ở chế độ “{{mode}}”. Vẫn bí mới xem lời giải."
+      }
+    }
+  },
   "problem": {
     "url": "Link bài",
     "urlPlaceholder": "https://leetcode.com/problems/…",
@@ -387,7 +459,7 @@
     "unlink": "Bỏ {{name}} khỏi pattern",
     "takeaway": "Điều rút ra từ {{name}}",
     "takeawayPlaceholder": "1-2 dòng bạn rút ra từ tài liệu này",
-    "takeawayEmpty": "Chưa ghi điều rút ra."
+    "writeTakeaway": "Ghi điều rút ra"
   },
   "card": {
     "question": "Câu hỏi",
@@ -452,13 +524,13 @@
   },
   "suggest": {
     "title": "Gợi ý: {{name}}",
-    "roadmapIntro": "Chỉ là gợi ý: bấm Thêm thì mục đó thành pattern (trống) của bạn, bài và tài liệu của nó hiện ở trang pattern để bạn chọn.",
-    "patternIntro": "Chỉ thêm vào pattern khi bạn bấm.",
+    "roadmapIntro": "Chỉ là gợi ý: bấm Thêm thì mục đó thành pattern của bạn, có sẵn lý thuyết mẫu, bài và tài liệu.",
+    "patternIntro": "Thứ gì chưa có trong pattern (chưa thêm hoặc đã xoá) thì thêm lại ở đây.",
     "left_other": "{{count}} chưa thêm",
     "add": "Thêm",
     "addAll_other": "Thêm tất cả ({{count}})",
     "addPhase_other": "Thêm cả giai đoạn ({{count}})",
-    "addedPatterns_other": "Đã thêm {{count}} pattern.",
+    "addedPatterns_other": "Đã thêm {{count}} pattern, kèm lý thuyết, bài và tài liệu.",
     "addedItems_other": "Đã thêm {{count}} mục vào pattern.",
     "undo": "Hoàn tác",
     "addNamed": "Thêm {{name}}",
@@ -468,7 +540,6 @@
     "pitfallsLabel": "Bẫy hay gặp",
     "copy": "Chép vào",
     "copyNamed": "Chép {{name}} vào ghi chú",
-    "noteCopied": "Đã chép",
     "noteCopiedTo": "Đã chép vào {{section}}.",
     "noteTitle": "{{name}} · gợi ý",
     "noteHint": "Chép vào thì nội dung này nằm ở mục {{section}}, bên dưới phần bạn đã viết. Sau đó viết lại bằng lời của bạn.",
@@ -549,7 +620,7 @@
   },
   "help": {
     "toggle": "Bí? Xem gợi ý",
-    "tip": "Tự nghĩ khoảng 20 phút trước. Bí thì hỏi AI ở chế độ “Chỉ gợi ý”, vẫn bí mới xem lời giải. Dùng tới phần này thì lần làm là “Cần gợi ý” hoặc “Xem lời giải”.",
+    "tip": "Tự nghĩ khoảng {{minutes}} phút trước. Bí thì hỏi AI ở chế độ “Chỉ gợi ý”, vẫn bí mới xem lời giải. Dùng tới phần này thì lần làm là “Cần gợi ý” hoặc “Xem lời giải”.",
     "read": "Xem lời giải",
     "editorial": "Lời giải chính thức",
     "solutions": "Lời giải cộng đồng",
@@ -571,7 +642,8 @@
   },
   "prompt": {
     "hint": "Mình đang tự luyện phỏng vấn theo pattern, bài này thuộc pattern \"{{lesson}}\".\nMình đang làm bài \"{{title}}\" trên {{site}}: {{url}}\n\nHãy hướng dẫn như một người thầy, đừng đưa lời giải ngay:\n1. Nhắc lại đề bằng lời đơn giản, kèm 1 ví dụ nhỏ. Nếu không chắc đây là bài nào, hãy bảo mình dán đề vào, đừng đoán.\n2. Mỗi lần chỉ gợi ý 1 ý nhỏ rồi dừng lại chờ mình trả lời. Đi từ cách vét cạn tới cách tối ưu.\n3. Chỉ viết code hoàn chỉnh ({{lang}}) khi mình yêu cầu.\n\nTrả lời bằng tiếng Việt.",
-    "explain": "Mình đang tự luyện phỏng vấn theo pattern, bài này thuộc pattern \"{{lesson}}\".\nGiải thích giúp mình bài \"{{title}}\" trên {{site}}: {{url}}\n\nHãy giải thích từng bước:\n1. Đề bài hỏi gì, nói bằng lời đơn giản, kèm 1 ví dụ nhỏ. Nếu không chắc đây là bài nào, hãy bảo mình dán đề vào, đừng đoán.\n2. Cách vét cạn (brute force) và vì sao nó chưa đủ nhanh.\n3. Nhận xét quan trọng nhất dẫn tới cách tối ưu, và vì sao nó là pattern này.\n4. Các bước của thuật toán, chạy tay trên ví dụ ở bước 1.\n5. Code {{lang}} có chú thích ngắn.\n6. Độ phức tạp time/space và các edge case dễ sai.\n\nTrả lời bằng tiếng Việt."
+    "explain": "Mình đang tự luyện phỏng vấn theo pattern, bài này thuộc pattern \"{{lesson}}\".\nGiải thích giúp mình bài \"{{title}}\" trên {{site}}: {{url}}\n\nHãy giải thích từng bước:\n1. Đề bài hỏi gì, nói bằng lời đơn giản, kèm 1 ví dụ nhỏ. Nếu không chắc đây là bài nào, hãy bảo mình dán đề vào, đừng đoán.\n2. Cách vét cạn (brute force) và vì sao nó chưa đủ nhanh.\n3. Nhận xét quan trọng nhất dẫn tới cách tối ưu, và vì sao nó là pattern này.\n4. Các bước của thuật toán, chạy tay trên ví dụ ở bước 1.\n5. Code {{lang}} có chú thích ngắn.\n6. Độ phức tạp time/space và các edge case dễ sai.\n\nTrả lời bằng tiếng Việt.",
+    "pattern": "Mình là người mới học DSA, đang học pattern \"{{pattern}}\". Mình chưa hiểu gì về nó.\n\nHãy giảng cho mình như một người thầy kiên nhẫn, bằng lời đơn giản, đọc một lượt là hiểu:\n1. Pattern này là gì, trong 2–3 câu, không dùng thuật ngữ khó.\n2. Vì sao cần nó: lấy 1 bài cụ thể, so cách vét cạn với cách dùng pattern (mỗi cách tốn bao nhiêu phép tính).\n3. Chạy tay cách dùng pattern trên bài đó từng bước: mỗi bước ghi giá trị các biến và vì sao làm vậy.\n4. Vì sao cách này đúng, không bỏ sót đáp án.\n5. Các dạng thường gặp của pattern, mỗi dạng 1 ví dụ nhỏ.\n6. Khung code {{lang}} ngắn, có chú thích.\n7. Dấu hiệu trong đề cho biết nên dùng pattern này.\n8. 2–3 câu hỏi để mình tự kiểm tra đã hiểu chưa (đừng ghi đáp án).\n\nTrả lời bằng tiếng Việt."
   },
   "copy": {
     "label": "Copy",
@@ -606,5 +678,14 @@
     "invalidJson": "{{file}} không phải JSON hợp lệ: {{message}}",
     "contentTitle": "Dữ liệu trong thư mục data có lỗi",
     "contentHint": "Sửa file JSON theo thông báo bên dưới. Đang chạy npm run dev thì lưu file là trang tự tải lại; chạy bằng start.sh thì chạy lại start.sh."
+  },
+  "quiz": {
+    "title": "Luyện nhận diện",
+    "progress": "Câu {{n}}/{{total}} · đúng {{right}}/{{answered}}",
+    "right": "Đúng.",
+    "wrong": "Chưa đúng.",
+    "prev": "Câu trước",
+    "next": "Câu sau",
+    "again": "Làm lại"
   }
 }

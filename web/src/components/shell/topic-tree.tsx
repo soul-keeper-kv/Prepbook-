@@ -14,7 +14,7 @@ import { LevelMeter, TopicDot } from "@/components/common/badges"
 import { useNow } from "@/lib/clock"
 import { KEYS, storage } from "@/lib/storage"
 import { cn } from "@/lib/utils"
-import { useNotebook } from "@/notebook/hooks"
+import { useNotebook, useSamples } from "@/notebook/hooks"
 import {
   getLive,
   patternStatus,
@@ -23,6 +23,7 @@ import {
   phasesOf,
   topicsOf,
   type Level,
+  type SampleTexts,
 } from "@/notebook/logic"
 import type { Notebook, TopicColor } from "@/notebook/schema"
 import { notebookActions } from "@/notebook/store"
@@ -45,7 +46,7 @@ interface Model {
   children: Map<string, string[]>
 }
 
-function buildModel(nb: Notebook, now: number): Model {
+function buildModel(nb: Notebook, now: number, samples: SampleTexts): Model {
   const nodes = new Map<string, Node>([[ROOT, { kind: "root", id: ROOT }]])
   const children = new Map<string, string[]>()
   const topics = topicsOf(nb)
@@ -67,7 +68,7 @@ function buildModel(nb: Notebook, now: number): Model {
       )
     }
     for (const pattern of [...loose, ...phases.flatMap((ph) => patternsOf(nb, topic.id, ph.id))]) {
-      const status = patternStatus(nb, pattern, now)
+      const status = patternStatus(nb, pattern, now, samples)
       nodes.set(pattern.id, {
         kind: "pattern",
         id: pattern.id,
@@ -94,7 +95,8 @@ export function TopicTree({ onNavigate }: { onNavigate?: () => void }) {
   const nb = useNotebook()
   const route = useRoute()
   const now = useNow()
-  const model = useMemo(() => buildModel(nb, now), [nb, now])
+  const samples = useSamples()
+  const model = useMemo(() => buildModel(nb, now, samples), [nb, now, samples])
   const [expanded, setExpanded] = useState<string[]>(readExpanded)
   const updateExpanded = (next: string[]) => setExpanded(next)
 

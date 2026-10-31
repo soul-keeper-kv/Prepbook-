@@ -102,6 +102,7 @@ export function NoteEditor({
   emptyText,
   mono = false,
   startEditing = false,
+  writeLabel,
 }: {
   value: string
   onChange: (value: string) => void
@@ -111,6 +112,8 @@ export function NoteEditor({
   emptyText?: string
   mono?: boolean
   startEditing?: boolean
+  /** While empty, show only a small button with this text (lists with one note per row) */
+  writeLabel?: string
 }) {
   const { t } = useTranslation()
   const [editing, setEditing] = useState(startEditing)
@@ -143,6 +146,20 @@ export function NoteEditor({
           <span className="text-12 text-faint">{t("edit.markdownHint")}</span>
         </div>
       </div>
+    )
+  }
+  if (writeLabel && !value.trim()) {
+    return (
+      <Button
+        size="xs"
+        variant="ghost"
+        className="-ml-2 text-muted-foreground max-md:h-11"
+        aria-label={t("edit.editNamed", { name: label })}
+        onClick={() => setEditing(true)}
+      >
+        <PencilIcon />
+        {writeLabel}
+      </Button>
     )
   }
   return (

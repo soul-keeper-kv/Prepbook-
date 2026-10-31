@@ -23,7 +23,7 @@ import { useContent } from "@/content/context"
 import { modulesOf, type Module } from "@/content/load"
 import { localize } from "@/content/localize"
 import { cn } from "@/lib/utils"
-import { useLang, useNotebook } from "@/notebook/hooks"
+import { useLang, useNotebook, useSamples } from "@/notebook/hooks"
 import {
   getLive,
   patternStatus,
@@ -34,7 +34,12 @@ import {
 } from "@/notebook/logic"
 import { TOPIC_COLORS, TOPIC_KINDS, type Pattern, type Phase, type Topic } from "@/notebook/schema"
 import { notebookActions } from "@/notebook/store"
-import { moduleSuggestions, patternIdFor, type SuggestedItem } from "@/notebook/suggestions"
+import {
+  moduleSuggestions,
+  patternIdFor,
+  samplesFrom,
+  type SuggestedItem,
+} from "@/notebook/suggestions"
 import { href, navigate } from "@/state/router"
 
 function MoveButtons({
@@ -121,9 +126,10 @@ function PhaseBlock({
   const { t } = useTranslation()
   const nb = useNotebook()
   const now = useNow()
+  const samples = useSamples()
   const [confirmDelete, setConfirmDelete] = useState(false)
   const patterns = patternsOf(nb, topic.id, phase?.id ?? null)
-  const statuses = patterns.map((p) => patternStatus(nb, p, now))
+  const statuses = patterns.map((p) => patternStatus(nb, p, now, samples))
   const gotIt = statuses.filter((s) => s.level >= 2).length
   const started = statuses.some((s) => s.level >= 1)
   const complete = patterns.length > 0 && gotIt === patterns.length
@@ -409,7 +415,7 @@ export function TopicPage({ id }: { id: string }) {
     )
   }
   const modules = modulesOf(content, topic.id)
-  const status = topicStatus(nb, topic.id, now)
+  const status = topicStatus(nb, topic.id, now, samplesFrom(content))
   const phases = phasesOf(nb, topic.id)
   const loose = patternsOf(nb, topic.id, null)
 
