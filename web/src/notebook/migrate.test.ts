@@ -2,9 +2,15 @@ import { describe, expect, it } from "vitest"
 import { buildContent, dataFiles } from "@/content/load"
 import { problemIdFor } from "@/notebook/ids"
 import { mergeNotebooks } from "@/notebook/merge"
-import { EPOCH, migrateProgress, withDefaultTopics } from "@/notebook/migrate"
+import {
+  EPOCH,
+  migrateProgress,
+  syncSuggestedPatternPhases,
+  withDefaultTopics,
+  patternFromItem,
+} from "@/notebook/migrate"
 import { emptyNotebook } from "@/notebook/schema"
-import { patternIdFor } from "@/notebook/suggestions"
+import { patternIdFor, phaseIdFor } from "@/notebook/suggestions"
 import { legacyModule } from "@/progress/legacy"
 import type { Progress } from "@/progress/schema"
 
@@ -83,5 +89,40 @@ describe("migrateProgress", () => {
     const renamed = structuredClone(start)
     renamed.topics.t_dsa = { ...renamed.topics.t_dsa!, deleted: true }
     expect(withDefaultTopics(renamed, "en").topics.t_dsa?.deleted).toBe(true)
+  })
+
+  it("moves a DSA item with its source phase, but preserves a phase the user moved it to", () => {
+    const made = patternFromItem(content, "p2-bsearch", "vi", EPOCH)!
+    const oldPhase = {
+      ...made.phase,
+      id: phaseIdFor("p2"),
+      sourceId: "p2",
+      updatedAt: EPOCH,
+    }
+    const oldPattern = { ...made.pattern, phaseId: oldPhase.id, updatedAt: EPOCH }
+    const saved = {
+      ...withDefaultTopics(emptyNotebook(), "vi"),
+      phases: { [oldPhase.id]: oldPhase },
+      patterns: { [oldPattern.id]: oldPattern },
+    }
+
+    const synced = syncSuggestedPatternPhases(saved, content, "vi")
+    expect(synced.patterns[oldPattern.id]?.phaseId).toBe(phaseIdFor("p1"))
+    expect(synced.phases[phaseIdFor("p1")]?.sourceId).toBe("p1")
+
+    const manuallyMoved = {
+      ...saved,
+      phases: {
+        ...saved.phases,
+        [phaseIdFor("p3")]: { ...oldPhase, id: phaseIdFor("p3"), sourceId: "p3" },
+      },
+      patterns: {
+        ...saved.patterns,
+        [oldPattern.id]: { ...oldPattern, phaseId: phaseIdFor("p3") },
+      },
+    }
+    expect(
+      syncSuggestedPatternPhases(manuallyMoved, content, "vi").patterns[oldPattern.id]?.phaseId
+    ).toBe(phaseIdFor("p3"))
   })
 })

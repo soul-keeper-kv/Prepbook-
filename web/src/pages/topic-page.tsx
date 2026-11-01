@@ -8,9 +8,11 @@ import {
   ChevronRightIcon,
   PlusIcon,
   SettingsIcon,
+  StarIcon,
   Trash2Icon,
 } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import { ContextMenu as ContextMenuPrimitive } from "radix-ui"
 import { toast } from "sonner"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { LevelBar, LevelMeter, TopicDot } from "@/components/common/badges"
@@ -19,6 +21,14 @@ import { PageHeader, Panel } from "@/components/common/page"
 import { Tag } from "@/components/tag"
 import { Button } from "@/components/ui/button"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { useContent } from "@/content/context"
 import { modulesOf, type Module } from "@/content/load"
 import { localize } from "@/content/localize"
@@ -78,6 +88,39 @@ function MoveButtons({
   )
 }
 
+function interviewPriority(itemId: string): "must" | "important" | undefined {
+  if (
+    [
+      "p1-hashing", "p1-prefix", "p1-matrix", "p1-twoptr", "p1-window", "p2-bsearch",
+      "p2-stack", "p2-queue", "p2-stackq", "p2-list", "p2-fast-slow",
+    ].includes(itemId)
+  ) return "must"
+  if (
+    [
+      "p3-tree", "p3-trees", "p3-tree-bfs", "p3-bst", "p3-graph", "p3-graphs",
+      "p3-bfs-path", "p2-heap", "p2-two-heaps", "p2-kway", "p4-neet-dp", "p4-dp",
+      "p4-lis", "p4-dp-strings", "p4-palindrome", "p4-dp-adv", "p4-dp-state",
+    ].includes(itemId)
+  ) return "important"
+  return undefined
+}
+
+function PriorityStar({ priority }: { priority: "must" | "important" }) {
+  const { t } = useTranslation()
+  return (
+    <span
+      className="inline-flex shrink-0"
+      title={t(`suggest.priority.${priority}`)}
+      aria-label={t(`suggest.priority.${priority}`)}
+    >
+      <StarIcon
+        aria-hidden
+        className={cn("size-3.5", priority === "must" ? "fill-current text-amber-500" : "text-link")}
+      />
+    </span>
+  )
+}
+
 function PatternRow({
   pattern,
   status,
@@ -92,21 +135,50 @@ function PatternRow({
   onMove: (index: number) => void
 }) {
   const { t } = useTranslation()
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const priority = interviewPriority(pattern.sourceId ?? pattern.id.replace(/^pt_/, ""))
   return (
-    <li className="flex items-center gap-2.5 border-b px-3 py-2 last:border-b-0">
-      <LevelMeter level={status.level} />
-      <a href={href.pattern(pattern.id)} className="min-w-0 flex-1 truncate font-medium">
-        {pattern.name}
-      </a>
-      {pattern.theory && <Tag tone="link">{t("pattern.theory")}</Tag>}
-      {status.due > 0 && <Tag tone="warn">{t("pattern.due", { count: status.due })}</Tag>}
-      <span className="font-mono text-12 text-muted-foreground max-sm:hidden">
-        {pattern.theory
-          ? t(`level.${status.level}`)
-          : t("pattern.problemCount", { count: status.problems })}
-      </span>
-      <MoveButtons index={index} count={count} name={pattern.name} onMove={onMove} />
-    </li>
+    <>
+      <ContextMenuPrimitive.Root>
+        <ContextMenuPrimitive.Trigger asChild>
+          <li className="flex items-center gap-2.5 border-b px-3 py-2 last:border-b-0">
+            <LevelMeter level={status.level} />
+            {priority && <PriorityStar priority={priority} />}
+            <a href={href.pattern(pattern.id)} className="min-w-0 flex-1 truncate font-medium">
+              {pattern.name}
+            </a>
+            {pattern.theory && <Tag tone="link">{t("pattern.theory")}</Tag>}
+            {status.due > 0 && <Tag tone="warn">{t("pattern.due", { count: status.due })}</Tag>}
+            <span className="font-mono text-12 text-muted-foreground max-sm:hidden">
+              {pattern.theory
+                ? t(`level.${status.level}`)
+                : t("pattern.problemCount", { count: status.problems })}
+            </span>
+            <MoveButtons index={index} count={count} name={pattern.name} onMove={onMove} />
+          </li>
+        </ContextMenuPrimitive.Trigger>
+        <ContextMenuPrimitive.Portal>
+          <ContextMenuPrimitive.Content className="z-50 min-w-36 rounded-md bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10">
+            <ContextMenuPrimitive.Item
+              className="flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-destructive outline-none select-none focus:bg-destructive/10"
+              onSelect={() => setConfirmDelete(true)}
+            >
+              <Trash2Icon className="size-4" />
+              {t("tree.deletePattern")}
+            </ContextMenuPrimitive.Item>
+          </ContextMenuPrimitive.Content>
+        </ContextMenuPrimitive.Portal>
+      </ContextMenuPrimitive.Root>
+      <ConfirmDialog
+        open={confirmDelete}
+        onOpenChange={setConfirmDelete}
+        title={t("pattern.deleteTitle", { name: pattern.name })}
+        description={t("pattern.deleteText")}
+        action={t("pattern.deleteAction")}
+        destructive
+        onConfirm={() => notebookActions.deletePattern(pattern.id)}
+      />
+    </>
   )
 }
 
@@ -306,9 +378,11 @@ function Suggestions({ module }: { module: Module }) {
   const content = useContent()
   const nb = useNotebook()
   const lang = useLang()
+  const [showAdded, setShowAdded] = useState(false)
   const phases = moduleSuggestions(module, nb, lang)
   const notAdded = (items: SuggestedItem[]) => items.filter((i) => !i.added).map((i) => i.itemId)
   const allLeft = notAdded(phases.flatMap((p) => p.items))
+  const isVisible = (item: SuggestedItem) => showAdded || !item.added || interviewPriority(item.itemId)
 
   // One change for the lot, with Undo in case of a slip: what it added is still empty
   function addAll(itemIds: string[]) {
@@ -320,27 +394,50 @@ function Suggestions({ module }: { module: Module }) {
   }
 
   return (
-    <Panel
-      title={t("suggest.title", { name: localize(module.title, lang) })}
-      actions={
-        allLeft.length > 0 && (
-          <Button size="xs" onClick={() => addAll(allLeft)}>
-            <ListPlusIcon />
-            {t("suggest.addAll", { count: allLeft.length })}
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="w-full justify-start py-3 text-left">
+          <ListPlusIcon />
+          {t("suggest.openRoadmap", { name: localize(module.title, lang) })}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="flex max-h-[90dvh] w-[89vw] max-w-[89vw] flex-col gap-4 overflow-hidden sm:max-w-[89vw] xl:max-w-[78rem]">
+        <DialogHeader>
+          <DialogTitle className="text-18 font-semibold">
+            {t("suggest.title", { name: localize(module.title, lang) })}
+          </DialogTitle>
+          <DialogDescription>{t("suggest.roadmapIntro")}</DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-3">
+          <Button variant={showAdded ? "secondary" : "outline"} onClick={() => setShowAdded((v) => !v)}>
+            {showAdded ? t("suggest.hideAdded") : t("suggest.showAdded")}
           </Button>
-        )
-      }
-    >
-      <p className="mb-2 text-13 text-muted-foreground">{t("suggest.roadmapIntro")}</p>
-      {phases.map((phase) => {
+          {allLeft.length > 0 && (
+            <Button onClick={() => addAll(allLeft)}>
+              <ListPlusIcon />
+              {t("suggest.addAll", { count: allLeft.length })}
+            </Button>
+          )}
+        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+          {phases
+            .filter((phase) => phase.items.some(isVisible))
+            .map((phase, phaseIndex) => {
         const leftIds = notAdded(phase.items)
         const left = leftIds.length
         return (
-          <Collapsible key={phase.phaseId} className="border-t">
-            <CollapsibleTrigger className="group/s flex w-full cursor-pointer items-center gap-2 py-2 text-left text-13 outline-none focus-visible:ring-2 focus-visible:ring-ring">
-              <ChevronRightIcon className="size-3.5 shrink-0 text-muted-foreground transition-transform group-data-[state=open]/s:rotate-90" />
-              <span className="min-w-0 flex-1 font-medium">{phase.name}</span>
-              <span className="font-mono text-11 text-faint">
+          <Collapsible
+            key={phase.phaseId}
+            className="mb-3 overflow-hidden rounded-lg border bg-card last:mb-0"
+            defaultOpen
+          >
+            <CollapsibleTrigger className="group/s flex w-full cursor-pointer items-center gap-3 bg-muted/50 px-4 py-3 text-left outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">
+              <ChevronRightIcon className="size-4 shrink-0 text-muted-foreground transition-transform group-data-[state=open]/s:rotate-90" />
+              <span className="grid size-7 shrink-0 place-items-center rounded-full border bg-background font-mono text-12 text-muted-foreground">
+                {phaseIndex + 1}
+              </span>
+              <span className="min-w-0 flex-1 text-14 font-semibold">{phase.name}</span>
+              <span className="rounded-full border bg-background px-2.5 py-1 font-mono text-11 text-muted-foreground">
                 {t("suggest.left", { count: left })}
               </span>
             </CollapsibleTrigger>
@@ -349,19 +446,25 @@ function Suggestions({ module }: { module: Module }) {
                 <Button
                   size="xs"
                   variant="outline"
-                  className="mb-1 ml-5"
+                  className="mx-4 mt-3 mb-1"
                   onClick={() => addAll(leftIds)}
                 >
                   <ListPlusIcon />
                   {t("suggest.addPhase", { count: left })}
                 </Button>
               )}
-              <ul className="pb-2">
-                {phase.items.map((item) => (
-                  <li key={item.itemId} className="flex items-center gap-2 py-1 pl-5 text-13">
-                    <span className="min-w-0 flex-1">
+              <ul className="mt-2 border-t">
+                {phase.items.filter(isVisible).map((item) => {
+                  const priority = interviewPriority(item.itemId)
+                  return (
+                    <li
+                      key={item.itemId}
+                      className="flex items-center gap-3 border-b px-4 py-2.5 text-13 last:border-b-0 hover:bg-muted/20"
+                    >
+                    <span className="min-w-0 flex-1 font-medium leading-5">
+                      {priority && <PriorityStar priority={priority} />}
                       {item.title}
-                      <span className="ml-1.5 font-mono text-11 text-faint">
+                      <span className="ml-2 inline-flex rounded border bg-muted/40 px-1.5 py-0.5 align-middle font-mono text-10 font-normal text-muted-foreground">
                         {item.theory
                           ? t("pattern.theory")
                           : t("pattern.problemCount", { count: item.problems.length })}
@@ -370,7 +473,7 @@ function Suggestions({ module }: { module: Module }) {
                     {item.added ? (
                       <a
                         href={href.pattern(patternIdFor(item.itemId))}
-                        className="shrink-0 text-12"
+                        className="shrink-0 rounded-full border border-ok/30 bg-ok/10 px-2.5 py-1 text-12 font-medium text-ok"
                       >
                         {t("suggest.added")}
                       </a>
@@ -378,6 +481,7 @@ function Suggestions({ module }: { module: Module }) {
                       <Button
                         size="xs"
                         variant="outline"
+                        className="shrink-0"
                         aria-label={t("suggest.addNamed", { name: item.title })}
                         onClick={() =>
                           notebookActions.addSuggestedPattern(content, item.itemId, lang)
@@ -387,14 +491,17 @@ function Suggestions({ module }: { module: Module }) {
                         {t("suggest.add")}
                       </Button>
                     )}
-                  </li>
-                ))}
+                    </li>
+                  )
+                })}
               </ul>
             </CollapsibleContent>
           </Collapsible>
         )
-      })}
-    </Panel>
+          })}
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }
 

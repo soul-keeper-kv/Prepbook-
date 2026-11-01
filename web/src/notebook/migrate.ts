@@ -1,6 +1,7 @@
 import type { Content } from "@/content/load"
 import { localize } from "@/content/localize"
 import type { Lang } from "@/i18n/languages"
+import { nowIso } from "@/lib/dates"
 import { hashId, problemIdFor } from "@/notebook/ids"
 import type { Notebook, Pattern, Phase, Problem } from "@/notebook/schema"
 import { patternIdFor, phaseIdFor, suggestedProblems } from "@/notebook/suggestions"
@@ -68,6 +69,50 @@ export function patternFromItem(
     createdAt: at,
   }
   return { phase, pattern }
+}
+
+/** Move an untouched DSA suggestion pattern when its source item moves to another phase. */
+export function syncSuggestedPatternPhases(nb: Notebook, content: Content, lang: Lang): Notebook {
+  let phases = nb.phases
+  let patterns = nb.patterns
+  const at = nowIso()
+
+  for (const pattern of Object.values(nb.patterns)) {
+    if (pattern.deleted || !pattern.sourceId) continue
+    const entry = content.items.get(pattern.sourceId)
+    if (!entry || entry.module.id !== "dsa" || pattern.topicId !== entry.module.topicId) continue
+
+    const destination = patternFromItem(content, pattern.sourceId, lang, at)
+    if (!destination || pattern.phaseId === destination.phase.id) continue
+    if (nb.phases[destination.phase.id]?.deleted) continue
+
+    // DSA item IDs keep their original phase prefix when an item is moved. Only follow the
+    // move when the saved pattern still sits in that original source phase; a user drag to
+    // another phase is respected.
+    const originalPhaseId = pattern.sourceId.match(/^(p\d+)-/)?.[1]
+    const savedPhase = pattern.phaseId ? nb.phases[pattern.phaseId] : undefined
+    if (
+      !originalPhaseId ||
+      !savedPhase ||
+      savedPhase.deleted ||
+      savedPhase.sourceId !== originalPhaseId ||
+      savedPhase.id !== phaseIdFor(originalPhaseId)
+    ) {
+      continue
+    }
+
+    if (phases === nb.phases) phases = { ...nb.phases }
+    phases[destination.phase.id] ??= destination.phase
+    if (patterns === nb.patterns) patterns = { ...nb.patterns }
+    patterns[pattern.id] = {
+      ...pattern,
+      phaseId: destination.phase.id,
+      order: entry.phase.items.indexOf(entry.item),
+      updatedAt: at,
+    }
+  }
+
+  return phases === nb.phases && patterns === nb.patterns ? nb : { ...nb, phases, patterns }
 }
 
 const fence = (code: string, lang: string) => `\`\`\`${lang}\n${code.replace(/\n+$/, "")}\n\`\`\``

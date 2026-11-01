@@ -25,6 +25,7 @@
     "settings": "Settings"
   },
   "tree": {
+    "deletePattern": "Delete lesson",
     "patterns_one": "{{count}} pattern",
     "patterns_other": "{{count}} patterns",
     "title": "Topics and patterns",
@@ -548,6 +549,13 @@
     "hoursMinutes": "{{h}} h {{m}} min"
   },
   "suggest": {
+    "openRoadmap": "Open roadmap suggestions: {{name}}",
+    "showAdded": "Show added items",
+    "hideAdded": "Hide added items",
+    "priority": {
+      "must": "Interview priority · Must know",
+      "important": "Interview priority · Important"
+    },
     "title": "Suggestions: {{name}}",
     "roadmapIntro": "Only a suggestion: Add turns an item into a pattern of yours, with its sample theory, problems and material already in.",
     "patternIntro": "Whatever the pattern does not hold (never added, or removed) can be added again here.",

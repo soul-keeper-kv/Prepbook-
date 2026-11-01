@@ -25,6 +25,7 @@
     "settings": "Cài đặt"
   },
   "tree": {
+    "deletePattern": "Xoá bài học",
     "patterns_other": "{{count}} pattern",
     "title": "Chủ đề và pattern",
     "label": "Chủ đề, giai đoạn và pattern. Kéo thả để sắp xếp lộ trình.",
@@ -523,6 +524,13 @@
     "hoursMinutes": "{{h}} giờ {{m}} phút"
   },
   "suggest": {
+    "openRoadmap": "Mở gợi ý lộ trình: {{name}}",
+    "showAdded": "Hiện bài đã thêm",
+    "hideAdded": "Ẩn bài đã thêm",
+    "priority": {
+      "must": "Ưu tiên phỏng vấn · Must know",
+      "important": "Ưu tiên phỏng vấn · Important"
+    },
     "title": "Gợi ý: {{name}}",
     "roadmapIntro": "Chỉ là gợi ý: bấm Thêm thì mục đó thành pattern của bạn, có sẵn lý thuyết mẫu, bài và tài liệu.",
     "patternIntro": "Thứ gì chưa có trong pattern (chưa thêm hoặc đã xoá) thì thêm lại ở đây.",
