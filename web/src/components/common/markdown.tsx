@@ -149,7 +149,7 @@ export function parseBlocks(text: string): Block[] {
 export function Markdown({ text, className }: { text: string; className?: string }) {
   const blocks = parseBlocks(text)
   return (
-    <div className={cn("space-y-2.5 text-14 break-words", className)}>
+    <div className={cn("max-w-[76ch] space-y-3 text-14 leading-7 break-words", className)}>
       {blocks.map((block, i) => {
         switch (block.kind) {
           case "code":
@@ -161,7 +161,7 @@ export function Markdown({ text, className }: { text: string; className?: string
           case "h":
             // A heading opens a part of a longer text (a lesson): space above sets it apart
             return (
-              <h3 key={i} className="pt-2 text-15 font-semibold first:pt-0">
+              <h3 key={i} className="mt-2 border-b pb-1.5 pt-3 text-16 font-semibold first:mt-0 first:pt-0">
                 <MarkdownInline text={block.text} />
               </h3>
             )
@@ -198,10 +198,23 @@ export function Markdown({ text, className }: { text: string; className?: string
             return (
               <List
                 key={i}
-                className={cn("space-y-1 pl-5", block.kind === "ul" ? "list-disc" : "list-decimal")}
+                className={cn(
+                  "space-y-1.5",
+                  block.kind === "ol"
+                    ? "list-none [counter-reset:lesson]"
+                    : "list-none"
+                )}
               >
                 {block.items.map((item, j) => (
-                  <li key={j}>
+                  <li
+                    key={j}
+                    className={cn(
+                      "relative rounded-md border bg-background py-2 pl-9 pr-3 text-14 leading-6",
+                      block.kind === "ol"
+                        ? "[counter-increment:lesson] before:absolute before:left-3 before:top-2 before:font-mono before:text-12 before:font-semibold before:text-link before:content-[counter(lesson)'.']"
+                        : "before:absolute before:left-3 before:top-2 before:size-2 before:rounded-full before:bg-primary"
+                    )}
+                  >
                     <MarkdownInline text={item} />
                   </li>
                 ))}
